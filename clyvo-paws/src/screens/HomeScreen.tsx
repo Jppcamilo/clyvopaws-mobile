@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 60,
   },
   fotoPerfil: {
     width: 60,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     color: colors.roxoMuitoEscuro,
   },
   secaoLembretes: {
-    marginBottom: 20,
+    marginBottom: 55,
   },
   tituloSecao: {
     fontSize: 18,
@@ -209,17 +209,17 @@ const styles = StyleSheet.create({
     color: colors.roxoMuitoEscuro,
     marginBottom: 20,
   },
-  // Novos estilos para o Scroll Horizontal
+
   scrollIcones: {
     flexDirection: 'row',
-    marginBottom: 40,
-    marginHorizontal: -20, // Tira o padding para o scroll ir até a borda da tela
-    paddingHorizontal: 20, // Devolve o padding interno
+    marginBottom: 60,
+    marginHorizontal: -20, 
+    paddingHorizontal: 20, 
   },
   itemIconeScroll: {
     alignItems: 'center',
-    width: 85, // Largura fixa para manter o padrão
-    marginRight: 10, // Espaço entre um botão e outro
+    width: 85, 
+    marginRight: 10, 
   },
   circuloIcone: {
     width: 70,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 40,
   },
   textoBanner: {
     flex: 1,
