@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image } from 'react-native';
 import { colors } from '../theme/colors';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // Usando os ícones que você tem no package.json
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = {
   visivel: boolean;
@@ -10,6 +11,15 @@ type Props = {
 };
 
 export default function PopPerfil({ visivel, fecharModal, nomeTutor }: Props) {
+  
+  const navigation = useNavigation<any>();
+
+  const irParaDadosPessoais = () => {
+    fecharModal();
+    navigation.navigate('Profile');
+  };
+  
+  
   return (
     <Modal visible={visivel} transparent={true} animationType="slide">
       <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={fecharModal}>
@@ -30,7 +40,7 @@ export default function PopPerfil({ visivel, fecharModal, nomeTutor }: Props) {
 
           <View style={styles.divisor} />
 
-          <TouchableOpacity style={styles.opcaoMenu}>
+          <TouchableOpacity style={styles.opcaoMenu} onPress={irParaDadosPessoais}>
             <Text style={styles.textoOpcao}>DADOS PESSOAIS</Text>
             <View style={styles.iconeFundo}>
               <MaterialCommunityIcons name="cog" size={20} color={colors.roxoMuitoEscuro} />
