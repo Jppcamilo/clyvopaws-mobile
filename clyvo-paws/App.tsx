@@ -8,6 +8,7 @@ import { colors } from './src/theme/colors';
 import HomeScreen from './src/screens/HomeScreen';
 import ServicesScreen from './src/screens/ServicesScreen';
 import PetFormScreen from './src/screens/PetFormScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -44,6 +45,8 @@ export default function App() {
         <Stack.Screen name="MainTabs" component={TabNavigator} />
         
         <Stack.Screen name="PetForm" component={PetFormScreen} />
+
+        <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
