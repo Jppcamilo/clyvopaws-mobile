@@ -8,10 +8,15 @@ type Props = {
 };
 
 export default function CardPet({ pet }: Props) {
+
+  const fotoUri = pet.foto 
+    ? pet.foto 
+    : 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
+
   return (
     <View style={styles.container}>
       <Image 
-        source={{ uri: 'https://via.placeholder.com/80' }} 
+        source={{ uri: fotoUri }} 
         style={styles.imagemPet} 
       />
       
@@ -26,23 +31,25 @@ export default function CardPet({ pet }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: 'row', 
     backgroundColor: colors.branco,
     borderColor: colors.roxoMuitoEscuro,
     borderWidth: 1,
     borderRadius: 20,
     padding: 15,
     marginBottom: 15,
-    alignItems: 'center',
+    alignItems: 'center', 
   },
   imagemPet: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    marginRight: 15,
+    width: 60,
+    height: 60,
+    borderRadius: 30, 
+    marginRight: 15, 
+    backgroundColor: '#E0E0E0',
   },
   infoContainer: {
     flex: 1,
+    justifyContent: 'center',
   },
   nomePet: {
     color: colors.verdeEscuro,

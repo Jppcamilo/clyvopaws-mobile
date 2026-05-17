@@ -4,6 +4,8 @@ import { colors } from '../theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CardPet from './CardPet';
 import { Pet } from '../types';
+import { useNavigation } from '@react-navigation/native'
+
 
 type Props = {
   visivel: boolean;
@@ -12,7 +14,18 @@ type Props = {
 };
 
 export default function PopPets({ visivel, fecharModal, listaPets }: Props) {
+   
+      const navigation = useNavigation<any>(); 
+
+      const irParaCadastro = () => {
+        fecharModal();
+        navigation.navigate('PetForm');
+      };
+
   return (
+
+
+
     <Modal visible={visivel} transparent={true} animationType="slide">
       <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={fecharModal}>
         
@@ -37,7 +50,7 @@ export default function PopPets({ visivel, fecharModal, listaPets }: Props) {
             ))}
           </ScrollView>
 
-          <TouchableOpacity style={styles.botaoCadastrar}>
+          <TouchableOpacity style={styles.botaoCadastrar} onPress={irParaCadastro}>
             <Text style={styles.textoBotaoCadastrar}>CADASTRAR</Text>
           </TouchableOpacity>
 
