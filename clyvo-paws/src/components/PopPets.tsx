@@ -4,8 +4,7 @@ import { colors } from '../theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CardPet from './CardPet';
 import { Pet } from '../types';
-import { useNavigation } from '@react-navigation/native'
-
+import { useNavigation } from '@react-navigation/native';
 
 type Props = {
   visivel: boolean;
@@ -14,18 +13,19 @@ type Props = {
 };
 
 export default function PopPets({ visivel, fecharModal, listaPets }: Props) {
-   
-      const navigation = useNavigation<any>(); 
+  const navigation = useNavigation<any>();
 
-      const irParaCadastro = () => {
-        fecharModal();
-        navigation.navigate('PetForm');
-      };
+  const irParaCadastro = () => {
+    fecharModal();
+    navigation.navigate('PetForm');
+  };
+
+const irParaDetalhesPet = (petId: string) => {
+    fecharModal(); 
+    navigation.navigate('PetDetails', { petId: petId }); 
+  };
 
   return (
-
-
-
     <Modal visible={visivel} transparent={true} animationType="slide">
       <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={fecharModal}>
         
@@ -44,9 +44,14 @@ export default function PopPets({ visivel, fecharModal, listaPets }: Props) {
           </Text>
 
           <ScrollView style={styles.listaScroll} showsVerticalScrollIndicator={false}>
-
             {listaPets.map(pet => (
-              <CardPet key={pet.id} pet={pet} />
+              <TouchableOpacity 
+                key={pet.id} 
+                activeOpacity={0.7} 
+                onPress={() => irParaDetalhesPet(pet.id)}
+              >
+                <CardPet pet={pet} />
+              </TouchableOpacity>
             ))}
           </ScrollView>
 
