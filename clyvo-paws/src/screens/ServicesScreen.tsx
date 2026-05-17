@@ -5,7 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 
 export default function ServicesScreen() {
-  const navigation = useNavigation();
+
+  const navigation = useNavigation<any>();
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -20,7 +21,6 @@ export default function ServicesScreen() {
 
       <Text style={styles.titulo}>NOSSOS SERVIÇOS</Text>
       <Text style={styles.subtitulo}>TUDO PARA VOCÊ CUIDAR DA SAÚDE DO SEU PET</Text>
-
 
       <View style={styles.gridContainer}>
         
@@ -49,7 +49,10 @@ export default function ServicesScreen() {
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity 
+          style={styles.gridItem} 
+          onPress={() => navigation.navigate('Pets')}
+        >
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="paw" size={35} color={colors.roxoMuitoEscuro} />
           </View>
@@ -63,6 +66,7 @@ export default function ServicesScreen() {
           </View>
           <Text style={styles.textoIcone}>MEDICAMENTOS{"\n"}COM DESCONTO</Text>
         </TouchableOpacity>
+
 
         <TouchableOpacity style={styles.gridItem}>
           <View style={styles.circuloIcone}>
