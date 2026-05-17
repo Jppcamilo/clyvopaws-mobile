@@ -9,6 +9,8 @@ import HomeScreen from './src/screens/HomeScreen';
 import ServicesScreen from './src/screens/ServicesScreen';
 import PetFormScreen from './src/screens/PetFormScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import PetsScreen from './src/screens/PetsScreen';
+import PetDetailsScreen from './src/screens/PetDetailsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -47,6 +49,10 @@ export default function App() {
         <Stack.Screen name="PetForm" component={PetFormScreen} />
 
         <Stack.Screen name="Profile" component={ProfileScreen} />
+
+        <Stack.Screen name="Pets" component={PetsScreen} />
+
+        <Stack.Screen name="PetDetails" component={PetDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
