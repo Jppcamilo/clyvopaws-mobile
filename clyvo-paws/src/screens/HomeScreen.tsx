@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -8,7 +8,8 @@ import {
   Image 
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native'; // <-- Import novo para a navegação
+import { useNavigation, useFocusEffect } from '@react-navigation/native'; // <-- Importamos o useFocusEffect
+import AsyncStorage from '@react-native-async-storage/async-storage'; // <-- Importamos o AsyncStorage
 import { colors } from '../theme/colors';
 import CardLembrete from '../components/CardLembrete';
 import PopPerfil from '../components/PopPerfil';
@@ -16,42 +17,39 @@ import PopPets from '../components/PopPets';
 import { Pet } from '../types';
 
 export default function HomeScreen() {
-  const navigation = useNavigation<any>(); // Hook para conseguirmos mudar de tela
+  const navigation = useNavigation<any>(); 
 
   const [modalPerfilVisivel, setModalPerfilVisivel] = useState(false);
   const [modalPetsVisivel, setModalPetsVisivel] = useState(false);
   const [nomeTutor, setNomeTutor] = useState('João Pedro');
 
-  const [listaPets, setListaPets] = useState<Pet[]>([
-    {
-      id: '1',
-      nome: 'DESTRUIDOR DE PLANETAS',
-      idade: '5 MESES',
-      raca: 'GATO LARANJA',
-      lembretes: [
-        { id: '101', tarefa: 'TOMAR VACINA V10', horario: 'EM 3 DIAS' },
-        { id: '102', tarefa: 'REMEDIO DE PULGA', horario: 'AS 19 HORAS' },
-      ]
-    },
-    {
-      id: '2',
-      nome: 'PRINCESA',
-      idade: '2 ANOS',
-      raca: 'PITBULL',
-      lembretes: [
-        { id: '201', tarefa: 'CIRURGIA', horario: 'AMANHÃ' },
-        { id: '202', tarefa: 'REMEDIO DE PULGA', horario: 'AS 19 HORAS' },
-      ]
-    }
-  ]);
+  // Agora começamos com a lista vazia, pois os dados virão do celular!
+  const [listaPets, setListaPets] = useState<Pet[]>([]);
 
-  // Lógica: Verifica se existe pelo menos UM pet que tenha algum lembrete pendente
+  // Função que vai lá no "banco de dados" do celular buscar os pets
+  const carregarPets = async () => {
+    try {
+      const petsSalvos = await AsyncStorage.getItem('@pets_clyvo');
+      if (petsSalvos) {
+        setListaPets(JSON.parse(petsSalvos));
+      }
+    } catch (error) {
+      console.error('Erro ao buscar os pets no AsyncStorage:', error);
+    }
+  };
+
+  // Esse Hook garante que a lista seja recarregada SEMPRE que a tela Home ganhar o "foco"
+  useFocusEffect(
+    useCallback(() => {
+      carregarPets();
+    }, [])
+  );
+
   const temLembretes = listaPets.some(pet => pet.lembretes && pet.lembretes.length > 0);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
-      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setModalPerfilVisivel(true)}>
           <Image 
@@ -65,27 +63,24 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* SEÇÃO: Lembretes do Dia (RENDERIZAÇÃO CONDICIONAL) */}
-      {/* Só vai aparecer na tela se a variável "temLembretes" for verdadeira */}
-      {temLembretes && (
+      {/* RENDERIZAÇÃO CONDICIONAL DOS LEMBRETES */}
+      {temLembretes ? (
         <View style={styles.secaoLembretes}>
           <Text style={styles.tituloSecao}>LEMBRETE DO DIA</Text>
           {listaPets.map(pet => {
-            // Se esse pet específico não tiver lembrete, a gente pula ele
             if (!pet.lembretes || pet.lembretes.length === 0) return null;
             return <CardLembrete key={pet.id} pet={pet} />;
           })}
         </View>
+      ) : (
+        <View style={styles.secaoVazia}>
+          <Text style={styles.textoVazio}>Nenhum lembrete para hoje! 🎉</Text>
+        </View>
       )}
 
-      {/* SEÇÃO: Mais Acessados (COM SCROLL HORIZONTAL) */}
       <Text style={styles.tituloSecao}>MAIS ACESSADOS</Text>
       
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        style={styles.scrollIcones}
-      >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollIcones}>
         <TouchableOpacity style={styles.itemIconeScroll}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="home-outline" size={30} color={colors.roxoMuitoEscuro} />
@@ -107,7 +102,6 @@ export default function HomeScreen() {
           <Text style={styles.legendaIcone}>MEUS{"\n"}MEDICAMENTOS</Text>
         </TouchableOpacity>
 
-        {/* + 1 Adicional que você pediu */}
         <TouchableOpacity style={styles.itemIconeScroll}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="calendar-clock" size={30} color={colors.roxoMuitoEscuro} />
@@ -115,11 +109,7 @@ export default function HomeScreen() {
           <Text style={styles.legendaIcone}>AGENDAR{"\n"}CONSULTA</Text>
         </TouchableOpacity>
 
-        {/* Botão que leva para a tela de Serviços */}
-        <TouchableOpacity 
-          style={styles.itemIconeScroll} 
-          onPress={() => navigation.navigate('Servicos')}
-        >
+        <TouchableOpacity style={styles.itemIconeScroll} onPress={() => navigation.navigate('Servicos')}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="dots-horizontal" size={30} color={colors.roxoMuitoEscuro} />
           </View>
@@ -127,7 +117,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* BANNER: Pets Cadastro */}
       <TouchableOpacity style={styles.bannerPets} onPress={() => setModalPetsVisivel(true)}>
         <View style={styles.textoBanner}>
           <Text style={styles.tituloBanner}>PETS</Text>
@@ -138,7 +127,6 @@ export default function HomeScreen() {
         </View>
       </TouchableOpacity>
 
-      {/* BOXES: Clinicas e Medicamentos */}
       <View style={styles.containerDuplo}>
         <TouchableOpacity style={styles.boxPequeno}>
           <MaterialCommunityIcons name="home-city-outline" size={24} color={colors.roxoMuitoEscuro} />
@@ -179,7 +167,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 50,
   },
   fotoPerfil: {
     width: 60,
@@ -201,7 +189,18 @@ const styles = StyleSheet.create({
     color: colors.roxoMuitoEscuro,
   },
   secaoLembretes: {
-    marginBottom: 55,
+    marginBottom: 45,
+  },
+  secaoVazia: {
+    backgroundColor: '#f0f0f0',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 45,
+    alignItems: 'center',
+  },
+  textoVazio: {
+    color: colors.cinza,
+    fontWeight: 'bold',
   },
   tituloSecao: {
     fontSize: 18,
@@ -209,10 +208,9 @@ const styles = StyleSheet.create({
     color: colors.roxoMuitoEscuro,
     marginBottom: 20,
   },
-
   scrollIcones: {
     flexDirection: 'row',
-    marginBottom: 60,
+    marginBottom: 50,
     marginHorizontal: -20, 
     paddingHorizontal: 20, 
   },
