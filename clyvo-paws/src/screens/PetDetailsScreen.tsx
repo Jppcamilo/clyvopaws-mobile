@@ -26,12 +26,19 @@ export default function PetDetailsScreen() {
   useEffect(() => {
     const carregarPet = async () => {
       try {
-        const petsSalvos = await AsyncStorage.getItem('@pets_clyvo');
-        if (petsSalvos) {
-          const listaPets: Pet[] = JSON.parse(petsSalvos);
-          const petEncontrado = listaPets.find(p => p.id === petId);
-          if (petEncontrado) {
-            setPet(petEncontrado);
+        const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
+        
+        if (dadosTutor) {
+          const tutor = JSON.parse(dadosTutor);
+          const chavePets = `@pets_${tutor.email}`; // <-- A chave específica do tutor logado
+
+          const petsSalvos = await AsyncStorage.getItem(chavePets);
+          if (petsSalvos) {
+            const listaPets: Pet[] = JSON.parse(petsSalvos);
+            const petEncontrado = listaPets.find(p => p.id === petId);
+            if (petEncontrado) {
+              setPet(petEncontrado);
+            }
           }
         }
       } catch (error) {
@@ -94,12 +101,11 @@ export default function PetDetailsScreen() {
       <View style={styles.secao}>
         <Text style={styles.tituloSecao}>CALENDÁRIO DAS CONSULTAS</Text>
         <Image 
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2838/2838779.png' }} 
+          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2838/2838779.png' }}
           style={styles.imagemCalendario}
           resizeMode="contain"
         />
       </View>
-
 
       <View style={styles.secao}>
         <Text style={styles.tituloSecao}>STATUS DO PET</Text>
@@ -125,7 +131,7 @@ export default function PetDetailsScreen() {
 
       <View style={styles.secao}>
         <Text style={styles.tituloSecao}>LAUDO MÉDICO</Text>
-
+        
         <View style={styles.cardClinica}>
           <Text style={styles.nomeClinica}>Clínica Amigo Fiel</Text>
           
@@ -151,7 +157,6 @@ export default function PetDetailsScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
       </View>
 
       <View style={{ height: 100 }} />
@@ -160,182 +165,35 @@ export default function PetDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  containerCentro: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.branco,
-  },
-  textoVazio: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.roxoMuitoEscuro,
-    marginBottom: 20,
-  },
-  botaoVoltarErro: {
-    backgroundColor: colors.verdeMedio,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  textoBotaoVoltar: {
-    color: colors.roxoMuitoEscuro,
-    fontWeight: 'bold',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.branco,
-    paddingHorizontal: 20,
-    paddingTop: 50,
-  },
-  header: {
-    marginBottom: 20,
-  },
-  botaoVoltar: {
-    backgroundColor: colors.verdeMedio,
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  nomePet: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: colors.verdeEscuro,
-    textTransform: 'uppercase',
-    marginBottom: 15,
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    marginBottom: 25,
-  },
-  imagemPet: {
-    width: 140,
-    height: 100,
-    borderRadius: 10,
-    marginRight: 15,
-  },
-  dadosContainer: {
-    justifyContent: 'center',
-  },
-  dadoTexto: {
-    fontSize: 14,
-    color: colors.roxoMuitoEscuro,
-    marginBottom: 5,
-    fontWeight: 'bold',
-  },
-  dadoLabel: {
-    fontWeight: '900',
-  },
-  secao: {
-    marginBottom: 30,
-  },
-  tituloSecao: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: colors.roxoMuitoEscuro,
-    marginBottom: 10,
-    textTransform: 'uppercase',
-  },
-  textoDescricao: {
-    fontSize: 14,
-    color: colors.roxoMuitoEscuro,
-    fontWeight: 'bold',
-    lineHeight: 20,
-  },
-  imagemCalendario: {
-    width: '100%',
-    height: 200,
-    alignSelf: 'center',
-    opacity: 0.7,
-  },
-  cardStatus: {
-    borderColor: colors.roxoMuitoEscuro,
-    borderWidth: 1,
-    borderRadius: 15,
-    padding: 15,
-    backgroundColor: colors.branco,
-  },
-  tituloCardStatus: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: colors.roxoMuitoEscuro,
-    marginBottom: 5,
-  },
-  subtituloCardStatus: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: colors.verdeMedio,
-    marginBottom: 10,
-  },
-  itemLembrete: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
-  },
-  bolinhaVerde: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.verdeMedio,
-    marginRight: 10,
-  },
-  textoLembrete: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: colors.verdeMedio,
-  },
-  cardClinica: {
-    backgroundColor: colors.verdeMedio,
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 15,
-  },
-  nomeClinica: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: colors.roxoMuitoEscuro,
-    marginBottom: 15,
-  },
-  cardLaudo: {
-    backgroundColor: colors.verdeEscuro,
-    borderRadius: 15,
-    padding: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  laudoTextos: {
-    flex: 1,
-    marginRight: 10,
-  },
-  tituloLaudo: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: colors.roxoMuitoEscuro,
-    marginBottom: 5,
-  },
-  linhaFalsa: {
-    height: 4,
-    backgroundColor: colors.verdeClaro,
-    borderRadius: 2,
-    marginBottom: 3,
-    width: '100%',
-  },
-  linhaFalsaCurta: {
-    height: 4,
-    backgroundColor: colors.verdeClaro,
-    borderRadius: 2,
-    width: '60%',
-  },
-  botaoDownload: {
-    backgroundColor: colors.verdeClaro,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
+  containerCentro: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.branco },
+  textoVazio: { fontSize: 18, fontWeight: 'bold', color: colors.roxoMuitoEscuro, marginBottom: 20 },
+  botaoVoltarErro: { backgroundColor: colors.verdeMedio, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20 },
+  textoBotaoVoltar: { color: colors.roxoMuitoEscuro, fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
+  header: { marginBottom: 20 },
+  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
+  nomePet: { fontSize: 22, fontWeight: '900', color: colors.verdeEscuro, textTransform: 'uppercase', marginBottom: 15 },
+  infoContainer: { flexDirection: 'row', marginBottom: 25 },
+  imagemPet: { width: 140, height: 100, borderRadius: 10, marginRight: 15 },
+  dadosContainer: { justifyContent: 'center' },
+  dadoTexto: { fontSize: 14, color: colors.roxoMuitoEscuro, marginBottom: 5, fontWeight: 'bold' },
+  dadoLabel: { fontWeight: '900' },
+  secao: { marginBottom: 30 },
+  tituloSecao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 10, textTransform: 'uppercase' },
+  textoDescricao: { fontSize: 14, color: colors.roxoMuitoEscuro, fontWeight: 'bold', lineHeight: 20 },
+  imagemCalendario: { width: '100%', height: 200, alignSelf: 'center', opacity: 0.7 },
+  cardStatus: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 15, padding: 15, backgroundColor: colors.branco },
+  tituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 5 },
+  subtituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 10 },
+  itemLembrete: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
+  bolinhaVerde: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.verdeMedio, marginRight: 10 },
+  textoLembrete: { fontSize: 14, fontWeight: 'bold', color: colors.verdeMedio },
+  cardClinica: { backgroundColor: colors.verdeMedio, borderRadius: 20, padding: 20, marginBottom: 15 },
+  nomeClinica: { fontSize: 14, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 15 },
+  cardLaudo: { backgroundColor: colors.verdeEscuro, borderRadius: 15, padding: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  laudoTextos: { flex: 1, marginRight: 10 },
+  tituloLaudo: { fontSize: 14, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 5 },
+  linhaFalsa: { height: 4, backgroundColor: colors.verdeClaro, borderRadius: 2, marginBottom: 3, width: '100%' },
+  linhaFalsaCurta: { height: 4, backgroundColor: colors.verdeClaro, borderRadius: 2, width: '60%' },
+  botaoDownload: { backgroundColor: colors.verdeClaro, width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' }
 });
