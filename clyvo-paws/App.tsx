@@ -5,6 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from './src/theme/colors';
 
+
+import LoginScreen from './src/screens/LoginScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import ServicesScreen from './src/screens/ServicesScreen';
 import PetFormScreen from './src/screens/PetFormScreen';
@@ -22,7 +25,7 @@ function TabNavigator() {
         headerShown: false,
         tabBarActiveTintColor: colors.verdeEscuro, 
         tabBarInactiveTintColor: colors.cinza,
-        tabBarStyle: { height: 90, paddingBottom: 20, paddingTop: 10, backgroundColor: colors.branco },
+        tabBarStyle: { height: 90, paddingBottom: 20, paddingTop: 10, backgroundColor: colors.branco, borderTopWidth: 1, borderTopColor: '#E0E0E0' },
         tabBarLabelStyle: { fontSize: 12, fontWeight: '900', marginTop: 4 },
         tabBarIcon: ({ color }) => {
           let iconName: keyof typeof MaterialCommunityIcons.glyphMap = 'home';
@@ -40,19 +43,21 @@ function TabNavigator() {
   );
 }
 
+
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs" component={TabNavigator} />
+      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
         
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+
+        <Stack.Screen name="MainTabs" component={TabNavigator} />
         <Stack.Screen name="PetForm" component={PetFormScreen} />
-
         <Stack.Screen name="Profile" component={ProfileScreen} />
-
         <Stack.Screen name="Pets" component={PetsScreen} />
-
         <Stack.Screen name="PetDetails" component={PetDetailsScreen} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
