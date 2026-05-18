@@ -60,11 +60,11 @@ export default function ServicesScreen() {
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Produtos')}>
           <View style={styles.circuloIcone}>
-            <MaterialCommunityIcons name="percent" size={35} color={colors.roxoMuitoEscuro} />
+          <MaterialCommunityIcons name="percent" size={35} color={colors.roxoMuitoEscuro} />
           </View>
-          <Text style={styles.textoIcone}>MEDICAMENTOS{"\n"}COM DESCONTO</Text>
+           <Text style={styles.textoIcone}>MEDICAMENTOS{"\n"}COM DESCONTO</Text>
         </TouchableOpacity>
 
 

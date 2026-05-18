@@ -16,6 +16,7 @@ import PetsScreen from './src/screens/PetsScreen';
 import PetDetailsScreen from './src/screens/PetDetailsScreen';
 import ConsultasScreen from './src/screens/ConsultaScreen';
 import RedeClinicaScreen from './src/screens/RedeClinicaScreen';
+import ProdutosScreen from './src/screens/ProdutosScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -61,6 +62,7 @@ export default function App() {
         <Stack.Screen name="PetDetails" component={PetDetailsScreen} />
         <Stack.Screen name="Consultas" component={ConsultasScreen} />
         <Stack.Screen name="RedeClinica" component={RedeClinicaScreen} />
+        <Stack.Screen name="Produtos" component={ProdutosScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

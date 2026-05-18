@@ -21,3 +21,12 @@ export type Pet = {
   foto?: string;
   lembretes: Lembrete[];
 };
+
+export type Produto = {
+  id: string;
+  nome: string;
+  precoAntigo?: string;
+  precoNovo: string;
+  imagem: any;
+  categoria: string;
+};
