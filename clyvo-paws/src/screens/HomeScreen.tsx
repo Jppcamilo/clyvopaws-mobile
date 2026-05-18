@@ -87,8 +87,10 @@ export default function HomeScreen() {
       <Text style={styles.tituloSecao}>MAIS ACESSADOS</Text>
       
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollIcones}>
-        <TouchableOpacity style={styles.itemIconeScroll}>
-          <View style={styles.circuloIcone}><MaterialCommunityIcons name="home-outline" size={30} color={colors.roxoMuitoEscuro} /></View>
+        <TouchableOpacity style={styles.itemIconeScroll} onPress={() => navigation.navigate('RedeClinica')}>
+          <View style={styles.circuloIcone}>
+              <MaterialCommunityIcons name="home-outline" size={30} color={colors.roxoMuitoEscuro} />
+          </View>
           <Text style={styles.legendaIcone}>REDE{"\n"}CLINICA</Text>
         </TouchableOpacity>
 
@@ -102,8 +104,10 @@ export default function HomeScreen() {
           <Text style={styles.legendaIcone}>MEUS{"\n"}MEDICAMENTOS</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.itemIconeScroll}>
-          <View style={styles.circuloIcone}><MaterialCommunityIcons name="calendar-clock" size={30} color={colors.roxoMuitoEscuro} /></View>
+        <TouchableOpacity style={styles.itemIconeScroll} onPress={() => navigation.navigate('Consultas')}>
+          <View style={styles.circuloIcone}>
+            <MaterialCommunityIcons name="calendar-clock" size={30} color={colors.roxoMuitoEscuro} />
+          </View>
           <Text style={styles.legendaIcone}>AGENDAR{"\n"}CONSULTA</Text>
         </TouchableOpacity>
 

@@ -25,7 +25,7 @@ export default function ServicesScreen() {
       <View style={styles.gridContainer}>
         
 
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('RedeClinica')}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="home-outline" size={35} color={colors.roxoMuitoEscuro} />
           </View>
@@ -68,12 +68,12 @@ export default function ServicesScreen() {
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={styles.gridItem}>
-          <View style={styles.circuloIcone}>
-            <MaterialCommunityIcons name="forum-outline" size={35} color={colors.roxoMuitoEscuro} />
-          </View>
-          <Text style={styles.textoIcone}>MARCAR{"\n"}CONSULTAS</Text>
-        </TouchableOpacity>
+       <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Consultas')}>
+        <View style={styles.circuloIcone}>
+         <MaterialCommunityIcons name="forum-outline" size={35} color={colors.roxoMuitoEscuro} />
+        </View>
+        <Text style={styles.textoIcone}>MARCAR{"\n"}CONSULTAS</Text>
+      </TouchableOpacity>
 
       </View>
 
