@@ -6,7 +6,8 @@ import {
   ScrollView, 
   TouchableOpacity, 
   Image,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert // 🌟 Importamos o Alert para a confirmação nativa
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -14,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { colors } from '../theme/colors';
 import { Pet } from '../types';
-import { DADOS_RACAS } from '../data/racas'; // 🌟 Importando nosso banco de raças!
+import { DADOS_RACAS } from '../data/racas';
 
 LocaleConfig.locales['pt-br'] = {
   monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -35,7 +36,7 @@ export default function PetDetailsScreen() {
   
   const [lembretes, setLembretes] = useState<any[]>([]);
   const [datasMarcadas, setDatasMarcadas] = useState<any>({});
-  const [racaInfo, setRacaInfo] = useState<any>(null); // 🌟 Estado para guardar os dados médicos da raça
+  const [racaInfo, setRacaInfo] = useState<any>(null);
 
   useEffect(() => {
     const carregarPet = async () => {
@@ -54,12 +55,11 @@ export default function PetDetailsScreen() {
             if (petEncontrado) {
               setPet(petEncontrado);
 
-              // 🌟 LÓGICA NOVA: Procura a raça no nosso arquivo de dados
               let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === petEncontrado.raca);
               if (!dadosMedicos) {
                 dadosMedicos = DADOS_RACAS.GATO.find((r: any) => r.nome === petEncontrado.raca);
               }
-              setRacaInfo(dadosMedicos); // Salva os dados encontrados
+              setRacaInfo(dadosMedicos);
 
               const hoje = new Date();
               const ano = hoje.getFullYear();
@@ -109,6 +109,47 @@ export default function PetDetailsScreen() {
     carregarPet();
   }, [petId]);
 
+  // 🌟 FUNÇÃO EXCLUSIVA PARA DELETAR O PET DO ASYNCSTORAGE
+  const handleExcluirPet = () => {
+    Alert.alert(
+      'Excluir Pet',
+      `Tem certeza de que deseja remover o(a) ${pet?.nome} da família Clyvo?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Excluir', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
+              if (dadosTutor) {
+                const tutor = JSON.parse(dadosTutor);
+                const chavePets = `@pets_${tutor.email}`;
+                const petsSalvos = await AsyncStorage.getItem(chavePets);
+                
+                if (petsSalvos) {
+                  const listaPets: Pet[] = JSON.parse(petsSalvos);
+                  
+                  // Filtramos a lista mantendo todos os pets, EXCETO o atual
+                  const listaAtualizada = listaPets.filter(p => p.id !== petId);
+                  
+                  // Salva de volta a lista limpa no AsyncStorage
+                  await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtualizada));
+                  
+                  Alert.alert('Sucesso', 'Pet removido com sucesso.');
+                  navigation.goBack(); // Retorna para a lista de pets atualizada
+                }
+              }
+            } catch (error) {
+              console.error('Erro ao excluir pet:', error);
+              Alert.alert('Erro', 'Não foi possível excluir o pet.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   if (carregando) {
     return (
       <View style={styles.containerCentro}>
@@ -137,6 +178,11 @@ export default function PetDetailsScreen() {
         <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
+        
+        
+        <TouchableOpacity style={styles.botaoDeletar} onPress={handleExcluirPet}>
+          <MaterialCommunityIcons name="trash-can-outline" size={24} color="#FF3B30" />
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.nomePet}>{pet.nome}</Text>
@@ -149,7 +195,6 @@ export default function PetDetailsScreen() {
         </View>
       </View>
 
-      {/* 🌟 BOTÃO DO PLANO PREVENTIVO (Só aparece se a raça estiver mapeada no banco) */}
       {racaInfo && (
         <TouchableOpacity 
           style={styles.botaoPreventivo}
@@ -242,18 +287,20 @@ const styles = StyleSheet.create({
   botaoVoltarErro: { backgroundColor: colors.verdeMedio, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20 },
   textoBotaoVoltar: { color: colors.roxoMuitoEscuro, fontWeight: 'bold' },
   container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
-  header: { marginBottom: 20 },
+  
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
+  
+  botaoDeletar: { backgroundColor: '#FFECEB', width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
+  
   nomePet: { fontSize: 22, fontWeight: '900', color: colors.verdeEscuro, textTransform: 'uppercase', marginBottom: 15 },
   infoContainer: { flexDirection: 'row', marginBottom: 20 },
   imagemPet: { width: 140, height: 100, borderRadius: 10, marginRight: 15 },
   dadosContainer: { justifyContent: 'center', flex: 1 },
   dadoTexto: { fontSize: 14, color: colors.roxoMuitoEscuro, marginBottom: 5, fontWeight: 'bold' },
   dadoLabel: { fontWeight: '900' },
-  
   botaoPreventivo: { flexDirection: 'row', backgroundColor: colors.verdeEscuro, paddingVertical: 12, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginBottom: 25 },
   textoBotaoPreventivo: { color: colors.branco, fontWeight: '900', fontSize: 14, textTransform: 'uppercase' },
-
   secao: { marginBottom: 30 },
   headerCalendario: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   tituloSecao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, textTransform: 'uppercase' },

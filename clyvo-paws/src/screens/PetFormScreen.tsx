@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  Image, 
+  Alert 
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker'; 
 import { colors } from '../theme/colors';
-import { DADOS_RACAS } from '../data/racas'; // <-- Importando o banco de raças
+import { DADOS_RACAS } from '../data/racas';
 
 export default function PetFormScreen() {
   const navigation = useNavigation<any>();
@@ -15,33 +24,46 @@ export default function PetFormScreen() {
   const [descricao, setDescricao] = useState('');
   const [foto, setFoto] = useState<string | null>(null);
   
-  // Novos estados para a lógica de espécie e raça
   const [especie, setEspecie] = useState<'CACHORRO' | 'GATO' | null>(null);
   const [racaSelecionada, setRacaSelecionada] = useState<any>(null);
 
   const escolherFoto = async () => {
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissao.status !== 'granted') {
-      Alert.alert('Atenção', 'Precisamos de permissão!');
+      Alert.alert('Atenção', 'Precisamos de permissão para acessar sua galeria!');
       return;
     }
     const resultado = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, aspect: [4, 3], quality: 1,
+      allowsEditing: true, 
+      aspect: [4, 3], 
+      quality: 1,
     });
     if (!resultado.canceled) setFoto(resultado.assets[0].uri);
   };
 
   const handleCadastrar = async () => {
     if (!nome.trim() || !idade.trim() || !especie || !racaSelecionada) {
-      Alert.alert('Atenção', 'Preencha todos os campos e selecione uma espécie e raça!');
+      Alert.alert('Atenção', 'Preencha todos os campos obrigatórios e selecione uma espécie e raça!');
       return;
     }
 
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const dataHoje = `${ano}-${mes}-${dia}`;
+
     const novoPet = {
       id: Date.now().toString(),
-      nome, idade, raca: racaSelecionada.nome, descricao, foto, 
-      lembretes: []
+      nome, 
+      idade, 
+      raca: racaSelecionada.nome, 
+      descricao, 
+      foto, 
+      lembretes: [
+        { data: dataHoje, tarefa: 'Avaliação Preventiva Inicial', horario: '14:30' }
+      ]
     };
 
     try {
@@ -51,10 +73,10 @@ export default function PetFormScreen() {
         const chavePets = `@pets_${tutor.email}`;
         const petsSalvos = await AsyncStorage.getItem(chavePets);
         const listaAtual = petsSalvos ? JSON.parse(petsSalvos) : [];
+        
         listaAtual.push(novoPet);
         await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtual));
         
-        // Aqui está a mágica: Se a raça tiver dados médicos, vamos para a tela de alerta preventivo!
         navigation.replace('InfoRaca', { racaData: racaSelecionada });
       }
     } catch (error) {
@@ -87,7 +109,7 @@ export default function PetFormScreen() {
 
       <Text style={styles.labelSecao}>NOME DO PET</Text>
       <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="NOME" placeholderTextColor={colors.cinza} value={nome} onChangeText={setNome} />
+        <TextInput style={styles.input} placeholder="EX: REX" placeholderTextColor={colors.cinza} value={nome} onChangeText={setNome} />
       </View>
 
       <Text style={styles.labelSecao}>IDADE</Text>
@@ -95,7 +117,19 @@ export default function PetFormScreen() {
         <TextInput style={styles.input} placeholder="EX: 5 MESES" placeholderTextColor={colors.cinza} value={idade} onChangeText={setIdade} />
       </View>
 
-      {/* SELEÇÃO DE ESPÉCIE */}
+      <Text style={styles.labelSecao}>DESCRIÇÃO</Text>
+      <View style={[styles.inputContainer, styles.inputDescricaoContainer]}>
+        <TextInput 
+          style={[styles.input, styles.inputArea]} 
+          placeholder="Descreva a personalidade do pet..." 
+          placeholderTextColor={colors.cinza} 
+          value={descricao} 
+          onChangeText={setDescricao} 
+          multiline={true} 
+          numberOfLines={4} 
+        />
+      </View>
+
       <Text style={styles.labelSecao}>ESPÉCIE</Text>
       <View style={styles.botoesEspecie}>
         <TouchableOpacity 
@@ -115,7 +149,6 @@ export default function PetFormScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* SELEÇÃO DE RAÇA (Só aparece após escolher a espécie) */}
       {especie && (
         <>
           <Text style={styles.labelSecao}>RAÇA</Text>
@@ -154,8 +187,12 @@ const styles = StyleSheet.create({
   botaoUpload: { backgroundColor: colors.verdeClaro, width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-start', marginBottom: 10 },
   imagemPet: { width: 150, height: 100, borderRadius: 10 },
   placeholderImagem: { width: 150, height: 100, borderRadius: 10, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: colors.cinza },
+  
   inputContainer: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, paddingHorizontal: 15, height: 50, justifyContent: 'center' },
   input: { color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 14 },
+  
+  inputDescricaoContainer: { height: 100, alignItems: 'flex-start', paddingTop: 15 },
+  inputArea: { textAlignVertical: 'top', height: '100%' },
   
   botoesEspecie: { flexDirection: 'row', gap: 10, marginBottom: 10 },
   botaoEspecie: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderColor: colors.roxoMuitoEscuro, borderWidth: 1, height: 50, borderRadius: 25 },
