@@ -99,8 +99,10 @@ export default function HomeScreen() {
           <Text style={styles.legendaIcone}>MEUS PETS</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.itemIconeScroll}>
-          <View style={styles.circuloIcone}><MaterialCommunityIcons name="file-document-outline" size={30} color={colors.roxoMuitoEscuro} /></View>
+        <TouchableOpacity style={styles.itemIconeScroll} onPress={() => navigation.navigate('MeusMedicamentos')}>
+          <View style={styles.circuloIcone}>
+            <MaterialCommunityIcons name="file-document-outline" size={30} color={colors.roxoMuitoEscuro} />
+          </View>
           <Text style={styles.legendaIcone}>MEUS{"\n"}MEDICAMENTOS</Text>
         </TouchableOpacity>
 
