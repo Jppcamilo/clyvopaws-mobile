@@ -13,89 +13,18 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { Produto } from '../types';
 
-const CATEGORIAS = ['CACHORRO', 'GATO', 'PÁSSARO', 'PEIXE', 'ROEDORES'];
-
-const PROMOCOES: Produto[] = [
-  { 
-    id: '1', 
-    nome: 'Antipulgas e Carrapatos Bravecto para Cães', 
-    precoAntigo: 'R$ 210,00', 
-    precoNovo: 'R$ 189,90', 
-    imagem: require('../../assets/produtos/Bravecto-Antipulgas-E-Carrapatos--Para-Caes-1000-Mg----De-20-A-40-Kg.png'),
-    categoria: 'CACHORRO'
-  },
-  { 
-    id: '2', 
-    nome: 'Ração Premier Formula Cães Adultos', 
-    precoAntigo: 'R$ 199,00', 
-    precoNovo: 'R$ 175,50', 
-    imagem: require('../../assets/produtos/PremieR-Formula-Caes-Adultos-PGG-Carne-15-kg-Lateral-Fechada.png.webp'),
-    categoria: 'CACHORRO'
-  },
-  { 
-    id: '3', 
-    nome: 'Tapete Higiênico Super Premium 30 un', 
-    precoAntigo: 'R$ 85,00', 
-    precoNovo: 'R$ 69,90', 
-    imagem: require('../../assets/produtos/61qZbBrwf2L._AC_SL1000_.jpg'),
-    categoria: 'CASA'
-  },
-];
-
-const REMEDIOS: Produto[] = [
-  { 
-    id: '4', 
-    nome: 'Vermífugo Drontal Plus Sabor Carne', 
-    precoNovo: 'R$ 39,90', 
-    imagem: require('../../assets/produtos/Vermífugo_Bayer_Drontal_Plus_Sabor_Carne_0009_1-10kg-2c.jpg'), 
-    categoria: 'CUIDADOS'
-  },
-  { 
-    id: '5', 
-    nome: 'Anti-inflamatório Meloxicam 1mg', 
-    precoAntigo: 'R$ 25,00', 
-    precoNovo: 'R$ 19,95', 
-    imagem: require('../../assets/produtos/Meloxinew-1mg.png'), 
-    categoria: 'CUIDADOS'
-  },
-  { 
-    id: '6', 
-    nome: 'Suplemento Vitamínico Ograx-3', 
-    precoNovo: 'R$ 95,00', 
-    imagem: require('../../assets/produtos/ograx-1500-2mnxltmijh.webp'), 
-    categoria: 'CUIDADOS'
-  },
-];
-
-const COSMETICOS: Produto[] = [
-  { 
-    id: '7', 
-    nome: 'Shampoo Neutro Pet Society 500ml', 
-    precoAntigo: 'R$ 35,00', 
-    precoNovo: 'R$ 29,90', 
-    imagem: require('../../assets/produtos/Shampoo-Neutro-Beeps-Pet-Society-500ml.png'), 
-    categoria: 'BANHO'
-  },
-  { 
-    id: '8', 
-    nome: 'Perfume Baby Pet 100ml', 
-    precoAntigo: 'R$ 40,00', 
-    precoNovo: 'R$ 34,90', 
-    imagem: require('../../assets/produtos/41XWTxLYKrL._AC_SL1200_.jpg'), 
-    categoria: 'BANHO'
-  },
-  { 
-    id: '9', 
-    nome: 'Condicionador Brilho Intenso 500ml', 
-    precoNovo: 'R$ 32,50', 
-    imagem: require('../../assets/produtos/613wXTWdlTL._AC_SL1000_.jpg'), 
-    categoria: 'BANHO'
-  },
-];
+import { CATEGORIAS, PROMOCOES, REMEDIOS, COSMETICOS } from '../data/produtos';
 
 export default function ProdutosScreen() {
   const navigation = useNavigation<any>();
   const [busca, setBusca] = useState('');
+
+  // Função auxiliar para aplicar o filtro de busca por nome nos produtos
+  const aplicarFiltro = (lista: Produto[]) => {
+    return lista.filter(produto => 
+      produto.nome.toLowerCase().includes(busca.toLowerCase())
+    );
+  };
 
   const renderProduto = (produto: Produto) => (
     <TouchableOpacity 
@@ -119,6 +48,7 @@ export default function ProdutosScreen() {
     <View style={styles.containerPrincipal}>
       <ScrollView showsVerticalScrollIndicator={false}>
         
+        {/* Cabeçalho */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
             <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
@@ -127,6 +57,7 @@ export default function ProdutosScreen() {
 
         <Text style={styles.titulo}>PRODUTOS</Text>
 
+        {/* Barra de Pesquisa */}
         <View style={styles.containerBusca}>
           <MaterialCommunityIcons name="magnify" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeBusca} />
           <TextInput 
@@ -138,6 +69,7 @@ export default function ProdutosScreen() {
           />
         </View>
 
+        {/* Faixa de Categorias */}
         <View style={styles.faixaCategorias}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollCategorias}>
             {CATEGORIAS.map((cat, index) => (
@@ -148,19 +80,22 @@ export default function ProdutosScreen() {
           </ScrollView>
         </View>
 
+        {/* Seção: Promoções */}
         <Text style={styles.tituloSecao}>PROMOÇÕES</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
-          {PROMOCOES.map(renderProduto)}
+          {aplicarFiltro(PROMOCOES).map(renderProduto)}
         </ScrollView>
 
+        {/* Seção: Remédios */}
         <Text style={styles.tituloSecao}>REMÉDIOS</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
-          {REMEDIOS.map(renderProduto)}
+          {aplicarFiltro(REMEDIOS).map(renderProduto)}
         </ScrollView>
 
+        {/* Seção: Cosméticos */}
         <Text style={styles.tituloSecao}>COSMÉTICOS</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
-          {COSMETICOS.map(renderProduto)}
+          {aplicarFiltro(COSMETICOS).map(renderProduto)}
         </ScrollView>
 
         <View style={{ height: 100 }} />
