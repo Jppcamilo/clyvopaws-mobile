@@ -128,12 +128,12 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <View style={styles.containerDuplo}>
-        <TouchableOpacity style={styles.boxPequeno}>
+        <TouchableOpacity style={styles.boxPequeno} onPress={() => navigation.navigate('RedeClinica')}>
           <MaterialCommunityIcons name="home-city-outline" size={24} color={colors.roxoMuitoEscuro} />
           <Text style={styles.tituloBox}>CLINICAS{"\n"}PERTO</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.boxPequeno}>
+        <TouchableOpacity style={styles.boxPequeno} onPress={() => navigation.navigate('MeusMedicamentos')}>
           <MaterialCommunityIcons name="pill" size={24} color={colors.roxoMuitoEscuro} />
           <Text style={styles.tituloBox}>MEDICAMENTOS</Text>
         </TouchableOpacity>

@@ -12,7 +12,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as ImagePicker from 'expo-image-picker'; // <-- Import da biblioteca da Galeria
+import * as ImagePicker from 'expo-image-picker'; 
 import { colors } from '../theme/colors';
 
 export default function RegisterScreen() {
@@ -24,11 +24,9 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [endereco, setEndereco] = useState('');
   const [senha, setSenha] = useState('');
-  const [foto, setFoto] = useState<string | null>(null); // <-- Novo estado para a foto
+  const [foto, setFoto] = useState<string | null>(null); 
 
-  // Função para abrir a galeria
   const escolherFoto = async () => {
-    // 1. Pede permissão para acessar as fotos
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
     if (permissao.status !== 'granted') {
@@ -36,15 +34,13 @@ export default function RegisterScreen() {
       return;
     }
 
-    // 2. Abre a galeria
     const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Só permite imagens
-      allowsEditing: true, // Permite cortar a foto
-      aspect: [4, 3], // Formato do corte
-      quality: 1, // Qualidade máxima
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
 
-    // 3. Se o usuário escolheu uma foto, salva o caminho (URI) no estado
     if (!resultado.canceled) {
       setFoto(resultado.assets[0].uri);
     }
@@ -56,7 +52,6 @@ export default function RegisterScreen() {
       return;
     }
 
-    // Adicionamos a foto ao objeto do Tutor
     const novoTutor = { nome, cpf, telefone, email, endereco, senha, foto };
 
     try {
@@ -80,16 +75,19 @@ export default function RegisterScreen() {
 
       <Text style={styles.labelSecao}>FOTO</Text>
       <View style={styles.boxFoto}>
-        {/* Adicionamos o onPress aqui para chamar a função de abrir galeria */}
         <TouchableOpacity style={styles.botaoUpload} onPress={escolherFoto}>
           <MaterialCommunityIcons name="upload" size={20} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
         
-        {/* A imagem agora mostra a foto escolhida. Se não tiver, mostra a padrão */}
-        <Image 
-          source={{ uri: foto ? foto : 'https://img.freepik.com/vetores-gratis/homem-jovem-com-telefone-inteligente_23-2148506899.jpg' }} 
-          style={styles.imagemPerfil} 
-        />
+        {/* 👇 AQUI: Trocamos o link do freepik pelo placeholder profissional */}
+        {foto ? (
+          <Image source={{ uri: foto }} style={styles.imagemPerfil} />
+        ) : (
+          <View style={styles.placeholderImagem}>
+            <MaterialCommunityIcons name="account-circle-outline" size={40} color={colors.cinza} />
+            <Text style={styles.textoPlaceholder}>Adicionar Foto</Text>
+          </View>
+        )}
       </View>
 
       <Text style={styles.labelSecao}>NOME</Text>
@@ -128,6 +126,11 @@ const styles = StyleSheet.create({
   boxFoto: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, padding: 15, alignItems: 'center', marginBottom: 20 },
   botaoUpload: { backgroundColor: colors.verdeClaro, width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-start', marginBottom: 10 },
   imagemPerfil: { width: 180, height: 120, borderRadius: 10, backgroundColor: '#E0E0E0' },
+  
+  
+  placeholderImagem: { width: 180, height: 120, borderRadius: 10, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: colors.cinza },
+  textoPlaceholder: { color: colors.cinza, fontSize: 12, fontWeight: 'bold', marginTop: 5 },
+  
   input: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 25, height: 55, marginBottom: 20, color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 14, textTransform: 'uppercase' },
   botaoCadastrar: { backgroundColor: colors.verdeClaro, borderRadius: 25, paddingVertical: 18, alignItems: 'center', marginTop: 10 },
   textoBotaoCadastrar: { color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 18, textTransform: 'uppercase' }

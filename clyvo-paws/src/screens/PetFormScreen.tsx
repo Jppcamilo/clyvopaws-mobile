@@ -58,14 +58,12 @@ export default function PetFormScreen() {
       return;
     }
 
-    // 🛠️ LÓGICA NOVA: Criando lembretes automáticos na hora do cadastro!
     const hoje = new Date();
     const ano = hoje.getFullYear();
     const mes = String(hoje.getMonth() + 1).padStart(2, '0');
     const dia = String(hoje.getDate()).padStart(2, '0');
-    
     const dataHoje = `${ano}-${mes}-${dia}`;
-    const dataFutura = `${ano}-${mes}-28`; // Um dia genérico no futuro para o calendário
+    const dataFutura = `${ano}-${mes}-28`; 
 
     const lembretesIniciais = [
       { data: dataHoje, tarefa: 'Primeira Consulta Clínica', horario: '14:00' },
@@ -79,7 +77,7 @@ export default function PetFormScreen() {
       raca,
       descricao,
       foto, 
-      lembretes: lembretesIniciais, // <-- Agora o pet já nasce com compromissos!
+      lembretes: lembretesIniciais,
     };
 
     try {
@@ -123,10 +121,15 @@ export default function PetFormScreen() {
         <TouchableOpacity style={styles.botaoUpload} onPress={escolherFoto}>
           <MaterialCommunityIcons name="upload" size={20} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
-        <Image 
-          source={{ uri: foto ? foto : 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150' }} 
-          style={styles.imagemPet} 
-        />
+        
+        {foto ? (
+          <Image source={{ uri: foto }} style={styles.imagemPet} />
+        ) : (
+          <View style={styles.placeholderImagem}>
+            <MaterialCommunityIcons name="camera-plus" size={40} color={colors.cinza} />
+            <Text style={styles.textoPlaceholder}>Adicionar Foto</Text>
+          </View>
+        )}
       </View>
 
       <Text style={styles.labelSecao}>NOME DO PET</Text>
@@ -170,7 +173,9 @@ const styles = StyleSheet.create({
   labelSecao: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 5 },
   boxFoto: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, padding: 15, alignItems: 'center', marginBottom: 20 },
   botaoUpload: { backgroundColor: colors.verdeClaro, width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-start', marginBottom: 10 },
-  imagemPet: { width: 150, height: 100, borderRadius: 10, backgroundColor: '#E0E0E0' },
+  imagemPet: { width: 150, height: 100, borderRadius: 10 },
+  placeholderImagem: { width: 150, height: 100, borderRadius: 10, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: colors.cinza },
+  textoPlaceholder: { color: colors.cinza, fontSize: 12, fontWeight: 'bold', marginTop: 5 },
   inputContainer: { flexDirection: 'row', alignItems: 'center', borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, paddingHorizontal: 15, marginBottom: 20, height: 50 },
   iconeInput: { marginRight: 10 },
   input: { flex: 1, color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 14 },
