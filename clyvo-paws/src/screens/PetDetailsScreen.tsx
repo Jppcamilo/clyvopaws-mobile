@@ -11,17 +11,29 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { colors } from '../theme/colors';
 import { Pet } from '../types';
+
+LocaleConfig.locales['pt-br'] = {
+  monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+  monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+  dayNamesShort: ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'],
+  today: 'Hoje'
+};
+LocaleConfig.defaultLocale = 'pt-br';
 
 export default function PetDetailsScreen() {
   const navigation = useNavigation();
   const route = useRoute<any>();
-  
   const { petId } = route.params;
 
   const [pet, setPet] = useState<Pet | null>(null);
   const [carregando, setCarregando] = useState(true);
+  
+  const [lembretes, setLembretes] = useState<any[]>([]);
+  const [datasMarcadas, setDatasMarcadas] = useState<any>({});
 
   useEffect(() => {
     const carregarPet = async () => {
@@ -30,14 +42,52 @@ export default function PetDetailsScreen() {
         
         if (dadosTutor) {
           const tutor = JSON.parse(dadosTutor);
-          const chavePets = `@pets_${tutor.email}`; // <-- A chave específica do tutor logado
+          const chavePets = `@pets_${tutor.email}`; 
 
           const petsSalvos = await AsyncStorage.getItem(chavePets);
           if (petsSalvos) {
             const listaPets: Pet[] = JSON.parse(petsSalvos);
             const petEncontrado = listaPets.find(p => p.id === petId);
+            
             if (petEncontrado) {
               setPet(petEncontrado);
+
+              const hoje = new Date();
+              const ano = hoje.getFullYear();
+              const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+              const dia = String(hoje.getDate()).padStart(2, '0');
+              const dataHojeString = `${ano}-${mes}-${dia}`;
+              const mesAtual = `${ano}-${mes}`;
+
+              const lembretesMock = [
+                { data: `${mesAtual}-05`, tarefa: 'Vacina V10', horario: '14:30' },
+                { data: `${mesAtual}-12`, tarefa: 'Consulta de Rotina', horario: '10:00' },
+                { data: `${mesAtual}-19`, tarefa: 'Vermífugo Drontal', horario: '08:00' }
+              ];
+
+              // CORREÇÃO AQUI: Tipamos explicitamente como any[] para aceitar a propriedade 'data' sem conflito com o tipo Pet
+              const lembretesAtuais: any[] = (petEncontrado.lembretes && petEncontrado.lembretes.length > 0) 
+                ? petEncontrado.lembretes 
+                : lembretesMock;
+
+              setLembretes(lembretesAtuais);
+
+              let marcacoes: any = {};
+              lembretesAtuais.forEach(lembrete => {
+                if (lembrete.data) {
+                  marcacoes[lembrete.data] = { marked: true, dotColor: colors.verdeMedio };
+                }
+              });
+
+              marcacoes[dataHojeString] = {
+                ...marcacoes[dataHojeString],
+                selected: true,
+                selectedColor: colors.verdeMedio,
+                marked: marcacoes[dataHojeString]?.marked || false,
+                dotColor: colors.branco
+              };
+
+              setDatasMarcadas(marcacoes);
             }
           }
         }
@@ -92,19 +142,45 @@ export default function PetDetailsScreen() {
       </View>
 
       <View style={styles.secao}>
-        <Text style={styles.tituloSecao}>Descrição :</Text>
+        <Text style={styles.tituloSecao}>DESCRIÇÃO</Text>
         <Text style={styles.textoDescricao}>
           {pet.descricao ? pet.descricao : "Nenhuma descrição cadastrada para este pet."}
         </Text>
       </View>
 
       <View style={styles.secao}>
-        <Text style={styles.tituloSecao}>CALENDÁRIO DAS CONSULTAS</Text>
-        <Image 
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2838/2838779.png' }}
-          style={styles.imagemCalendario}
-          resizeMode="contain"
-        />
+        <View style={styles.headerCalendario}>
+          <Text style={styles.tituloSecao}>CALENDÁRIO</Text>
+          <TouchableOpacity>
+            <Text style={styles.textoAbrir}>Abrir {'>'}</Text>
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.containerCalendarioEscuro}>
+          <Calendar
+            markedDates={datasMarcadas}
+            theme={{
+              backgroundColor: '#2C2C2E',
+              calendarBackground: '#2C2C2E',
+              textSectionTitleColor: '#8E8E93',
+              selectedDayBackgroundColor: colors.verdeMedio,
+              selectedDayTextColor: '#FFFFFF',
+              todayTextColor: colors.verdeMedio,
+              dayTextColor: '#FFFFFF',
+              textDisabledColor: '#48484A',
+              dotColor: colors.verdeMedio,
+              selectedDotColor: '#FFFFFF',
+              arrowColor: '#FFFFFF',
+              monthTextColor: '#FFFFFF',
+              textDayFontWeight: '500',
+              textMonthFontWeight: 'bold',
+              textDayHeaderFontWeight: '600',
+              textDayFontSize: 14,
+              textMonthFontSize: 16,
+              textDayHeaderFontSize: 12
+            }}
+          />
+        </View>
       </View>
 
       <View style={styles.secao}>
@@ -113,13 +189,20 @@ export default function PetDetailsScreen() {
           <Text style={styles.tituloCardStatus}>VACINAS / LEMBRETES</Text>
           <Text style={styles.subtituloCardStatus}>Pendente</Text>
           
-          {pet.lembretes && pet.lembretes.length > 0 ? (
-            pet.lembretes.map((lembrete, index) => (
-              <View key={index} style={styles.itemLembrete}>
-                <View style={styles.bolinhaVerde} />
-                <Text style={styles.textoLembrete}>{lembrete.tarefa} - {lembrete.horario}</Text>
-              </View>
-            ))
+          {lembretes && lembretes.length > 0 ? (
+            lembretes.map((lembrete, index) => {
+              const dataQuebrada = lembrete.data ? lembrete.data.split('-') : [];
+              const dataFormatada = dataQuebrada.length === 3 ? `${dataQuebrada[2]}/${dataQuebrada[1]}` : '';
+
+              return (
+                <View key={index} style={styles.itemLembrete}>
+                  <View style={styles.bolinhaVerde} />
+                  <Text style={styles.textoLembrete}>
+                    {dataFormatada} - {lembrete.tarefa} ({lembrete.horario})
+                  </Text>
+                </View>
+              );
+            })
           ) : (
             <View style={styles.itemLembrete}>
               <View style={styles.bolinhaVerde} />
@@ -135,17 +218,6 @@ export default function PetDetailsScreen() {
         <View style={styles.cardClinica}>
           <Text style={styles.nomeClinica}>Clínica Amigo Fiel</Text>
           
-          <View style={styles.cardLaudo}>
-            <View style={styles.laudoTextos}>
-              <Text style={styles.tituloLaudo}>LAUDO MEDICO</Text>
-              <View style={styles.linhaFalsa} />
-              <View style={styles.linhaFalsaCurta} />
-            </View>
-            <TouchableOpacity style={styles.botaoDownload}>
-              <MaterialCommunityIcons name="download" size={20} color={colors.roxoMuitoEscuro} />
-            </TouchableOpacity>
-          </View>
-
           <View style={styles.cardLaudo}>
             <View style={styles.laudoTextos}>
               <Text style={styles.tituloLaudo}>LAUDO MEDICO</Text>
@@ -175,13 +247,15 @@ const styles = StyleSheet.create({
   nomePet: { fontSize: 22, fontWeight: '900', color: colors.verdeEscuro, textTransform: 'uppercase', marginBottom: 15 },
   infoContainer: { flexDirection: 'row', marginBottom: 25 },
   imagemPet: { width: 140, height: 100, borderRadius: 10, marginRight: 15 },
-  dadosContainer: { justifyContent: 'center' },
+  dadosContainer: { justifyContent: 'center', flex: 1 },
   dadoTexto: { fontSize: 14, color: colors.roxoMuitoEscuro, marginBottom: 5, fontWeight: 'bold' },
   dadoLabel: { fontWeight: '900' },
   secao: { marginBottom: 30 },
-  tituloSecao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 10, textTransform: 'uppercase' },
+  headerCalendario: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  tituloSecao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, textTransform: 'uppercase' },
+  textoAbrir: { color: colors.cinza, fontWeight: 'bold', fontSize: 14 },
   textoDescricao: { fontSize: 14, color: colors.roxoMuitoEscuro, fontWeight: 'bold', lineHeight: 20 },
-  imagemCalendario: { width: '100%', height: 200, alignSelf: 'center', opacity: 0.7 },
+  containerCalendarioEscuro: { backgroundColor: '#2C2C2E', borderRadius: 15, overflow: 'hidden', paddingBottom: 10, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 },
   cardStatus: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 15, padding: 15, backgroundColor: colors.branco },
   tituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 5 },
   subtituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 10 },
