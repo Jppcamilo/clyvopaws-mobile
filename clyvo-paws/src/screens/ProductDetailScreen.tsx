@@ -17,7 +17,6 @@ export default function ProductDetailsScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
  
-  // Pegamos o produto que foi passado na navegação
   const { produtoCompleto } = route.params;
   const produto: Produto = produtoCompleto;
  
@@ -31,25 +30,21 @@ export default function ProductDetailsScreen() {
   return (
     <View style={styles.containerPrincipal}>
      
-      {/* Botão Flutuante de Voltar */}
       <TouchableOpacity style={styles.botaoVoltarFlutuante} onPress={() => navigation.goBack()}>
         <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
       </TouchableOpacity>
  
       <ScrollView showsVerticalScrollIndicator={false}>
        
-        {/* Foto Grande do Produto */}
         <View style={styles.containerImagem}>
           <Image source={produto.imagem} style={styles.imagemGrande} resizeMode="contain" />
         </View>
  
         <View style={styles.conteudo}>
-          {/* Categoria Tag */}
           <View style={styles.tagCategoria}>
             <Text style={styles.textoTagCategoria}>{produto.categoria}</Text>
           </View>
  
-          {/* Nome e Preço */}
           <Text style={styles.nomeProduto}>{produto.nome}</Text>
          
           <View style={styles.containerPreco}>
@@ -59,7 +54,6 @@ export default function ProductDetailsScreen() {
             <Text style={styles.precoNovo}>{produto.precoNovo}</Text>
           </View>
  
-          {/* Frete e Benefícios */}
           <View style={styles.boxBeneficios}>
             <MaterialCommunityIcons name="truck-delivery-outline" size={24} color={colors.verdeEscuro} />
             <View style={styles.textosBeneficios}>
@@ -68,7 +62,6 @@ export default function ProductDetailsScreen() {
             </View>
           </View>
  
-          {/* Descrição Genérica */}
           <Text style={styles.tituloSecao}>DESCRIÇÃO</Text>
           <Text style={styles.textoDescricao}>
             Produto de alta qualidade recomendado pelos especialistas da Clyvo VET.
@@ -78,10 +71,8 @@ export default function ProductDetailsScreen() {
         <View style={{ height: 120 }} />
       </ScrollView>
  
-      {/* Barra fixa na parte inferior para Comprar */}
       <View style={styles.barraInferior}>
        
-        {/* Controle de Quantidade */}
         <View style={styles.controleQuantidade}>
           <TouchableOpacity
             style={styles.botaoQtd}
@@ -98,7 +89,6 @@ export default function ProductDetailsScreen() {
           </TouchableOpacity>
         </View>
  
-        {/* Botão Adicionar */}
         <TouchableOpacity style={styles.botaoAdicionar} onPress={adicionarAoCarrinho}>
           <Text style={styles.textoBotaoAdicionar}>ADICIONAR</Text>
         </TouchableOpacity>
@@ -127,7 +117,6 @@ const styles = StyleSheet.create({
   tituloSecao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 10 },
   textoDescricao: { fontSize: 14, color: colors.roxoMuitoEscuro, lineHeight: 22, fontWeight: '500' },
  
-  // Barra inferior fixa
   barraInferior: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.branco, flexDirection: 'row', padding: 20, paddingTop: 15, borderTopWidth: 1, borderColor: '#EEEEEE', elevation: 15, shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.1, shadowRadius: 5 },
   controleQuantidade: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F0F0', borderRadius: 25, paddingHorizontal: 5, height: 50, marginRight: 15 },
   botaoQtd: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },

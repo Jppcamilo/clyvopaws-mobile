@@ -17,20 +17,17 @@ export default function EnderecosScreen() {
     <View style={styles.containerPrincipal}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
        
-        {/* Cabeçalho com botão voltar */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
             <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
           </TouchableOpacity>
         </View>
  
-        {/* Títulos */}
         <Text style={styles.titulo}>Nossos endereços</Text>
         <Text style={styles.subtitulo}>
           Caso você deseje um atendimento presencial, dirija-se a um de nossos endereços abaixo:
         </Text>
  
-        {/* Unidade São Paulo */}
         <Text style={styles.nomeCidade}>São Paulo</Text>
         <View style={styles.cardEndereco}>
           <Text style={styles.textoEndereco}>Av. Moema, 300</Text>
@@ -45,7 +42,6 @@ export default function EnderecosScreen() {
           </View>
         </View>
  
-        {/* Unidade Rio de Janeiro */}
         <Text style={styles.nomeCidade}>Rio de Janeiro</Text>
         <View style={styles.cardEndereco}>
           <Text style={styles.textoEndereco}>Rua do Passeio, 42 - 6º andar</Text>

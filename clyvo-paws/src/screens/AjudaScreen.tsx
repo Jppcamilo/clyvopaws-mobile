@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
  
-  // Estilo dos Botões (Cards)
   cardAjuda: {
     flexDirection: 'row',
     alignItems: 'center',

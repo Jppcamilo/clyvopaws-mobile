@@ -14,7 +14,6 @@ import { colors } from '../theme/colors';
 export default function ContatosScreen() {
   const navigation = useNavigation<any>();
  
-  // Função para fazer o celular abrir o discador de telefone ou link
   const abrirLink = (url: string) => {
     Linking.openURL(url).catch((err) => console.error('Erro ao abrir link', err));
   };
@@ -23,7 +22,6 @@ export default function ContatosScreen() {
     <View style={styles.containerPrincipal}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
        
-        {/* Cabeçalho */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
             <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
@@ -32,7 +30,6 @@ export default function ContatosScreen() {
  
         <Text style={styles.titulo}>Demais contatos</Text>
  
-        {/* Central de Serviços */}
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Central de serviços</Text>
           <Text style={styles.textoExplicativo}>
@@ -55,7 +52,6 @@ export default function ContatosScreen() {
           </View>
         </View>
  
-        {/* SAC */}
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>SAC</Text>
           <Text style={styles.textoExplicativo}>Reclamações e informações institucionais</Text>
@@ -68,7 +64,6 @@ export default function ContatosScreen() {
           </View>
         </View>
  
-        {/* Pessoa com deficiência */}
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Pessoa com deficiência</Text>
           <Text style={styles.textoExplicativo}>Audição e fala</Text>
@@ -88,7 +83,6 @@ export default function ContatosScreen() {
           </View>
         </View>
  
-        {/* Canal de denúncia */}
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Fale comigo - Canal de denúncia</Text>
           <Text style={styles.textoExplicativo}>

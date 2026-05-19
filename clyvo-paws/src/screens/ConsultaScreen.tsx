@@ -16,21 +16,17 @@ export default function ConsultasScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
-      {/* Botão de Voltar */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
       </View>
 
-      {/* Títulos */}
       <Text style={styles.titulo}>CONSULTAS</Text>
       <Text style={styles.subtitulo}>CLINICAS PARA MARCAR CONSULTAS</Text>
 
-      {/* Lista de Clínicas */}
       <View style={styles.listaClinicas}>
         
-        {/* Card 1 */}
         <TouchableOpacity style={styles.cardClinica} activeOpacity={0.8}>
           <View style={styles.tagNome}>
             <Text style={styles.textoTag}>Dr. Pet Domiciliar</Text>
@@ -41,7 +37,6 @@ export default function ConsultasScreen() {
           <Text style={styles.textoTelefone}>(11) 99999-0001</Text>
         </TouchableOpacity>
 
-        {/* Card 2 */}
         <TouchableOpacity style={styles.cardClinica} activeOpacity={0.8}>
           <View style={styles.tagNome}>
             <Text style={styles.textoTag}>SERES</Text>
@@ -52,7 +47,6 @@ export default function ConsultasScreen() {
           <Text style={styles.textoTelefone}>(11) 99999-0002</Text>
         </TouchableOpacity>
 
-        {/* Card 3 */}
         <TouchableOpacity style={styles.cardClinica} activeOpacity={0.8}>
           <View style={styles.tagNome}>
             <Text style={styles.textoTag}>VET DOMICÍLIO SP</Text>
@@ -111,7 +105,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     marginBottom: 25,
-    // Sombra para dar o efeito flutuante do seu design
     elevation: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
