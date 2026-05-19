@@ -51,43 +51,6 @@ export default function PetDetailsScreen() {
             
             if (petEncontrado) {
               setPet(petEncontrado);
-
-              const hoje = new Date();
-              const ano = hoje.getFullYear();
-              const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-              const dia = String(hoje.getDate()).padStart(2, '0');
-              const dataHojeString = `${ano}-${mes}-${dia}`;
-              const mesAtual = `${ano}-${mes}`;
-
-              const lembretesMock = [
-                { data: `${mesAtual}-05`, tarefa: 'Vacina V10', horario: '14:30' },
-                { data: `${mesAtual}-12`, tarefa: 'Consulta de Rotina', horario: '10:00' },
-                { data: `${mesAtual}-19`, tarefa: 'Vermífugo Drontal', horario: '08:00' }
-              ];
-
-              // CORREÇÃO AQUI: Tipamos explicitamente como any[] para aceitar a propriedade 'data' sem conflito com o tipo Pet
-              const lembretesAtuais: any[] = (petEncontrado.lembretes && petEncontrado.lembretes.length > 0) 
-                ? petEncontrado.lembretes 
-                : lembretesMock;
-
-              setLembretes(lembretesAtuais);
-
-              let marcacoes: any = {};
-              lembretesAtuais.forEach(lembrete => {
-                if (lembrete.data) {
-                  marcacoes[lembrete.data] = { marked: true, dotColor: colors.verdeMedio };
-                }
-              });
-
-              marcacoes[dataHojeString] = {
-                ...marcacoes[dataHojeString],
-                selected: true,
-                selectedColor: colors.verdeMedio,
-                marked: marcacoes[dataHojeString]?.marked || false,
-                dotColor: colors.branco
-              };
-
-              setDatasMarcadas(marcacoes);
             }
           }
         }
@@ -189,20 +152,13 @@ export default function PetDetailsScreen() {
           <Text style={styles.tituloCardStatus}>VACINAS / LEMBRETES</Text>
           <Text style={styles.subtituloCardStatus}>Pendente</Text>
           
-          {lembretes && lembretes.length > 0 ? (
-            lembretes.map((lembrete, index) => {
-              const dataQuebrada = lembrete.data ? lembrete.data.split('-') : [];
-              const dataFormatada = dataQuebrada.length === 3 ? `${dataQuebrada[2]}/${dataQuebrada[1]}` : '';
-
-              return (
-                <View key={index} style={styles.itemLembrete}>
-                  <View style={styles.bolinhaVerde} />
-                  <Text style={styles.textoLembrete}>
-                    {dataFormatada} - {lembrete.tarefa} ({lembrete.horario})
-                  </Text>
-                </View>
-              );
-            })
+          {pet.lembretes && pet.lembretes.length > 0 ? (
+            pet.lembretes.map((lembrete, index) => (
+              <View key={index} style={styles.itemLembrete}>
+                <View style={styles.bolinhaVerde} />
+                <Text style={styles.textoLembrete}>{lembrete.tarefa} - {lembrete.horario}</Text>
+              </View>
+            ))
           ) : (
             <View style={styles.itemLembrete}>
               <View style={styles.bolinhaVerde} />

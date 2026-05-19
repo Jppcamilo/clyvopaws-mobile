@@ -17,6 +17,12 @@ import PetDetailsScreen from './src/screens/PetDetailsScreen';
 import ConsultasScreen from './src/screens/ConsultaScreen';
 import RedeClinicaScreen from './src/screens/RedeClinicaScreen';
 import ProdutosScreen from './src/screens/ProdutosScreen';
+import ProductDetailsScreen from './src/screens/ProductDetailScreen';
+import MeusMedicamentosScreen from './src/screens/MeusMedicamentosScreen';
+import AjudaScreen from './src/screens/AjudaScreen';
+import EnderecosScreen from './src/screens/EnderecosScreen';
+import ContatosScreen from './src/screens/ContatosScreen';
+import ChatScreen from './src/screens/ChatScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -41,7 +47,7 @@ function TabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'HOME' }} />
       <Tab.Screen name="Servicos" component={ServicesScreen} options={{ tabBarLabel: 'SERVIÇOS' }} />
-      <Tab.Screen name="Ajuda" component={() => null} options={{ tabBarLabel: 'AJUDA' }} />
+      <Tab.Screen name="Ajuda" component={AjudaScreen} options={{ tabBarLabel: 'AJUDA' }} />
     </Tab.Navigator>
   );
 }
@@ -63,6 +69,11 @@ export default function App() {
         <Stack.Screen name="Consultas" component={ConsultasScreen} />
         <Stack.Screen name="RedeClinica" component={RedeClinicaScreen} />
         <Stack.Screen name="Produtos" component={ProdutosScreen} />
+        <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+        <Stack.Screen name="MeusMedicamentos" component={MeusMedicamentosScreen} />
+        <Stack.Screen name="Enderecos" component={EnderecosScreen} />
+        <Stack.Screen name="Contatos" component={ContatosScreen} />
+        <Stack.Screen name="Chat" component={ChatScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

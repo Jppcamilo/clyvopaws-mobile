@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Pet } from '../types';
-import { colors } from '../theme/colors'; // <-- Importando nossas cores!
+import { colors } from '../theme/colors';
 
 type Props = {
   pet: Pet;
@@ -14,8 +14,8 @@ export default function CardLembrete({ pet }: Props) {
         <Text style={styles.textoNome}>{pet.nome}</Text>
       </View>
 
-      {pet.lembretes.map((lembrete) => (
-        <View key={lembrete.id} style={styles.linhaLembrete}>
+      {pet.lembretes.map((lembrete, index) => (
+        <View key={index} style={styles.lembrete}>
           <View style={styles.bolinha} />
           <Text style={styles.textoLembrete}>
             {lembrete.tarefa} • {lembrete.horario}
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontSize: 14,
   },
-  linhaLembrete: {
+  lembrete: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 5,

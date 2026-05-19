@@ -7,7 +7,7 @@ export type Usuario = {
 };
 
 export type Lembrete = {
-  id: string;
+  data: string;
   tarefa: string;
   horario: string;
 };
@@ -17,9 +17,9 @@ export type Pet = {
   nome: string;
   idade: string;
   raca: string;
-  descricao?: string;
-  foto?: string;
-  lembretes: Lembrete[];
+  descricao: string;
+  foto: string | null;
+  lembretes: Lembrete[]; 
 };
 
 export type Produto = {
