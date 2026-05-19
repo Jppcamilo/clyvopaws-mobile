@@ -24,12 +24,10 @@ export default function PetFormScreen() {
   const [descricao, setDescricao] = useState('');
   const [foto, setFoto] = useState<string | null>(null);
 
-  // 🛠️ FUNÇÃO NOVA: Protege contra o erro do "GO_BACK"
   const voltarSeguro = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      // Se não tiver histórico (devido a reload), força a volta para as abas principais
       navigation.navigate('MainTabs'); 
     }
   };
@@ -60,6 +58,20 @@ export default function PetFormScreen() {
       return;
     }
 
+    // 🛠️ LÓGICA NOVA: Criando lembretes automáticos na hora do cadastro!
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    
+    const dataHoje = `${ano}-${mes}-${dia}`;
+    const dataFutura = `${ano}-${mes}-28`; // Um dia genérico no futuro para o calendário
+
+    const lembretesIniciais = [
+      { data: dataHoje, tarefa: 'Primeira Consulta Clínica', horario: '14:00' },
+      { data: dataFutura, tarefa: 'Vacina V10', horario: '09:30' }
+    ];
+
     const novoPet = {
       id: Date.now().toString(),
       nome,
@@ -67,7 +79,7 @@ export default function PetFormScreen() {
       raca,
       descricao,
       foto, 
-      lembretes: [], 
+      lembretes: lembretesIniciais, // <-- Agora o pet já nasce com compromissos!
     };
 
     try {
@@ -88,7 +100,7 @@ export default function PetFormScreen() {
       await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtual));
 
       Alert.alert('Sucesso!', 'Pet cadastrado na família Clyvo!');
-      voltarSeguro(); // 🛠️ Usa a função segura após salvar também
+      voltarSeguro();
 
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível salvar os dados do pet.');
