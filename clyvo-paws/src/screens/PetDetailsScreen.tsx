@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { colors } from '../theme/colors';
 import { Pet } from '../types';
+import { DADOS_RACAS } from '../data/racas'; // 🌟 Importando nosso banco de raças!
 
 LocaleConfig.locales['pt-br'] = {
   monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -25,7 +26,7 @@ LocaleConfig.locales['pt-br'] = {
 LocaleConfig.defaultLocale = 'pt-br';
 
 export default function PetDetailsScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { petId } = route.params;
 
@@ -34,6 +35,7 @@ export default function PetDetailsScreen() {
   
   const [lembretes, setLembretes] = useState<any[]>([]);
   const [datasMarcadas, setDatasMarcadas] = useState<any>({});
+  const [racaInfo, setRacaInfo] = useState<any>(null); // 🌟 Estado para guardar os dados médicos da raça
 
   useEffect(() => {
     const carregarPet = async () => {
@@ -51,6 +53,49 @@ export default function PetDetailsScreen() {
             
             if (petEncontrado) {
               setPet(petEncontrado);
+
+              // 🌟 LÓGICA NOVA: Procura a raça no nosso arquivo de dados
+              let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === petEncontrado.raca);
+              if (!dadosMedicos) {
+                dadosMedicos = DADOS_RACAS.GATO.find((r: any) => r.nome === petEncontrado.raca);
+              }
+              setRacaInfo(dadosMedicos); // Salva os dados encontrados
+
+              const hoje = new Date();
+              const ano = hoje.getFullYear();
+              const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+              const dia = String(hoje.getDate()).padStart(2, '0');
+              const dataHojeString = `${ano}-${mes}-${dia}`;
+              const mesAtual = `${ano}-${mes}`;
+
+              const lembretesMock = [
+                { data: `${mesAtual}-05`, tarefa: 'Vacina V10', horario: '14:30' },
+                { data: `${mesAtual}-12`, tarefa: 'Consulta de Rotina', horario: '10:00' },
+                { data: `${mesAtual}-19`, tarefa: 'Vermífugo Drontal', horario: '08:00' }
+              ];
+
+              const lembretesAtuais = (petEncontrado.lembretes && petEncontrado.lembretes.length > 0) 
+                ? petEncontrado.lembretes 
+                : lembretesMock;
+
+              setLembretes(lembretesAtuais);
+
+              let marcacoes: any = {};
+              lembretesAtuais.forEach(lembrete => {
+                if (lembrete.data) {
+                  marcacoes[lembrete.data] = { marked: true, dotColor: colors.verdeMedio };
+                }
+              });
+
+              marcacoes[dataHojeString] = {
+                ...marcacoes[dataHojeString],
+                selected: true,
+                selectedColor: colors.verdeMedio,
+                marked: marcacoes[dataHojeString]?.marked || false,
+                dotColor: colors.branco
+              };
+
+              setDatasMarcadas(marcacoes);
             }
           }
         }
@@ -104,6 +149,17 @@ export default function PetDetailsScreen() {
         </View>
       </View>
 
+      {/* 🌟 BOTÃO DO PLANO PREVENTIVO (Só aparece se a raça estiver mapeada no banco) */}
+      {racaInfo && (
+        <TouchableOpacity 
+          style={styles.botaoPreventivo}
+          onPress={() => navigation.navigate('InfoRaca', { racaData: racaInfo })}
+        >
+          <MaterialCommunityIcons name="shield-check" size={24} color={colors.branco} style={{ marginRight: 10 }} />
+          <Text style={styles.textoBotaoPreventivo}>VER PLANO PREVENTIVO</Text>
+        </TouchableOpacity>
+      )}
+
       <View style={styles.secao}>
         <Text style={styles.tituloSecao}>DESCRIÇÃO</Text>
         <Text style={styles.textoDescricao}>
@@ -152,13 +208,20 @@ export default function PetDetailsScreen() {
           <Text style={styles.tituloCardStatus}>VACINAS / LEMBRETES</Text>
           <Text style={styles.subtituloCardStatus}>Pendente</Text>
           
-          {pet.lembretes && pet.lembretes.length > 0 ? (
-            pet.lembretes.map((lembrete, index) => (
-              <View key={index} style={styles.itemLembrete}>
-                <View style={styles.bolinhaVerde} />
-                <Text style={styles.textoLembrete}>{lembrete.tarefa} - {lembrete.horario}</Text>
-              </View>
-            ))
+          {lembretes && lembretes.length > 0 ? (
+            lembretes.map((lembrete, index) => {
+              const dataQuebrada = lembrete.data ? lembrete.data.split('-') : [];
+              const dataFormatada = dataQuebrada.length === 3 ? `${dataQuebrada[2]}/${dataQuebrada[1]}` : '';
+
+              return (
+                <View key={index} style={styles.itemLembrete}>
+                  <View style={styles.bolinhaVerde} />
+                  <Text style={styles.textoLembrete}>
+                    {dataFormatada} - {lembrete.tarefa} ({lembrete.horario})
+                  </Text>
+                </View>
+              );
+            })
           ) : (
             <View style={styles.itemLembrete}>
               <View style={styles.bolinhaVerde} />
@@ -168,222 +231,39 @@ export default function PetDetailsScreen() {
         </View>
       </View>
 
-      <View style={styles.secao}>
-        <Text style={styles.tituloSecao}>LAUDO MÉDICO</Text>
-        
-        <View style={styles.cardClinica}>
-          <Text style={styles.nomeClinica}>Clínica Amigo Fiel</Text>
-          
-          <View style={styles.cardLaudo}>
-            <View style={styles.laudoTextos}>
-              <Text style={styles.tituloLaudo}>LAUDO MEDICO</Text>
-              <View style={styles.linhaFalsa} />
-              <View style={styles.linhaFalsaCurta} />
-            </View>
-            <TouchableOpacity style={styles.botaoDownload}>
-              <MaterialCommunityIcons name="download" size={20} color={colors.roxoMuitoEscuro} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
       <View style={{ height: 100 }} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  containerCentro: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    backgroundColor: colors.branco },
+  containerCentro: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.branco },
+  textoVazio: { fontSize: 18, fontWeight: 'bold', color: colors.roxoMuitoEscuro, marginBottom: 20 },
+  botaoVoltarErro: { backgroundColor: colors.verdeMedio, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20 },
+  textoBotaoVoltar: { color: colors.roxoMuitoEscuro, fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
+  header: { marginBottom: 20 },
+  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
+  nomePet: { fontSize: 22, fontWeight: '900', color: colors.verdeEscuro, textTransform: 'uppercase', marginBottom: 15 },
+  infoContainer: { flexDirection: 'row', marginBottom: 20 },
+  imagemPet: { width: 140, height: 100, borderRadius: 10, marginRight: 15 },
+  dadosContainer: { justifyContent: 'center', flex: 1 },
+  dadoTexto: { fontSize: 14, color: colors.roxoMuitoEscuro, marginBottom: 5, fontWeight: 'bold' },
+  dadoLabel: { fontWeight: '900' },
+  
+  botaoPreventivo: { flexDirection: 'row', backgroundColor: colors.verdeEscuro, paddingVertical: 12, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginBottom: 25 },
+  textoBotaoPreventivo: { color: colors.branco, fontWeight: '900', fontSize: 14, textTransform: 'uppercase' },
 
-  textoVazio: { 
-    
-    fontSize: 18, 
-    
-    fontWeight: 'bold', 
-    
-    color: colors.roxoMuitoEscuro, 
-    
-    marginBottom: 20 },
-
-  botaoVoltarErro: { 
-    backgroundColor: colors.verdeMedio, 
-    paddingHorizontal: 20, 
-    paddingVertical: 10, 
-    borderRadius: 20 },
-
-  textoBotaoVoltar: {
-     color: colors.roxoMuitoEscuro, 
-    fontWeight: 'bold' },
-
-  container: {
-     flex: 1,
-     backgroundColor: colors.branco, 
-    paddingHorizontal: 20, 
-    paddingTop: 50 },
-
-  header: { 
-    marginBottom: 20 },
-
-  botaoVoltar: { 
-    backgroundColor: colors.verdeMedio, 
-    width: 46, 
-    height: 46,
-     borderRadius: 23, 
-    justifyContent: 'center', 
-    alignItems: 'center' },
-
-  nomePet: { 
-    fontSize: 22, 
-    fontWeight: '900', 
-    color: colors.verdeEscuro, 
-    textTransform: 'uppercase', 
-    marginBottom: 15 },
-
-  infoContainer: { 
-    flexDirection: 'row', 
-    marginBottom: 25 },
-
-  imagemPet: {
-     width: 190, 
-    height: 150, 
-    borderRadius: 10, 
-    marginRight: 15 },
-
-  dadosContainer: { 
-    justifyContent: 'center',
-     flex: 1 },
-
-  dadoTexto: { 
-    fontSize: 14,
-     color: colors.roxoMuitoEscuro, 
-    marginBottom: 5, 
-    fontWeight: 'bold' },
-
-  dadoLabel: { 
-    fontWeight: '900' },
-
-  secao: { 
-    marginBottom: 30 },
-  headerCalendario: { 
-    flexDirection: 'row',
-     justifyContent: 'space-between', 
-    alignItems: 'center', 
-    marginBottom: 10 },
-
-  tituloSecao: { 
-    fontSize: 16,
-     fontWeight: '900', 
-    color: colors.roxoMuitoEscuro, 
-    textTransform: 'uppercase' },
-
-  textoAbrir: { 
-    color: colors.cinza,
-     fontWeight: 'bold', 
-    fontSize: 14 },
-
-  textoDescricao: {
-     fontSize: 14,
-    color: colors.roxoMuitoEscuro, 
-    fontWeight: 'bold',
-     lineHeight: 20 },
-  containerCalendarioEscuro: { 
-    backgroundColor: '#2C2C2E',
-     borderRadius: 15, 
-    overflow: 'hidden', 
-    paddingBottom: 10, 
-    elevation: 5, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.25, 
-    shadowRadius: 3.84 },
-  cardStatus: { 
-    borderColor: colors.roxoMuitoEscuro, 
-    borderWidth: 1, 
-    borderRadius: 15,
-     padding: 15, 
-    backgroundColor: colors.branco },
-
-  tituloCardStatus: { 
-    fontSize: 14,
-     fontWeight: '900', 
-    color: colors.roxoMuitoEscuro, 
-    marginBottom: 5 },
-
-  subtituloCardStatus: { 
-    fontSize: 14,
-     fontWeight: '900', 
-    color: colors.verdeMedio, 
-    marginBottom: 10 },
-  itemLembrete: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 5 },
-
-  bolinhaVerde: {
-     width: 10,
-     height: 10, 
-    borderRadius: 5, 
-    backgroundColor: colors.verdeMedio, 
-    marginRight: 10 },
-
-  textoLembrete: { 
-    fontSize: 14,
-     fontWeight: 'bold', 
-    color: colors.verdeMedio },
-
-  cardClinica: { 
-    backgroundColor: colors.verdeMedio, 
-    borderRadius: 20, 
-    padding: 20, 
-    marginBottom: 15 },
-
-  nomeClinica: { 
-    fontSize: 14, 
-    fontWeight: '900', 
-    color: colors.roxoMuitoEscuro, 
-    marginBottom: 15 },
-
-  cardLaudo: { 
-    backgroundColor: colors.verdeEscuro, 
-    borderRadius: 15, 
-    padding: 15, 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
-    marginBottom: 10 },
-  laudoTextos: { 
-    flex: 1, 
-    marginRight: 10 },
-
-  tituloLaudo: { 
-    fontSize: 14, 
-    fontWeight: '900', 
-    color: colors.roxoMuitoEscuro, 
-    marginBottom: 5 },
-
-  linhaFalsa: { 
-    height: 4, 
-    backgroundColor: colors.verdeClaro, 
-    borderRadius: 2, 
-    marginBottom: 3, 
-    width: '100%' },
-
-  linhaFalsaCurta: { 
-    height: 4, 
-    backgroundColor: colors.verdeClaro, 
-    borderRadius: 2, 
-    width: '60%' },
-
-  botaoDownload: { 
-    backgroundColor: colors.verdeClaro, 
-    width: 36, 
-    height: 36, 
-    borderRadius: 18, 
-    justifyContent: 'center', 
-    alignItems: 'center' }
-
+  secao: { marginBottom: 30 },
+  headerCalendario: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  tituloSecao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, textTransform: 'uppercase' },
+  textoAbrir: { color: colors.cinza, fontWeight: 'bold', fontSize: 14 },
+  textoDescricao: { fontSize: 14, color: colors.roxoMuitoEscuro, fontWeight: 'bold', lineHeight: 20 },
+  containerCalendarioEscuro: { backgroundColor: '#2C2C2E', borderRadius: 15, overflow: 'hidden', paddingBottom: 10, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 },
+  cardStatus: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 15, padding: 15, backgroundColor: colors.branco },
+  tituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 5 },
+  subtituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 10 },
+  itemLembrete: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
+  bolinhaVerde: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.verdeMedio, marginRight: 10 },
+  textoLembrete: { fontSize: 14, fontWeight: 'bold', color: colors.verdeMedio }
 });

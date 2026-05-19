@@ -23,6 +23,7 @@ import AjudaScreen from './src/screens/AjudaScreen';
 import EnderecosScreen from './src/screens/EnderecosScreen';
 import ContatosScreen from './src/screens/ContatosScreen';
 import ChatScreen from './src/screens/ChatScreen';
+import InfoRacaScreen from './src/screens/InfoRacaScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -74,6 +75,7 @@ export default function App() {
         <Stack.Screen name="Enderecos" component={EnderecosScreen} />
         <Stack.Screen name="Contatos" component={ContatosScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="InfoRaca" component={InfoRacaScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>
