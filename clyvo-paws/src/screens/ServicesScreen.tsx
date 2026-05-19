@@ -33,7 +33,7 @@ export default function ServicesScreen() {
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('MeusMedicamentos')}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="file-document-outline" size={35} color={colors.roxoMuitoEscuro} />
           </View>
