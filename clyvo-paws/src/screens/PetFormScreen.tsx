@@ -21,17 +21,14 @@ export default function PetFormScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   
-  // Verifica se a tela foi aberta para EDITAR um pet existente (recebido do PetDetailsScreen)
   const petParaEditar = route.params?.pet;
 
-  // Lógica para auto-selecionar a espécie se estivermos editando
-  let especieInicial: 'CACHORRO' | 'GATO' | null = null;
+   let especieInicial: 'CACHORRO' | 'GATO' | null = null;
   if (petParaEditar) {
     const isCachorro = DADOS_RACAS.CACHORRO.some((r: any) => r.nome === petParaEditar.raca);
     especieInicial = isCachorro ? 'CACHORRO' : 'GATO';
   }
 
-  // Estados: usam os dados de petParaEditar se existir, senão ficam vazios para cadastro novo
   const [nome, setNome] = useState(petParaEditar?.nome || '');
   const [dataNascimento, setDataNascimento] = useState<Date>(
     petParaEditar && petParaEditar.dataNascimento ? new Date(petParaEditar.dataNascimento) : new Date()
@@ -63,7 +60,7 @@ export default function PetFormScreen() {
   };
 
   const handleSalvar = async () => {
-    // Validação de segurança
+
     if (!nome.trim() || !peso.trim() || !sexo || !especie || !racaSelecionada) {
       Alert.alert('Atenção', 'Preencha todos os campos obrigatórios (Nome, Peso, Sexo, Espécie e Raça)!');
       return;
@@ -74,8 +71,7 @@ export default function PetFormScreen() {
     const mes = String(hoje.getMonth() + 1).padStart(2, '0');
     const dia = String(hoje.getDate()).padStart(2, '0');
     const dataHoje = `${ano}-${mes}-${dia}`;
-
-    // Objeto do pet, se for edição ele mantém o ID e os lembretes originais
+ 
     const petAtualizado = {
       id: petParaEditar ? petParaEditar.id : Date.now().toString(),
       nome, 
@@ -99,19 +95,15 @@ export default function PetFormScreen() {
         let listaAtual = petsSalvos ? JSON.parse(petsSalvos) : [];
         
         if (petParaEditar) {
-          // MODO EDIÇÃO: Atualiza o pet existente na lista
           listaAtual = listaAtual.map((p: any) => p.id === petParaEditar.id ? petAtualizado : p);
           await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtual));
           Alert.alert('Sucesso', 'Dados do pet atualizados com sucesso!');
           
-          // Na edição, não precisamos mostrar o plano preventivo de novo, só voltar pra tela de detalhes
           navigation.goBack(); 
         } else {
-          // MODO NOVO CADASTRO: Adiciona na lista
           listaAtual.push(petAtualizado);
           await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtual));
           
-          // No cadastro novo, enviamos o tutor para ver a tela do plano preventivo
           navigation.replace('InfoRaca', { racaData: racaSelecionada }); 
         }
       }
