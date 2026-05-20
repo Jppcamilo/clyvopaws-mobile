@@ -278,11 +278,29 @@ const styles = StyleSheet.create({
   botaoEspecieAtivo: { backgroundColor: colors.verdeEscuro, borderColor: colors.verdeEscuro },
   textoEspecie: { fontWeight: 'bold', color: colors.roxoMuitoEscuro, marginLeft: 8 },
   
-  scrollRacas: { marginBottom: 20 },
-  tagRaca: { borderColor: colors.verdeMedio, borderWidth: 1, borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, marginRight: 10, justifyContent: 'center' },
-  tagRacaAtiva: { backgroundColor: colors.verdeMedio },
-  textoRaca: { color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 12 },
+  scrollRacas: { 
+    marginBottom: 20 },
+  tagRaca: { 
+    borderColor: colors.verdeMedio, 
+    borderWidth: 1, 
+    borderRadius: 20, 
+    paddingHorizontal: 15, 
+    paddingVertical: 8, 
+    marginRight: 10, 
+    justifyContent: 'center' },
+  tagRacaAtiva: { 
+    backgroundColor: colors.verdeMedio },
+  textoRaca: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: 'bold', 
+    fontSize: 12 },
 
-  botaoCadastrar: { backgroundColor: colors.verdeClaro, borderRadius: 25, paddingVertical: 15, alignItems: 'center', marginTop: 10, marginBottom: 40 },
-  textoBotaoCadastrar: { color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 16 }
+  botaoCadastrar: { 
+    backgroundColor: colors.verdeClaro, 
+    borderRadius: 25, 
+    paddingVertical: 15, alignItems: 'center', marginTop: 10, marginBottom: 40 },
+  textoBotaoCadastrar: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 16 }
 });
