@@ -10,7 +10,7 @@ import {
   Alert 
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'; // 🌟 Importamos o useFocusEffect
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { colors } from '../theme/colors';
@@ -38,8 +38,7 @@ export default function PetDetailsScreen() {
   const [lembretes, setLembretes] = useState<any[]>([]);
   const [datasMarcadas, setDatasMarcadas] = useState<any>({});
   const [racaInfo, setRacaInfo] = useState<any>(null);
-
-  // 🌟 Trocamos useEffect por useFocusEffect para recarregar ao voltar da edição!
+  
   useFocusEffect(
     useCallback(() => {
       const carregarPet = async () => {
@@ -179,7 +178,6 @@ export default function PetDetailsScreen() {
         
         <View style={{ flexDirection: 'row' }}>
           
-          {/* 🌟 BOTÃO DE EDITAR COM ESTILO PRÓPRIO */}
           <TouchableOpacity 
             style={styles.botaoEditar} 
             onPress={() => navigation.navigate('PetForm', { pet: pet })}
@@ -301,8 +299,7 @@ const styles = StyleSheet.create({
   
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
-  
-  // 🌟 NOVO ESTILO DO BOTÃO DE EDITAR
+
   botaoEditar: { backgroundColor: '#E8F5E9', width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
   
   botaoDeletar: { backgroundColor: '#FFECEB', width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
