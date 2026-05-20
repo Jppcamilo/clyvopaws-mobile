@@ -291,37 +291,189 @@ export default function PetDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  containerCentro: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.branco },
-  textoVazio: { fontSize: 18, fontWeight: 'bold', color: colors.roxoMuitoEscuro, marginBottom: 20 },
-  botaoVoltarErro: { backgroundColor: colors.verdeMedio, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20 },
-  textoBotaoVoltar: { color: colors.roxoMuitoEscuro, fontWeight: 'bold' },
-  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
+  containerCentro: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: colors.branco 
+  },
+  textoVazio: { 
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    color: colors.roxoMuitoEscuro, 
+    marginBottom: 20 
+  },
+  botaoVoltarErro: { 
+    backgroundColor: colors.verdeMedio, 
+    paddingHorizontal: 20, 
+    paddingVertical: 10, 
+    borderRadius: 20 
+  },
+  textoBotaoVoltar: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: 'bold' 
+  },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    paddingHorizontal: 20, 
+    paddingTop: 50 
+  },
   
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginBottom: 20 
+  },
+  botaoVoltar: { 
+    backgroundColor: colors.verdeMedio, 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
 
-  botaoEditar: { backgroundColor: '#E8F5E9', width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
+  botaoEditar: { 
+    backgroundColor: '#E8F5E9', 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginRight: 10 
+  },
   
-  botaoDeletar: { backgroundColor: '#FFECEB', width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
+  botaoDeletar: { 
+    backgroundColor: '#FFECEB', 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
   
-  nomePet: { fontSize: 22, fontWeight: '900', color: colors.verdeEscuro, textTransform: 'uppercase', marginBottom: 15 },
-  infoContainer: { flexDirection: 'row', marginBottom: 20 },
-  imagemPet: { width: 140, height: 100, borderRadius: 10, marginRight: 15 },
-  dadosContainer: { justifyContent: 'center', flex: 1 },
-  dadoTexto: { fontSize: 14, color: colors.roxoMuitoEscuro, marginBottom: 5, fontWeight: 'bold' },
-  dadoLabel: { fontWeight: '900' },
-  botaoPreventivo: { flexDirection: 'row', backgroundColor: colors.verdeEscuro, paddingVertical: 12, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginBottom: 25 },
-  textoBotaoPreventivo: { color: colors.branco, fontWeight: '900', fontSize: 14, textTransform: 'uppercase' },
-  secao: { marginBottom: 30 },
-  headerCalendario: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  tituloSecao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, textTransform: 'uppercase' },
-  textoAbrir: { color: colors.cinza, fontWeight: 'bold', fontSize: 14 },
-  textoDescricao: { fontSize: 14, color: colors.roxoMuitoEscuro, fontWeight: 'bold', lineHeight: 20 },
-  containerCalendarioEscuro: { backgroundColor: '#2C2C2E', borderRadius: 15, overflow: 'hidden', paddingBottom: 10, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 },
-  cardStatus: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 15, padding: 15, backgroundColor: colors.branco },
-  tituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 5 },
-  subtituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 10 },
-  itemLembrete: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
-  bolinhaVerde: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.verdeMedio, marginRight: 10 },
-  textoLembrete: { fontSize: 14, fontWeight: 'bold', color: colors.verdeMedio }
+  nomePet: { 
+    fontSize: 22, 
+    fontWeight: '900', 
+    color: colors.verdeEscuro, 
+    textTransform: 'uppercase', 
+    marginBottom: 15 
+  },
+  infoContainer: { 
+    flexDirection: 'row', 
+    marginBottom: 20 
+  },
+  imagemPet: { 
+    width: 140, 
+    height: 100, 
+    borderRadius: 10, 
+    marginRight: 15 
+  },
+  dadosContainer: { 
+    justifyContent: 'center', 
+    flex: 1 
+  },
+  dadoTexto: { 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro, 
+    marginBottom: 5, 
+    fontWeight: 'bold' 
+  },
+  dadoLabel: { 
+    fontWeight: '900' 
+  },
+  botaoPreventivo: { 
+    flexDirection: 'row', 
+    backgroundColor: colors.verdeEscuro, 
+    paddingVertical: 12, 
+    borderRadius: 25, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginBottom: 25 
+  },
+  textoBotaoPreventivo: { 
+    color: colors.branco, 
+    fontWeight: '900', 
+    fontSize: 14, 
+    textTransform: 'uppercase' 
+  },
+  secao: { 
+    marginBottom: 30 
+  },
+  headerCalendario: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginBottom: 10 
+  },
+  tituloSecao: { 
+    fontSize: 16, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    textTransform: 'uppercase' 
+  },
+  textoAbrir: { 
+    color: colors.cinza, 
+    fontWeight: 'bold', 
+    fontSize: 14 
+  },
+  textoDescricao: { 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: 'bold', 
+    lineHeight: 20 
+  },
+  containerCalendarioEscuro: { 
+    backgroundColor: '#2C2C2E', 
+    borderRadius: 15, 
+    overflow: 'hidden', 
+    paddingBottom: 10, 
+    elevation: 5, 
+    shadowColor: '#000', 
+    shadowOffset: { 
+      width: 0, 
+      height: 2 
+    }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84 
+  },
+  cardStatus: { 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 15, 
+    padding: 15, 
+    backgroundColor: 
+    colors.branco 
+  },
+  tituloCardStatus: { 
+    fontSize: 14, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    marginBottom: 5 
+  },
+  subtituloCardStatus: { 
+    fontSize: 14, 
+    fontWeight: '900', 
+    color: colors.verdeMedio, 
+    marginBottom: 10 
+  },
+  itemLembrete: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 5 
+  },
+  bolinhaVerde: { 
+    width: 10, 
+    height: 10, 
+    borderRadius: 5, 
+    backgroundColor: colors.verdeMedio, 
+    marginRight: 10 
+  },
+  textoLembrete: { 
+    fontSize: 14, 
+    fontWeight: 'bold', 
+    color: colors.verdeMedio 
+  }
 });
