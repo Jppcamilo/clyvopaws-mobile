@@ -15,7 +15,7 @@ export type Lembrete = {
 export type Pet = {
   id: string;
   nome: string;
-  idade: string;
+  dataNascimento: string;
   raca: string;
   peso?: string;
   sexo?: 'MACHO' | 'FÊMEA';

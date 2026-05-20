@@ -15,9 +15,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker'; 
 import { colors } from '../theme/colors';
 import { DADOS_RACAS } from '../data/racas';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { calcularIdade } from '../utils/dateUtils';
+
 
 export default function PetFormScreen() {
   const navigation = useNavigation<any>();
+
+  const [dataNascimento, setDataNascimento] = useState<Date>(new Date());
+  const [mostraCalendario, setMostraCalendario] = useState(false);
 
   const [nome, setNome] = useState('');
   const [idade, setIdade] = useState('');
@@ -45,8 +51,8 @@ export default function PetFormScreen() {
   };
 
   const handleCadastrar = async () => {
-    if (!nome.trim() || !idade.trim() || !especie || !racaSelecionada) {
-      Alert.alert('Atenção', 'Preencha todos os campos obrigatórios e selecione uma espécie e raça!');
+    if (!nome.trim() || !peso.trim() || !sexo || !especie || !racaSelecionada) {
+      Alert.alert('Atenção', 'Preencha todos os campos (Nome, Peso, Sexo, Espécie e Raça)!');
       return;
     }
 
@@ -59,7 +65,7 @@ export default function PetFormScreen() {
     const novoPet = {
       id: Date.now().toString(),
       nome, 
-      idade, 
+      dataNascimento: dataNascimento.toISOString(), 
       raca: racaSelecionada.nome, 
       peso,
       sexo,
@@ -116,10 +122,24 @@ export default function PetFormScreen() {
         <TextInput style={styles.input} placeholder="EX: REX" placeholderTextColor={colors.cinza} value={nome} onChangeText={setNome} />
       </View>
 
-      <Text style={styles.labelSecao}>IDADE</Text>
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="EX: 5 MESES" placeholderTextColor={colors.cinza} value={idade} onChangeText={setIdade} />
-      </View>
+      <Text style={styles.labelSecao}>DATA DE NASCIMENTO</Text>
+    <TouchableOpacity style={styles.inputContainer} onPress={() => setMostraCalendario(true)}>
+     <Text style={styles.input}>
+        {dataNascimento.toLocaleDateString('pt-BR')}
+      </Text>
+    </TouchableOpacity>
+
+    {mostraCalendario && (
+    <DateTimePicker
+      value={dataNascimento}
+      mode="date"
+      display="default"
+      onChange={(event, selectedDate) => {
+        setMostraCalendario(false);
+        if (selectedDate) setDataNascimento(selectedDate);
+      }}
+    />
+  )}
       <Text style={styles.labelSecao}>PESO (KG)</Text>
 <View style={styles.inputContainer}>
   <TextInput style={styles.input} placeholder="EX: 5.5" placeholderTextColor={colors.cinza} value={peso} onChangeText={setPeso} keyboardType="numeric" />

@@ -16,6 +16,7 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { colors } from '../theme/colors';
 import { Pet } from '../types';
 import { DADOS_RACAS } from '../data/racas';
+import { calcularIdade } from '../utils/dateUtils';
 
 LocaleConfig.locales['pt-br'] = {
   monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -54,7 +55,6 @@ export default function PetDetailsScreen() {
             
             if (petEncontrado) {
               setPet(petEncontrado);
-
               let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === petEncontrado.raca);
               if (!dadosMedicos) {
                 dadosMedicos = DADOS_RACAS.GATO.find((r: any) => r.nome === petEncontrado.raca);
@@ -187,7 +187,7 @@ export default function PetDetailsScreen() {
       <View style={styles.infoContainer}>
         <Image source={{ uri: fotoUri }} style={styles.imagemPet} />
         <View style={styles.dadosContainer}>
-          <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Idade:</Text> {pet.idade}</Text>
+          <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Idade:</Text> {calcularIdade(pet.dataNascimento)}</Text>
           <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Raça:</Text> {pet.raca}</Text>
           <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Peso:</Text> {pet.peso ? `${pet.peso} kg` : 'Não informado'}</Text>
           <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Sexo:</Text> {pet.sexo || 'Não informado'}</Text>
