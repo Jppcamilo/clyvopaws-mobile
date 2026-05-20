@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -7,10 +7,10 @@ import {
   TouchableOpacity, 
   Image,
   ActivityIndicator,
-  Alert // 🌟 Importamos o Alert para a confirmação nativa
+  Alert 
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'; // 🌟 Importamos o useFocusEffect
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { colors } from '../theme/colors';
@@ -39,75 +39,78 @@ export default function PetDetailsScreen() {
   const [datasMarcadas, setDatasMarcadas] = useState<any>({});
   const [racaInfo, setRacaInfo] = useState<any>(null);
 
-  useEffect(() => {
-    const carregarPet = async () => {
-      try {
-        const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
-        
-        if (dadosTutor) {
-          const tutor = JSON.parse(dadosTutor);
-          const chavePets = `@pets_${tutor.email}`; 
+  // 🌟 Trocamos useEffect por useFocusEffect para recarregar ao voltar da edição!
+  useFocusEffect(
+    useCallback(() => {
+      const carregarPet = async () => {
+        try {
+          const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
+          
+          if (dadosTutor) {
+            const tutor = JSON.parse(dadosTutor);
+            const chavePets = `@pets_${tutor.email}`; 
 
-          const petsSalvos = await AsyncStorage.getItem(chavePets);
-          if (petsSalvos) {
-            const listaPets: Pet[] = JSON.parse(petsSalvos);
-            const petEncontrado = listaPets.find(p => p.id === petId);
-            
-            if (petEncontrado) {
-              setPet(petEncontrado);
-              let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === petEncontrado.raca);
-              if (!dadosMedicos) {
-                dadosMedicos = DADOS_RACAS.GATO.find((r: any) => r.nome === petEncontrado.raca);
-              }
-              setRacaInfo(dadosMedicos);
-
-              const hoje = new Date();
-              const ano = hoje.getFullYear();
-              const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-              const dia = String(hoje.getDate()).padStart(2, '0');
-              const dataHojeString = `${ano}-${mes}-${dia}`;
-              const mesAtual = `${ano}-${mes}`;
-
-              const lembretesMock = [
-                { data: `${mesAtual}-05`, tarefa: 'Vacina V10', horario: '14:30' },
-                { data: `${mesAtual}-12`, tarefa: 'Consulta de Rotina', horario: '10:00' },
-                { data: `${mesAtual}-19`, tarefa: 'Vermífugo Drontal', horario: '08:00' }
-              ];
-
-              const lembretesAtuais = (petEncontrado.lembretes && petEncontrado.lembretes.length > 0) 
-                ? petEncontrado.lembretes 
-                : lembretesMock;
-
-              setLembretes(lembretesAtuais);
-
-              let marcacoes: any = {};
-              lembretesAtuais.forEach(lembrete => {
-                if (lembrete.data) {
-                  marcacoes[lembrete.data] = { marked: true, dotColor: colors.verdeMedio };
+            const petsSalvos = await AsyncStorage.getItem(chavePets);
+            if (petsSalvos) {
+              const listaPets: Pet[] = JSON.parse(petsSalvos);
+              const petEncontrado = listaPets.find(p => p.id === petId);
+              
+              if (petEncontrado) {
+                setPet(petEncontrado);
+                let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === petEncontrado.raca);
+                if (!dadosMedicos) {
+                  dadosMedicos = DADOS_RACAS.GATO.find((r: any) => r.nome === petEncontrado.raca);
                 }
-              });
+                setRacaInfo(dadosMedicos);
 
-              marcacoes[dataHojeString] = {
-                ...marcacoes[dataHojeString],
-                selected: true,
-                selectedColor: colors.verdeMedio,
-                marked: marcacoes[dataHojeString]?.marked || false,
-                dotColor: colors.branco
-              };
+                const hoje = new Date();
+                const ano = hoje.getFullYear();
+                const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                const dia = String(hoje.getDate()).padStart(2, '0');
+                const dataHojeString = `${ano}-${mes}-${dia}`;
+                const mesAtual = `${ano}-${mes}`;
 
-              setDatasMarcadas(marcacoes);
+                const lembretesMock = [
+                  { data: `${mesAtual}-05`, tarefa: 'Vacina V10', horario: '14:30' },
+                  { data: `${mesAtual}-12`, tarefa: 'Consulta de Rotina', horario: '10:00' },
+                  { data: `${mesAtual}-19`, tarefa: 'Vermífugo Drontal', horario: '08:00' }
+                ];
+
+                const lembretesAtuais = (petEncontrado.lembretes && petEncontrado.lembretes.length > 0) 
+                  ? petEncontrado.lembretes 
+                  : lembretesMock;
+
+                setLembretes(lembretesAtuais);
+
+                let marcacoes: any = {};
+                lembretesAtuais.forEach(lembrete => {
+                  if (lembrete.data) {
+                    marcacoes[lembrete.data] = { marked: true, dotColor: colors.verdeMedio };
+                  }
+                });
+
+                marcacoes[dataHojeString] = {
+                  ...marcacoes[dataHojeString],
+                  selected: true,
+                  selectedColor: colors.verdeMedio,
+                  marked: marcacoes[dataHojeString]?.marked || false,
+                  dotColor: colors.branco
+                };
+
+                setDatasMarcadas(marcacoes);
+              }
             }
           }
+        } catch (error) {
+          console.error('Erro ao buscar detalhes do pet:', error);
+        } finally {
+          setCarregando(false);
         }
-      } catch (error) {
-        console.error('Erro ao buscar detalhes do pet:', error);
-      } finally {
-        setCarregando(false);
-      }
-    };
+      };
 
-    carregarPet();
-  }, [petId]);
+      carregarPet();
+    }, [petId])
+  );
 
   const handleExcluirPet = () => {
     Alert.alert(
@@ -128,9 +131,7 @@ export default function PetDetailsScreen() {
                 
                 if (petsSalvos) {
                   const listaPets: Pet[] = JSON.parse(petsSalvos);
-                  
                   const listaAtualizada = listaPets.filter(p => p.id !== petId);
-                  
                   await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtualizada));
                   
                   Alert.alert('Sucesso', 'Pet removido com sucesso.');
@@ -176,10 +177,21 @@ export default function PetDetailsScreen() {
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
         
-        
-        <TouchableOpacity style={styles.botaoDeletar} onPress={handleExcluirPet}>
-          <MaterialCommunityIcons name="trash-can-outline" size={24} color="#FF3B30" />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          
+          {/* 🌟 BOTÃO DE EDITAR COM ESTILO PRÓPRIO */}
+          <TouchableOpacity 
+            style={styles.botaoEditar} 
+            onPress={() => navigation.navigate('PetForm', { pet: pet })}
+          >
+            <MaterialCommunityIcons name="pencil-outline" size={24} color={colors.verdeEscuro} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.botaoDeletar} onPress={handleExcluirPet}>
+            <MaterialCommunityIcons name="trash-can-outline" size={24} color="#FF3B30" />
+          </TouchableOpacity>
+          
+        </View>
       </View>
 
       <Text style={styles.nomePet}>{pet.nome}</Text>
@@ -281,166 +293,38 @@ export default function PetDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  containerCentro: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    backgroundColor: colors.branco },
-  textoVazio: {
-     fontSize: 18, 
-    fontWeight: 'bold', 
-    color: colors.roxoMuitoEscuro, 
-    marginBottom: 20 },
-  botaoVoltarErro: { 
-    backgroundColor: colors.verdeMedio, 
-    paddingHorizontal: 20, 
-    paddingVertical: 10, 
-    borderRadius: 20 },
-  textoBotaoVoltar: { 
-    color: colors.roxoMuitoEscuro, 
-    fontWeight: 'bold' },
-  container: { 
-    flex: 1, 
-    backgroundColor: colors.branco, 
-    paddingHorizontal: 20, 
-    paddingTop: 50 },
+  containerCentro: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.branco },
+  textoVazio: { fontSize: 18, fontWeight: 'bold', color: colors.roxoMuitoEscuro, marginBottom: 20 },
+  botaoVoltarErro: { backgroundColor: colors.verdeMedio, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20 },
+  textoBotaoVoltar: { color: colors.roxoMuitoEscuro, fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
   
-  header: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    marginBottom: 20 },
-  botaoVoltar: { 
-    backgroundColor: colors.verdeMedio, 
-    width: 46, 
-    height: 46, 
-    borderRadius: 23, 
-    justifyContent: 'center', 
-    alignItems: 'center' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
   
-  botaoDeletar: { 
-    backgroundColor: '#FFECEB', 
-    width: 46, 
-    height: 46, 
-    borderRadius: 23, 
-    justifyContent: 'center', 
-    alignItems: 'center' },
+  // 🌟 NOVO ESTILO DO BOTÃO DE EDITAR
+  botaoEditar: { backgroundColor: '#E8F5E9', width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
   
-  nomePet: { 
-    fontSize: 22, 
-    fontWeight: '900', 
-    color: colors.verdeEscuro, 
-    textTransform: 'uppercase', 
-    marginBottom: 15 },
+  botaoDeletar: { backgroundColor: '#FFECEB', width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
   
-    infoContainer: { 
-    flexDirection: 'row', 
-    marginBottom: 20 },
-  
-    imagemPet: { 
-    width: 140, 
-    height: 100, 
-    borderRadius: 10, 
-    marginRight: 15 },
-  
-    dadosContainer: { 
-    justifyContent: 'center', 
-    flex: 1 },
-  
-    dadoTexto: { 
-    fontSize: 14, 
-    color: colors.roxoMuitoEscuro, 
-    marginBottom: 5, 
-    fontWeight: 'bold' },
-  
-    dadoLabel: { 
-    fontWeight: '900' },
- 
-    botaoPreventivo: { 
-    flexDirection: 'row', 
-    backgroundColor: colors.verdeEscuro, 
-    paddingVertical: 12, 
-    borderRadius: 25, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    marginBottom: 25 },
-  
-    textoBotaoPreventivo: { 
-    color: colors.branco, 
-    fontWeight: '900', 
-    fontSize: 14, 
-    textTransform: 'uppercase' },
-  
-    secao: { 
-    marginBottom: 30 },
- 
-    headerCalendario: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    marginBottom: 10 },
- 
-    tituloSecao: { 
-    fontSize: 16, 
-    fontWeight: '900', 
-    color: colors.roxoMuitoEscuro, 
-    textTransform: 'uppercase' },
-  
-    textoAbrir: { 
-    color: colors.cinza, 
-    fontWeight: 'bold', 
-    fontSize: 14 },
-  
-    textoDescricao: { 
-    fontSize: 14, 
-    color: colors.roxoMuitoEscuro, 
-    fontWeight: 'bold', 
-    lineHeight: 20 },
- 
-    containerCalendarioEscuro: { 
-    backgroundColor: '#2C2C2E', 
-    borderRadius: 15, 
-    overflow: 'hidden', 
-    paddingBottom: 10, 
-    elevation: 5, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.25, 
-    shadowRadius: 3.84 },
-  
-    cardStatus: { 
-    borderColor: colors.roxoMuitoEscuro, 
-    borderWidth: 1, 
-    borderRadius: 15, 
-    padding: 15, 
-    backgroundColor: colors.branco },
-  
-    tituloCardStatus: { 
-    fontSize: 14, 
-    fontWeight: '900', 
-    color: colors.roxoMuitoEscuro, 
-    marginBottom: 5 },
-  
-    subtituloCardStatus: { 
-    fontSize: 14, 
-    fontWeight: '900', 
-    color: colors.verdeMedio, 
-    marginBottom: 10 },
- 
-    itemLembrete: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 5 },
- 
-    bolinhaVerde: { 
-    width: 10, 
-    height: 10, 
-    borderRadius: 5, 
-    backgroundColor: colors.verdeMedio, 
-    marginRight: 10 },
- 
-    textoLembrete: { 
-    fontSize: 14, 
-    fontWeight: 'bold', 
-    color: colors.verdeMedio }
+  nomePet: { fontSize: 22, fontWeight: '900', color: colors.verdeEscuro, textTransform: 'uppercase', marginBottom: 15 },
+  infoContainer: { flexDirection: 'row', marginBottom: 20 },
+  imagemPet: { width: 140, height: 100, borderRadius: 10, marginRight: 15 },
+  dadosContainer: { justifyContent: 'center', flex: 1 },
+  dadoTexto: { fontSize: 14, color: colors.roxoMuitoEscuro, marginBottom: 5, fontWeight: 'bold' },
+  dadoLabel: { fontWeight: '900' },
+  botaoPreventivo: { flexDirection: 'row', backgroundColor: colors.verdeEscuro, paddingVertical: 12, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginBottom: 25 },
+  textoBotaoPreventivo: { color: colors.branco, fontWeight: '900', fontSize: 14, textTransform: 'uppercase' },
+  secao: { marginBottom: 30 },
+  headerCalendario: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  tituloSecao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, textTransform: 'uppercase' },
+  textoAbrir: { color: colors.cinza, fontWeight: 'bold', fontSize: 14 },
+  textoDescricao: { fontSize: 14, color: colors.roxoMuitoEscuro, fontWeight: 'bold', lineHeight: 20 },
+  containerCalendarioEscuro: { backgroundColor: '#2C2C2E', borderRadius: 15, overflow: 'hidden', paddingBottom: 10, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 },
+  cardStatus: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 15, padding: 15, backgroundColor: colors.branco },
+  tituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 5 },
+  subtituloCardStatus: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 10 },
+  itemLembrete: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
+  bolinhaVerde: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.verdeMedio, marginRight: 10 },
+  textoLembrete: { fontSize: 14, fontWeight: 'bold', color: colors.verdeMedio }
 });
