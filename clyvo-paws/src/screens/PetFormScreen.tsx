@@ -267,16 +267,47 @@ const styles = StyleSheet.create({
   imagemPet: { width: 150, height: 100, borderRadius: 10 },
   placeholderImagem: { width: 150, height: 100, borderRadius: 10, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: colors.cinza },
   
-  inputContainer: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, paddingHorizontal: 15, height: 50, justifyContent: 'center' },
-  input: { color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 14 },
+  inputContainer: { 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 20, 
+    paddingHorizontal: 15, 
+    height: 50, 
+    justifyContent: 'center' 
+  },
+  input: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: 'bold', 
+    fontSize: 14 },
   
-  inputDescricaoContainer: { height: 100, alignItems: 'flex-start', paddingTop: 15 },
-  inputArea: { textAlignVertical: 'top', height: '100%' },
+  inputDescricaoContainer: { 
+    height: 100, 
+    alignItems: 'flex-start', 
+    paddingTop: 15 },
+  inputArea: { 
+    textAlignVertical: 'top', 
+    height: '100%' },
   
-  botoesEspecie: { flexDirection: 'row', gap: 10, marginBottom: 10 },
-  botaoEspecie: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderColor: colors.roxoMuitoEscuro, borderWidth: 1, height: 50, borderRadius: 25 },
-  botaoEspecieAtivo: { backgroundColor: colors.verdeEscuro, borderColor: colors.verdeEscuro },
-  textoEspecie: { fontWeight: 'bold', color: colors.roxoMuitoEscuro, marginLeft: 8 },
+  botoesEspecie: { 
+    flexDirection: 'row', 
+    gap: 10, 
+    marginBottom: 10 },
+  botaoEspecie: { 
+    flex: 1, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    height: 50, 
+    borderRadius: 25 },
+  botaoEspecieAtivo: { 
+    backgroundColor: colors.verdeEscuro, 
+    borderColor: colors.verdeEscuro },
+  textoEspecie: { 
+    fontWeight: 'bold', 
+    color: colors.roxoMuitoEscuro, 
+    marginLeft: 8 },
   
   scrollRacas: { 
     marginBottom: 20 },
