@@ -19,7 +19,6 @@ export default function ProdutosScreen() {
   const navigation = useNavigation<any>();
   const [busca, setBusca] = useState('');
 
-  // Função auxiliar para aplicar o filtro de busca por nome nos produtos
   const aplicarFiltro = (lista: Produto[]) => {
     return lista.filter(produto => 
       produto.nome.toLowerCase().includes(busca.toLowerCase())
@@ -48,7 +47,6 @@ export default function ProdutosScreen() {
     <View style={styles.containerPrincipal}>
       <ScrollView showsVerticalScrollIndicator={false}>
         
-        {/* Cabeçalho */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
             <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
@@ -57,7 +55,6 @@ export default function ProdutosScreen() {
 
         <Text style={styles.titulo}>PRODUTOS</Text>
 
-        {/* Barra de Pesquisa */}
         <View style={styles.containerBusca}>
           <MaterialCommunityIcons name="magnify" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeBusca} />
           <TextInput 
@@ -69,7 +66,6 @@ export default function ProdutosScreen() {
           />
         </View>
 
-        {/* Faixa de Categorias */}
         <View style={styles.faixaCategorias}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollCategorias}>
             {CATEGORIAS.map((cat, index) => (
@@ -80,19 +76,16 @@ export default function ProdutosScreen() {
           </ScrollView>
         </View>
 
-        {/* Seção: Promoções */}
         <Text style={styles.tituloSecao}>PROMOÇÕES</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
           {aplicarFiltro(PROMOCOES).map(renderProduto)}
         </ScrollView>
 
-        {/* Seção: Remédios */}
         <Text style={styles.tituloSecao}>REMÉDIOS</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
           {aplicarFiltro(REMEDIOS).map(renderProduto)}
         </ScrollView>
 
-        {/* Seção: Cosméticos */}
         <Text style={styles.tituloSecao}>COSMÉTICOS</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
           {aplicarFiltro(COSMETICOS).map(renderProduto)}
@@ -105,22 +98,91 @@ export default function ProdutosScreen() {
 }
 
 const styles = StyleSheet.create({
-  containerPrincipal: { flex: 1, backgroundColor: colors.branco },
-  header: { paddingHorizontal: 20, paddingTop: 50, marginBottom: 20, alignItems: 'flex-start' },
-  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
-  titulo: { fontSize: 22, fontWeight: '900', color: colors.roxoMuitoEscuro, paddingHorizontal: 20, marginBottom: 15 },
-  containerBusca: { flexDirection: 'row', alignItems: 'center', borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 25, height: 45, marginHorizontal: 20, paddingHorizontal: 15, marginBottom: 25 },
-  iconeBusca: { marginRight: 10 },
-  inputBusca: { flex: 1, color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 14 },
-  faixaCategorias: { backgroundColor: colors.verdeEscuro, paddingVertical: 12, marginBottom: 30 },
-  scrollCategorias: { paddingHorizontal: 15 },
-  itemCategoria: { marginHorizontal: 10 },
-  textoCategoria: { color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 12 },
-  tituloSecao: { fontSize: 18, fontWeight: '900', color: colors.roxoMuitoEscuro, paddingHorizontal: 20, marginBottom: 15, textTransform: 'uppercase' },
-  scrollProdutos: { paddingHorizontal: 15, marginBottom: 35 },
-  cardProduto: { width: 130, borderColor: colors.verdeMedio, borderWidth: 1, borderRadius: 15, padding: 10, marginHorizontal: 5, backgroundColor: colors.branco },
-  imagemProduto: { width: '100%', height: 80, marginBottom: 10 },
-  nomeProduto: { fontSize: 10, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 5, lineHeight: 12 },
-  precoAntigo: { fontSize: 10, color: colors.cinza, textDecorationLine: 'line-through', fontWeight: 'bold' },
-  precoNovo: { fontSize: 14, color: colors.verdeMedio, fontWeight: '900' }
+  containerPrincipal: { 
+    flex: 1, 
+    backgroundColor: colors.branco },
+  header: { 
+    paddingHorizontal: 20, 
+    paddingTop: 50, 
+    marginBottom: 20, 
+    alignItems: 'flex-start' },
+  botaoVoltar: { 
+    backgroundColor: colors.verdeMedio, 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center' },
+  titulo: { 
+    fontSize: 22, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    paddingHorizontal: 20, 
+    marginBottom: 15 },
+  containerBusca: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 25, 
+    height: 45, 
+    marginHorizontal: 20, 
+    paddingHorizontal: 15, 
+    marginBottom: 25 },
+  iconeBusca: { 
+    marginRight: 10 },
+  inputBusca: { 
+    flex: 1, 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: 'bold', 
+    fontSize: 14 },
+  faixaCategorias: { 
+    backgroundColor: colors.verdeEscuro, 
+    paddingVertical: 12, 
+    marginBottom: 30 },
+  scrollCategorias: { 
+    paddingHorizontal: 15 },
+  itemCategoria: { 
+    marginHorizontal: 10 },
+  textoCategoria: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 12 },
+  tituloSecao: { 
+    fontSize: 18, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    paddingHorizontal: 20, 
+    marginBottom: 15, 
+    textTransform: 'uppercase' },
+  scrollProdutos: { 
+    paddingHorizontal: 15, 
+    marginBottom: 35 },
+  cardProduto: { 
+    width: 130, 
+    borderColor: colors.verdeMedio, 
+    borderWidth: 1, 
+    borderRadius: 15, 
+    padding: 10, 
+    marginHorizontal: 5, 
+    backgroundColor: colors.branco },
+  imagemProduto: { 
+    width: '100%', 
+    height: 80, 
+    marginBottom: 10 },
+  nomeProduto: { 
+    fontSize: 10, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    marginBottom: 5, 
+    lineHeight: 12 },
+  precoAntigo: { 
+    fontSize: 10, 
+    color: colors.cinza, 
+    textDecorationLine: 'line-through', 
+    fontWeight: 'bold' },
+  precoNovo: { 
+    fontSize: 14, 
+    color: colors.verdeMedio, 
+    fontWeight: '900' }
 });

@@ -67,18 +67,67 @@ export default function PopPerfil({ visivel, fecharModal, nomeTutor, fotoTutor }
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'flex-end' },
-  bottomSheet: { backgroundColor: colors.branco, borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 20, minHeight: 300 },
-  handleBar: { width: 60, height: 5, backgroundColor: '#E0E0E0', borderRadius: 5, alignSelf: 'center', marginBottom: 20 },
-  headerPerfil: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  fotoTutor: { width: 60, height: 60, borderRadius: 30, marginRight: 15, backgroundColor: '#E0E0E0' },
-  infoTutor: { flex: 1 },
-  nomeTutor: { fontSize: 18, fontWeight: '900', color: colors.roxoMuitoEscuro },
-  tagTutor: { fontSize: 12, color: colors.verdeMedio, fontWeight: 'bold' },
-  botaoContas: { backgroundColor: colors.verdeMedio, paddingVertical: 8, paddingHorizontal: 15, borderRadius: 20 },
-  textoBotaoContas: { color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 12 },
-  divisor: { height: 1, backgroundColor: '#E0E0E0', marginVertical: 10 },
-  opcaoMenu: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 },
-  textoOpcao: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro },
-  iconeFundo: { backgroundColor: colors.verdeMedio, padding: 8, borderRadius: 20 }
+  overlay: { 
+    flex: 1, 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    justifyContent: 'flex-end' },
+  bottomSheet: { 
+    backgroundColor: colors.branco, 
+    borderTopLeftRadius: 30, 
+    borderTopRightRadius: 30, 
+    padding: 20, 
+    minHeight: 300 },
+  handleBar: { 
+    width: 60, 
+    height: 5, 
+    backgroundColor: '#E0E0E0', 
+    borderRadius: 5, 
+    alignSelf: 'center', 
+    marginBottom: 20 },
+  headerPerfil: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 20 },
+  fotoTutor: { 
+    width: 60, 
+    height: 60, 
+    borderRadius: 30, 
+    marginRight: 15, 
+    backgroundColor: '#E0E0E0' },
+  infoTutor: { 
+    flex: 1 },
+  nomeTutor: { 
+    fontSize: 18, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro },
+  tagTutor: { 
+    fontSize: 12, 
+    color: colors.verdeMedio, 
+    fontWeight: 'bold' },
+  botaoContas: { 
+    backgroundColor: colors.verdeMedio, 
+    paddingVertical: 8, 
+    paddingHorizontal: 15, 
+    borderRadius: 20 },
+  textoBotaoContas: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 12 },
+  divisor: { 
+    height: 1, 
+    backgroundColor: '#E0E0E0', 
+    marginVertical: 10 },
+  opcaoMenu: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingVertical: 10 },
+  textoOpcao: { 
+    fontSize: 16, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro },
+  iconeFundo: { 
+    backgroundColor: colors.verdeMedio,
+     padding: 8, 
+    borderRadius: 20 }
 });

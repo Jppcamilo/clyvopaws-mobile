@@ -98,19 +98,72 @@ export default function ContatosScreen() {
 }
  
 const styles = StyleSheet.create({
-  containerPrincipal: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
-  scrollContainer: { flexGrow: 1 },
-  header: { marginBottom: 20, alignItems: 'flex-start' },
-  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
-  titulo: { fontSize: 28, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 25 },
-  secao: { marginBottom: 30 },
-  tituloSecao: { fontSize: 18, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 5 },
-  textoExplicativo: { fontSize: 14, color: colors.roxoMuitoEscuro, lineHeight: 22, fontWeight: '500', marginBottom: 15 },
-  linkTexto: { color: colors.verdeEscuro, fontWeight: 'bold', textDecorationLine: 'underline' },
-  cardContato: { backgroundColor: colors.branco, borderColor: '#EAEAEA', borderWidth: 1, borderRadius: 15, padding: 20, elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2 },
-  labelContato: { fontSize: 14, color: colors.roxoMuitoEscuro, marginBottom: 2, fontWeight: '500' },
-  numeroTelefone: { fontSize: 16, color: colors.verdeEscuro, fontWeight: 'bold', textDecorationLine: 'underline' },
-  linkTextoCard: { fontSize: 16, color: colors.verdeEscuro, fontWeight: 'bold', textDecorationLine: 'underline' },
-  espaco: { height: 20 }
+  containerPrincipal: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    paddingHorizontal: 20, 
+    paddingTop: 50 },
+  scrollContainer: { 
+    flexGrow: 1 },
+  header: { 
+    marginBottom: 20, 
+    alignItems: 'flex-start' },
+  botaoVoltar: { 
+    backgroundColor: colors.verdeMedio, 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center' },
+  titulo: { 
+    fontSize: 28, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    marginBottom: 25 },
+  secao: { 
+    marginBottom: 30 },
+  tituloSecao: { 
+    fontSize: 18, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    marginBottom: 5 },
+  textoExplicativo: { 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro, 
+    lineHeight: 22, 
+    fontWeight: '500', 
+    marginBottom: 15 },
+  linkTexto: { 
+    color: colors.verdeEscuro, 
+    fontWeight: 'bold', 
+    textDecorationLine: 'underline' },
+  cardContato: { 
+    backgroundColor: colors.branco, 
+    borderColor: '#EAEAEA', 
+    borderWidth: 1, 
+    borderRadius: 15, 
+    padding: 20, 
+    elevation: 1, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 1 }, 
+    shadowOpacity: 0.05, 
+    shadowRadius: 2 },
+  labelContato: { 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro, 
+    marginBottom: 2, 
+    fontWeight: '500' },
+  numeroTelefone: { 
+    fontSize: 16, 
+    color: colors.verdeEscuro, 
+    fontWeight: 'bold', 
+    textDecorationLine: 'underline' },
+  linkTextoCard: { 
+    fontSize: 16, 
+    color: colors.verdeEscuro, 
+    fontWeight: 'bold', 
+    textDecorationLine: 'underline' },
+  espaco: { 
+    height: 20 }
 });
  

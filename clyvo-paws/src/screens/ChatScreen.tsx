@@ -134,32 +134,122 @@ export default function ChatScreen() {
 }
  
 const styles = StyleSheet.create({
-  containerPrincipal: { flex: 1, backgroundColor: colors.branco, paddingTop: 50 },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingBottom: 10 },
-  botaoVoltar: { padding: 5 },
-  headerTextos: { flex: 1, alignItems: 'center' },
-  titulo: { fontSize: 18, fontWeight: '900', color: colors.roxoMuitoEscuro },
-  subtitulo: { fontSize: 10, color: colors.cinza, fontWeight: 'bold' },
-  linhaDivisoria: { height: 1, backgroundColor: '#EAEAEA', width: '100%' },
+  containerPrincipal: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    paddingTop: 50 
+  },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: 15, 
+    paddingBottom: 10 
+  },
+  botaoVoltar: { 
+    padding: 5 
+
+  },
+  headerTextos: { 
+    flex: 1, 
+    alignItems: 'center' 
+  },
+  titulo: { 
+    fontSize: 18, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro 
+  },
+  subtitulo: { 
+    fontSize: 10, 
+    color: colors.cinza, 
+    fontWeight: 'bold' 
+  },
+  linhaDivisoria: { 
+    height: 1, 
+    backgroundColor: '#EAEAEA', 
+    width: '100%' 
+  },
  
-  scrollContainer: { padding: 15, paddingBottom: 30 },
+  scrollContainer: { 
+    padding: 15, 
+    paddingBottom: 30 
+  },
  
-  linhaBot: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 10, maxWidth: '85%' },
-  iconeBot: { backgroundColor: colors.verdeEscuro, width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center', marginRight: 8, marginBottom: 5 },
-  balaoBot: { backgroundColor: '#F0F4F8', padding: 12, borderRadius: 15, borderBottomLeftRadius: 5 },
-  textoBot: { fontSize: 14, color: colors.roxoMuitoEscuro, lineHeight: 20 },
+  linhaBot: { 
+    flexDirection: 'row', alignItems: 'flex-end', 
+    marginBottom: 10, 
+    maxWidth: '85%' },
+  iconeBot: { 
+    backgroundColor: colors.verdeEscuro, 
+    width: 30, 
+    height: 30, 
+    borderRadius: 15, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginRight: 8, 
+    marginBottom: 5 },
+  balaoBot: { 
+    backgroundColor: '#F0F4F8', 
+    padding: 12, 
+    borderRadius: 15, 
+    borderBottomLeftRadius: 5 },
+  textoBot: { 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro, 
+    lineHeight: 20 },
  
-  linhaUser: { alignSelf: 'flex-end', marginBottom: 10, maxWidth: '80%' },
-  balaoUser: { backgroundColor: colors.verdeClaro, padding: 12, borderRadius: 15, borderBottomRightRadius: 5 },
-  textoUser: { fontSize: 14, color: colors.roxoMuitoEscuro, lineHeight: 20, fontWeight: '500' },
+  linhaUser: { 
+    alignSelf: 'flex-end', 
+    marginBottom: 10, 
+    maxWidth: '80%' },
+  balaoUser: { 
+    backgroundColor: colors.verdeClaro, 
+    padding: 12, 
+    borderRadius: 15, 
+    borderBottomRightRadius: 5 },
+  textoUser: { 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro, 
+    lineHeight: 20, 
+    fontWeight: '500' },
  
-  horaMensagem: { fontSize: 10, color: colors.cinza, alignSelf: 'flex-end', marginTop: 4 },
+  horaMensagem: { 
+    fontSize: 10, 
+    color: colors.cinza, 
+    alignSelf: 'flex-end', 
+    marginTop: 4 },
  
-  containerOpcoes: { marginTop: 10, alignItems: 'center' },
-  botaoOpcao: { backgroundColor: colors.verdeEscuro, width: '90%', paddingVertical: 12, borderRadius: 25, alignItems: 'center', marginBottom: 8 },
-  textoBotaoOpcao: { color: colors.branco, fontSize: 12, fontWeight: 'bold' },
+  containerOpcoes: { 
+    marginTop: 10, 
+    alignItems: 'center' },
+  botaoOpcao: { 
+    backgroundColor: colors.verdeEscuro, 
+    width: '90%', 
+    paddingVertical: 12,
+     borderRadius: 25, 
+    alignItems: 'center', 
+    marginBottom: 8 },
+  textoBotaoOpcao: { 
+    color: colors.branco, 
+    fontSize: 12, 
+    fontWeight: 'bold' },
  
-  footer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, borderTopWidth: 1, borderColor: '#EAEAEA', backgroundColor: colors.branco },
-  input: { flex: 1, backgroundColor: '#F5F5F5', borderRadius: 25, paddingHorizontal: 20, height: 50, fontSize: 14, color: colors.roxoMuitoEscuro },
-  botaoEnviar: { padding: 10, marginLeft: 5 }
+  footer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: 15, 
+    paddingVertical: 10,
+    borderTopWidth: 1, 
+    borderColor: '#EAEAEA', 
+    backgroundColor: colors.branco },
+  input: {
+     flex: 1, 
+    backgroundColor: '#F5F5F5', 
+    borderRadius: 25, 
+    paddingHorizontal: 20, 
+    height: 50, 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro },
+  botaoEnviar: { 
+    padding: 10, 
+    marginLeft: 5 }
 });

@@ -16,7 +16,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../theme/colors';
 import { DADOS_RACAS } from '../data/racas';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { calcularIdade } from '../utils/dateUtils';
 
 
 export default function PetFormScreen() {
@@ -225,32 +224,130 @@ export default function PetFormScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
-  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-  titulo: { fontSize: 20, fontWeight: '900', color: colors.roxoMuitoEscuro, textTransform: 'uppercase' },
-  labelSecao: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 5, marginTop: 10 },
-  boxFoto: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, padding: 15, alignItems: 'center', marginBottom: 10 },
-  botaoUpload: { backgroundColor: colors.verdeClaro, width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-start', marginBottom: 10 },
-  imagemPet: { width: 150, height: 100, borderRadius: 10 },
-  placeholderImagem: { width: 150, height: 100, borderRadius: 10, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: colors.cinza },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    paddingHorizontal: 20, 
+    paddingTop: 50 },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 20 },
+  botaoVoltar: { 
+    backgroundColor: colors.verdeMedio, 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginRight: 15 },
+  titulo: { 
+    fontSize: 20, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    textTransform: 'uppercase' },
+  labelSecao: { 
+    fontSize: 14, 
+    fontWeight: '900', 
+    color: colors.verdeMedio, 
+    marginBottom: 5, 
+    marginTop: 10 },
+  boxFoto: {
+     borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 20, 
+    padding: 15, 
+    alignItems: 'center',
+     marginBottom: 10 },
+  botaoUpload: { 
+    backgroundColor: colors.verdeClaro, 
+    width: 36, 
+    height: 36, 
+    borderRadius: 18, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    alignSelf: 'flex-start', 
+    marginBottom: 10 },
+  imagemPet: { 
+    width: 150, 
+    height: 100, 
+    borderRadius: 10 },
+  placeholderImagem: { 
+    width: 150, 
+    height: 100, 
+    borderRadius: 10, 
+    backgroundColor: '#F0F0F0', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    borderStyle: 'dashed', 
+    borderWidth: 1, borderColor: colors.cinza },
   
-  inputContainer: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, paddingHorizontal: 15, height: 50, justifyContent: 'center' },
-  input: { color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 14 },
+  inputContainer: { 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 20, 
+    paddingHorizontal: 15, 
+    height: 50, 
+    justifyContent: 'center' },
+  input: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: 'bold', 
+    fontSize: 14 },
   
-  inputDescricaoContainer: { height: 100, alignItems: 'flex-start', paddingTop: 15 },
-  inputArea: { textAlignVertical: 'top', height: '100%' },
+  inputDescricaoContainer: { 
+    height: 100, 
+    alignItems: 'flex-start', 
+    paddingTop: 15 },
+  inputArea: { 
+    textAlignVertical: 'top', 
+    height: '100%' },
   
-  botoesEspecie: { flexDirection: 'row', gap: 10, marginBottom: 10 },
-  botaoEspecie: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderColor: colors.roxoMuitoEscuro, borderWidth: 1, height: 50, borderRadius: 25 },
-  botaoEspecieAtivo: { backgroundColor: colors.verdeEscuro, borderColor: colors.verdeEscuro },
-  textoEspecie: { fontWeight: 'bold', color: colors.roxoMuitoEscuro, marginLeft: 8 },
+  botoesEspecie: { 
+    flexDirection: 'row', 
+    gap: 10, 
+    marginBottom: 10 },
+  botaoEspecie: { 
+    flex: 1, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    height: 50, 
+    borderRadius: 25 },
+  botaoEspecieAtivo: { 
+    backgroundColor: colors.verdeEscuro, 
+    borderColor: colors.verdeEscuro },
+  textoEspecie: { 
+    fontWeight: 'bold', 
+    color: colors.roxoMuitoEscuro, 
+    marginLeft: 8 },
   
-  scrollRacas: { marginBottom: 20 },
-  tagRaca: { borderColor: colors.verdeMedio, borderWidth: 1, borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, marginRight: 10, justifyContent: 'center' },
-  tagRacaAtiva: { backgroundColor: colors.verdeMedio },
-  textoRaca: { color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 12 },
+  scrollRacas: { 
+    marginBottom: 20 },
+  tagRaca: { 
+    borderColor: colors.verdeMedio, 
+    borderWidth: 1, 
+    borderRadius: 20, 
+    paddingHorizontal: 15, 
+    paddingVertical: 8, 
+    marginRight: 10, 
+    justifyContent: 'center' },
+  tagRacaAtiva: { 
+    backgroundColor: colors.verdeMedio },
+  textoRaca: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: 'bold', 
+    fontSize: 12 },
 
-  botaoCadastrar: { backgroundColor: colors.verdeClaro, borderRadius: 25, paddingVertical: 15, alignItems: 'center', marginTop: 10, marginBottom: 40 },
-  textoBotaoCadastrar: { color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 16 }
+  botaoCadastrar: { 
+    backgroundColor: colors.verdeClaro, 
+    borderRadius: 25, 
+    paddingVertical: 15, 
+    alignItems: 'center', 
+    marginTop: 10, 
+    marginBottom: 40 },
+  textoBotaoCadastrar: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', fontSize: 16 }
 });

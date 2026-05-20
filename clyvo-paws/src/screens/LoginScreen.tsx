@@ -23,9 +23,7 @@ export default function LoginScreen() {
       if (dadosSalvos) {
         const tutor = JSON.parse(dadosSalvos);
         
-        // Verifica se o email e senha batem com o cadastro local
         if (tutor.email.toLowerCase() === email.toLowerCase().trim() && tutor.senha === senha) {
-          // Navega para a Home resetando a pilha para não voltar pro Login
           navigation.reset({
             index: 0,
             routes: [{ name: 'MainTabs' }],
@@ -43,7 +41,6 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Detalhe diagonal no fundo */}
       <View style={styles.bgDiagonal} />
 
       <View style={styles.content}>

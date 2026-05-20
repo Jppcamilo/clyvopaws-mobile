@@ -1,4 +1,3 @@
-// src/utils/dateUtils.ts
 export const calcularIdade = (dataNascimento: string) => {
   const hoje = new Date();
   const nascimento = new Date(dataNascimento);

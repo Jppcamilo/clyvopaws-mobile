@@ -118,20 +118,115 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
-  header: { marginBottom: 30, alignItems: 'flex-start' },
-  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-  titulo: { fontSize: 20, fontWeight: '900', color: colors.roxoMuitoEscuro, textTransform: 'uppercase' },
-  labelSecao: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 5 },
-  boxFoto: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, padding: 15, alignItems: 'center', marginBottom: 20 },
-  botaoUpload: { backgroundColor: colors.verdeClaro, width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-start', marginBottom: 10 },
-  imagemPerfil: { width: 180, height: 120, borderRadius: 10, backgroundColor: '#E0E0E0' },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    paddingHorizontal: 20, 
+    paddingTop: 50 
+    
+  },
+  header: { 
+    marginBottom: 30, 
+    alignItems: 'flex-start' 
+    
+  },
+  botaoVoltar: { 
+    backgroundColor: colors.verdeMedio, 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginBottom: 20 
+    
+  },
+  titulo: { 
+    fontSize: 20, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    textTransform: 'uppercase' 
+    
+  },
+  labelSecao: { 
+    fontSize: 14, 
+    fontWeight: '900', 
+    color: colors.verdeMedio, 
+    marginBottom: 5 
+    
+  },
+  boxFoto: { 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 20, 
+    padding: 15, 
+    alignItems: 'center', 
+    marginBottom: 20 
+    
+  },
+  botaoUpload: { 
+    backgroundColor: colors.verdeClaro, 
+    width: 36, 
+    height: 36, 
+    borderRadius: 18, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    alignSelf: 'flex-start', 
+    marginBottom: 10 },
+  
+  imagemPerfil: { 
+    width: 180, 
+    height: 120, 
+    borderRadius: 10, 
+    backgroundColor: '#E0E0E0' 
+
+  },
   
   
-  placeholderImagem: { width: 180, height: 120, borderRadius: 10, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: colors.cinza },
-  textoPlaceholder: { color: colors.cinza, fontSize: 12, fontWeight: 'bold', marginTop: 5 },
+  placeholderImagem: { 
+    width: 180, 
+    height: 120, 
+    borderRadius: 10, 
+    backgroundColor: '#F0F0F0', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    borderStyle: 'dashed', 
+    borderWidth: 1, 
+    borderColor: colors.cinza 
+  },
+
+  textoPlaceholder: { 
+    color: colors.cinza, 
+    fontSize: 12, 
+    fontWeight: 'bold', 
+    marginTop: 5 
+
+  },
   
-  input: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 25, height: 55, marginBottom: 20, color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 14, textTransform: 'uppercase' },
-  botaoCadastrar: { backgroundColor: colors.verdeClaro, borderRadius: 25, paddingVertical: 18, alignItems: 'center', marginTop: 10 },
-  textoBotaoCadastrar: { color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 18, textTransform: 'uppercase' }
+  input: { 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 25, 
+    height: 55, 
+    marginBottom: 20, 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 14, 
+    textTransform: 'uppercase' 
+  },
+
+  botaoCadastrar: { 
+    backgroundColor: colors.verdeClaro, 
+    borderRadius: 25, 
+    paddingVertical: 18, 
+    alignItems: 'center', 
+    marginTop: 10 
+
+  },
+  textoBotaoCadastrar: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 18, 
+    textTransform: 'uppercase' 
+
+  }
 });

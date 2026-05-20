@@ -96,15 +96,72 @@ export default function PetsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
-  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-  titulo: { fontSize: 22, fontWeight: '900', color: colors.roxoMuitoEscuro },
-  subtitulo: { fontSize: 12, fontWeight: 'bold', color: colors.cinza, marginBottom: 30, textTransform: 'uppercase' },
-  scrollList: { flex: 1, marginBottom: 90 },
-  containerCentro: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30, marginBottom: 100 },
-  textoVazio: { fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, marginTop: 15, marginBottom: 5 },
-  subtextoVazio: { fontSize: 12, color: colors.cinza, textAlign: 'center', fontWeight: 'bold' },
-  botaoFlutuante: { position: 'absolute', bottom: 30, left: 20, right: 20, backgroundColor: colors.verdeEscuro, borderRadius: 25, paddingVertical: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.23, shadowRadius: 2.62 },
-  textoBotaoFlutuante: { color: colors.branco, fontWeight: '900', fontSize: 16, marginLeft: 8 },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    paddingHorizontal: 20, 
+    paddingTop: 50 },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 20 },
+  botaoVoltar: { 
+    backgroundColor: colors.verdeMedio, 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginRight: 15 },
+  titulo: { 
+    fontSize: 22, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro },
+  subtitulo: { 
+    fontSize: 12, 
+    fontWeight: 'bold', 
+    color: colors.cinza, 
+    marginBottom: 30, 
+    textTransform: 'uppercase' },
+  scrollList: { 
+    flex: 1, 
+    marginBottom: 90 },
+  containerCentro: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    paddingHorizontal: 30, 
+    marginBottom: 100 },
+  textoVazio: { 
+    fontSize: 16, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    marginTop: 15, 
+    marginBottom: 5 },
+  subtextoVazio: { 
+    fontSize: 12, 
+    color: colors.cinza, 
+    textAlign: 'center', 
+    fontWeight: 'bold' },
+  botaoFlutuante: { 
+    position: 'absolute', 
+    bottom: 30, 
+    left: 20, 
+    right: 20, 
+    backgroundColor: colors.verdeEscuro, 
+    borderRadius: 25, 
+    paddingVertical: 15, 
+    flexDirection: 'row',
+     alignItems: 'center', 
+     justifyContent: 'center', 
+     elevation: 4, 
+     shadowColor: '#000', 
+     shadowOffset: { width: 0, height: 2 }, 
+     shadowOpacity: 0.23, 
+     shadowRadius: 2.62 },
+  textoBotaoFlutuante: { 
+    color: colors.branco, 
+    fontWeight: '900', 
+    fontSize: 16, 
+    marginLeft: 8 },
 });

@@ -55,18 +55,72 @@ export default function InfoRacaScreen() {
 }
 
 const styles = StyleSheet.create({
-  containerPrincipal: { flex: 1, backgroundColor: colors.verdeClaro, paddingHorizontal: 20, paddingTop: 50 },
-  header: { alignItems: 'flex-end', marginBottom: 10 },
-  botaoVoltar: { backgroundColor: colors.branco, width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  iconeAlerta: { alignItems: 'center', marginBottom: 15 },
-  titulo: { fontSize: 24, fontWeight: '900', color: colors.roxoMuitoEscuro, textAlign: 'center', marginBottom: 5 },
-  subtitulo: { fontSize: 14, color: colors.roxoMuitoEscuro, textAlign: 'center', marginBottom: 30, fontWeight: '500' },
-  cardInfo: { backgroundColor: colors.branco, borderRadius: 15, padding: 20, marginBottom: 15, elevation: 2 },
-  labelSecao: { fontSize: 12, fontWeight: '900', color: colors.verdeMedio, marginBottom: 8 },
-  textoDestaque: { fontSize: 18, fontWeight: 'bold', color: colors.roxoMuitoEscuro, marginBottom: 10 },
-  linhaHorario: { flexDirection: 'row', alignItems: 'center' },
-  textoIdade: { fontSize: 14, color: colors.cinza, fontWeight: 'bold' },
-  textoNormal: { fontSize: 14, color: colors.roxoMuitoEscuro, lineHeight: 22, fontWeight: '500' },
-  botaoConcluir: { backgroundColor: colors.verdeEscuro, borderRadius: 25, paddingVertical: 15, alignItems: 'center', marginTop: 20 },
-  textoBotaoConcluir: { color: colors.branco, fontWeight: '900', fontSize: 16 }
+  containerPrincipal: { 
+    flex: 1, 
+    backgroundColor: colors.verdeClaro, 
+    paddingHorizontal: 20, 
+    paddingTop: 50 },
+  header: { 
+    alignItems: 'flex-end', 
+    marginBottom: 10 },
+  botaoVoltar: { 
+    backgroundColor: colors.branco, 
+    width: 40, 
+    height: 40, 
+    borderRadius: 20, 
+    justifyContent: 'center', 
+    alignItems: 'center' },
+  iconeAlerta: { 
+    alignItems: 'center', 
+    marginBottom: 15 },
+  titulo: { 
+    fontSize: 24, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    textAlign: 'center', 
+    marginBottom: 5 },
+  subtitulo: { 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro, 
+    textAlign: 'center', 
+    marginBottom: 30, 
+    fontWeight: '500' },
+  cardInfo: { 
+    backgroundColor: colors.branco, 
+    borderRadius: 15, 
+    padding: 20, 
+    marginBottom: 15, 
+    elevation: 2 },
+  labelSecao: { 
+    fontSize: 12, 
+    fontWeight: '900', 
+    color: colors.verdeMedio, 
+    marginBottom: 8 },
+  textoDestaque: { 
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    color: colors.roxoMuitoEscuro, 
+    marginBottom: 10 },
+  linhaHorario: { 
+    flexDirection: 'row', 
+    alignItems: 'center' },
+  textoIdade: { 
+    fontSize: 14, 
+    color: colors.cinza, 
+    fontWeight: 'bold' },
+  textoNormal: { 
+    fontSize: 14, 
+    color: colors.roxoMuitoEscuro, 
+    lineHeight: 22, 
+    fontWeight: '500' },
+  botaoConcluir: { 
+    backgroundColor: colors.verdeEscuro, 
+    borderRadius: 25, 
+    paddingVertical: 15, 
+    alignItems: 'center', 
+    marginTop: 20 },
+  textoBotaoConcluir: { 
+    color: colors.branco, 
+    fontWeight: '900', 
+    fontSize: 16 }
 });

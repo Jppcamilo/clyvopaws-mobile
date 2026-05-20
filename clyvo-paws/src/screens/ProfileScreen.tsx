@@ -134,19 +134,80 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
-  header: { marginBottom: 20 },
-  botaoVoltar: { backgroundColor: colors.verdeMedio, width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-  titulo: { fontSize: 22, fontWeight: '900', color: colors.roxoMuitoEscuro },
-  descricao: { fontSize: 14, color: colors.cinza, marginBottom: 20, fontWeight: 'bold' },
-  boxFotoCentral: { alignItems: 'center', marginBottom: 30 },
-  imagemPerfil: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#E0E0E0', marginBottom: 10 },
-  botaoAlterarFoto: { flexDirection: 'row', backgroundColor: colors.verdeEscuro, paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, alignItems: 'center' },
-  textoBotaoFoto: { color: colors.branco, fontWeight: 'bold', marginLeft: 5 },
-  labelSecao: { fontSize: 14, fontWeight: '900', color: colors.verdeMedio, marginBottom: 5 },
-  inputContainer: { flexDirection: 'row', alignItems: 'center', borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 20, paddingHorizontal: 15, marginBottom: 20, height: 50 },
-  iconeInput: { marginRight: 10 },
-  input: { flex: 1, color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 14 },
-  botaoSalvar: { backgroundColor: colors.verdeEscuro, borderRadius: 25, paddingVertical: 15, alignItems: 'center', marginTop: 10, marginBottom: 40 },
-  textoBotaoSalvar: { color: colors.branco, fontWeight: '900', fontSize: 16 }
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    paddingHorizontal: 20, 
+    paddingTop: 50 },
+  header: { 
+    marginBottom: 20 },
+  botaoVoltar: { 
+    backgroundColor: colors.verdeMedio, 
+    width: 46, 
+    height: 46, 
+    borderRadius: 23, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginBottom: 20 },
+  titulo: { 
+    fontSize: 22, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro },
+  descricao: { 
+    fontSize: 14, 
+    color: colors.cinza, 
+    marginBottom: 20, 
+    fontWeight: 'bold' },
+  boxFotoCentral: { 
+    alignItems: 'center', 
+    marginBottom: 30 },
+  imagemPerfil: { 
+    width: 100, 
+    height: 100, 
+    borderRadius: 50, 
+    backgroundColor: '#E0E0E0', 
+    marginBottom: 10 },
+  botaoAlterarFoto: { 
+    flexDirection: 'row', 
+    backgroundColor: colors.verdeEscuro, 
+    paddingHorizontal: 15, 
+    paddingVertical: 8, 
+    borderRadius: 20, 
+    alignItems: 'center' },
+  textoBotaoFoto: { 
+    color: colors.branco, 
+    fontWeight: 'bold', 
+    marginLeft: 5 },
+  labelSecao: { 
+    fontSize: 14, 
+    fontWeight: '900', 
+    color: colors.verdeMedio, 
+    marginBottom: 5 },
+  inputContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 20, 
+    paddingHorizontal: 15, 
+    marginBottom: 20, 
+    height: 50 },
+  iconeInput: { 
+    marginRight: 10 },
+  input: { 
+    flex: 1, 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: 'bold', 
+    fontSize: 14 },
+  botaoSalvar: { 
+    backgroundColor: colors.verdeEscuro, 
+    borderRadius: 25, 
+    paddingVertical: 15, 
+    alignItems: 'center', 
+    marginTop: 10, 
+    marginBottom: 40 },
+  textoBotaoSalvar: { 
+    color: colors.branco, 
+    fontWeight: '900', 
+    fontSize: 16 }
 });
