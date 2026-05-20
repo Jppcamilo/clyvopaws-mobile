@@ -109,7 +109,6 @@ export default function PetDetailsScreen() {
     carregarPet();
   }, [petId]);
 
-  // 🌟 FUNÇÃO EXCLUSIVA PARA DELETAR O PET DO ASYNCSTORAGE
   const handleExcluirPet = () => {
     Alert.alert(
       'Excluir Pet',
@@ -130,14 +129,12 @@ export default function PetDetailsScreen() {
                 if (petsSalvos) {
                   const listaPets: Pet[] = JSON.parse(petsSalvos);
                   
-                  // Filtramos a lista mantendo todos os pets, EXCETO o atual
                   const listaAtualizada = listaPets.filter(p => p.id !== petId);
                   
-                  // Salva de volta a lista limpa no AsyncStorage
                   await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtualizada));
                   
                   Alert.alert('Sucesso', 'Pet removido com sucesso.');
-                  navigation.goBack(); // Retorna para a lista de pets atualizada
+                  navigation.goBack(); 
                 }
               }
             } catch (error) {
@@ -192,6 +189,8 @@ export default function PetDetailsScreen() {
         <View style={styles.dadosContainer}>
           <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Idade:</Text> {pet.idade}</Text>
           <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Raça:</Text> {pet.raca}</Text>
+          <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Peso:</Text> {pet.peso ? `${pet.peso} kg` : 'Não informado'}</Text>
+          <Text style={styles.dadoTexto}><Text style={styles.dadoLabel}>Sexo:</Text> {pet.sexo || 'Não informado'}</Text>
         </View>
       </View>
 

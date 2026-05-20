@@ -23,6 +23,8 @@ export default function PetFormScreen() {
   const [idade, setIdade] = useState('');
   const [descricao, setDescricao] = useState('');
   const [foto, setFoto] = useState<string | null>(null);
+  const [peso, setPeso] = useState('');
+  const [sexo, setSexo] = useState<'MACHO' | 'FÊMEA' | null>(null);
   
   const [especie, setEspecie] = useState<'CACHORRO' | 'GATO' | null>(null);
   const [racaSelecionada, setRacaSelecionada] = useState<any>(null);
@@ -59,6 +61,8 @@ export default function PetFormScreen() {
       nome, 
       idade, 
       raca: racaSelecionada.nome, 
+      peso,
+      sexo,
       descricao, 
       foto, 
       lembretes: [
@@ -116,6 +120,29 @@ export default function PetFormScreen() {
       <View style={styles.inputContainer}>
         <TextInput style={styles.input} placeholder="EX: 5 MESES" placeholderTextColor={colors.cinza} value={idade} onChangeText={setIdade} />
       </View>
+      <Text style={styles.labelSecao}>PESO (KG)</Text>
+<View style={styles.inputContainer}>
+  <TextInput style={styles.input} placeholder="EX: 5.5" placeholderTextColor={colors.cinza} value={peso} onChangeText={setPeso} keyboardType="numeric" />
+</View>
+
+<Text style={styles.labelSecao}>SEXO</Text>
+<View style={styles.botoesEspecie}>
+  <TouchableOpacity 
+    style={[styles.botaoEspecie, sexo === 'MACHO' && styles.botaoEspecieAtivo]} 
+    onPress={() => setSexo('MACHO')}
+  >
+    <MaterialCommunityIcons name="gender-male" size={20} color={sexo === 'MACHO' ? colors.branco : colors.roxoMuitoEscuro} />
+    <Text style={[styles.textoEspecie, sexo === 'MACHO' && { color: colors.branco }]}>MACHO</Text>
+  </TouchableOpacity>
+  
+  <TouchableOpacity 
+    style={[styles.botaoEspecie, sexo === 'FÊMEA' && styles.botaoEspecieAtivo]} 
+    onPress={() => setSexo('FÊMEA')}
+  >
+    <MaterialCommunityIcons name="gender-female" size={20} color={sexo === 'FÊMEA' ? colors.branco : colors.roxoMuitoEscuro} />
+    <Text style={[styles.textoEspecie, sexo === 'FÊMEA' && { color: colors.branco }]}>FÊMEA</Text>
+  </TouchableOpacity>
+</View>
 
       <Text style={styles.labelSecao}>DESCRIÇÃO</Text>
       <View style={[styles.inputContainer, styles.inputDescricaoContainer]}>

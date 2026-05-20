@@ -17,6 +17,8 @@ export type Pet = {
   nome: string;
   idade: string;
   raca: string;
+  peso?: string;
+  sexo?: 'MACHO' | 'FÊMEA';
   descricao: string;
   foto: string | null;
   lembretes: Lembrete[]; 
