@@ -86,7 +86,9 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.branco },
+  container: { 
+    flex: 1, backgroundColor: colors.branco 
+  },
   bgDiagonal: { 
     position: 'absolute', 
     top: -150, 
@@ -96,13 +98,66 @@ const styles = StyleSheet.create({
     backgroundColor: colors.verdeMedio, 
     transform: [{ rotate: '-20deg' }] 
   },
-  content: { flex: 1, justifyContent: 'center', paddingHorizontal: 30, paddingTop: 100 },
-  logoContainer: { borderColor: '#3b82f6', borderWidth: 1, paddingVertical: 10, marginBottom: 40, alignItems: 'center', backgroundColor: colors.branco },
-  logoTexto: { fontSize: 32, fontWeight: '900', color: colors.roxoMuitoEscuro, textTransform: 'uppercase', letterSpacing: 2 },
-  input: { borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 25, height: 60, marginBottom: 25, color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 16, textTransform: 'uppercase', backgroundColor: colors.branco },
-  botaoLogar: { backgroundColor: colors.verdeClaro, borderRadius: 25, paddingVertical: 18, alignItems: 'center', marginBottom: 30 },
-  textoBotaoLogar: { color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 18, textTransform: 'uppercase' },
-  textoAviso: { textAlign: 'center', color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 12, marginBottom: 20 },
-  botaoCadastrar: { backgroundColor: colors.verdeClaro, borderRadius: 25, paddingVertical: 18, alignItems: 'center' },
-  textoBotaoCadastrar: { color: colors.roxoMuitoEscuro, fontWeight: '900', fontSize: 18, textTransform: 'uppercase' }
+  content: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    paddingHorizontal: 30, 
+    paddingTop: 100 
+  },
+    logoContainer: { 
+      borderColor: '#3b82f6', 
+    borderWidth: 1, 
+    paddingVertical: 10, 
+    marginBottom: 40, 
+    alignItems: 'center', 
+    backgroundColor: colors.branco 
+  },
+  logoTexto: { fontSize: 32, 
+    fontWeight: '900', 
+    color: colors.roxoMuitoEscuro, 
+    textTransform: 'uppercase', 
+    letterSpacing: 2 
+  },
+  input: { 
+    borderColor: colors.roxoMuitoEscuro, 
+    borderWidth: 1, 
+    borderRadius: 25, 
+    height: 60, 
+    marginBottom: 25, 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 16, 
+    textTransform: 'uppercase', 
+    backgroundColor: colors.branco 
+  },
+  botaoLogar: { 
+    backgroundColor: colors.verdeClaro, 
+    borderRadius: 25, 
+    paddingVertical: 18, 
+    alignItems: 'center', 
+    marginBottom: 30 
+  },
+  textoBotaoLogar: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 18, 
+    textTransform: 'uppercase' 
+  },
+  textoAviso: { 
+    textAlign: 'center', 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 12, marginBottom: 20 
+  },
+  botaoCadastrar: { 
+    backgroundColor: colors.verdeClaro, 
+    borderRadius: 25, 
+    paddingVertical: 18, 
+    alignItems: 'center' 
+  },
+  textoBotaoCadastrar: { 
+    color: colors.roxoMuitoEscuro, 
+    fontWeight: '900', 
+    fontSize: 18, textTransform: 'uppercase' 
+  }
 });
