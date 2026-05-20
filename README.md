@@ -4,29 +4,37 @@ O **Clyvo VET** é um aplicativo mobile desenvolvido para revolucionar o acompan
 
 ---
 
+## 🎥 Demonstração do Projeto
+
+**[CLIQUE AQUI PARA ASSISTIR AO VÍDEO DE DEMONSTRAÇÃO NO YOUTUBE] (Insira seu link aqui)**
+
+> *Vídeo narrado demonstrando todas as telas, fluxo de navegação, funcionamento dos formulários com manipulação de estado (useState) e a persistência de dados utilizando AsyncStorage (incluindo a restauração dos dados ao reiniciar o app).*
+
+---
+
 ## 🚀 Principais Funcionalidades
 
-- **Autenticação e Perfil do Tutor:** Cadastro completo de usuários com upload de foto e gestão de sessão local.
-- **Gestão Inteligente de Pets (CRUD Completo):**
-  - Cadastro detalhado com cálculo automático de idade (via Data de Nascimento), Peso, Sexo, Espécie e Raça.
-  - Edição de dados e exclusão segura.
+- **Autenticação e Perfil do Tutor:** Cadastro de usuários com gestão de sessão local.
+- **Gestão Inteligente de Pets (CRUD Completo com AsyncStorage):**
+  - Cadastro detalhado com cálculo automático de idade, Peso, Sexo, Espécie e Raça usando formulários interativos.
+  - Edição de dados e exclusão segura persistidos localmente.
   - Upload de fotos do pet diretamente da galeria do dispositivo.
-- **Mapeamento Preventivo (Diferencial):** Sistema que cruza a espécie e raça do animal com um banco de dados clínico, exibindo automaticamente um **Plano Preventivo** (doenças predispostas, idade de alerta e cuidados recomendados) logo após o cadastro ou a qualquer momento na ficha do pet.
-- **Dashboard Dinâmico (Home):** Tela inicial inteligente que exibe alertas e lembretes de saúde (vacinas, consultas) em tempo real, baseados na data atual.
-- **Calendário de Saúde:** Integração com calendário interativo para visualização rápida dos dias de medicação e consultas agendadas.
-- **Assistente Virtual:** Protótipo visual de chat integrado para suporte 24h e triagem de sintomas.
+- **Mapeamento Preventivo (Diferencial):** Sistema que cruza a espécie e raça do animal com um banco de dados clínico, exibindo automaticamente um **Plano Preventivo** logo após o cadastro ou na ficha do pet.
+- **Dashboard Dinâmico (Home):** Tela inicial inteligente que exibe alertas e lembretes de saúde reais baseados nos dados salvos.
+- **Calendário de Saúde:** Integração com calendário interativo.
+- **Assistente Virtual:** Protótipo visual de chat integrado para suporte e triagem.
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-O projeto foi construído utilizando as melhores práticas do ecossistema mobile atual:
+Projeto desenvolvido atendendo aos requisitos da disciplina de Mobile Application Development:
 
 - **React Native** - Framework principal.
 - **Expo** - Plataforma para desenvolvimento, build e testes rápidos.
-- **TypeScript** - Tipagem estática para maior segurança e escalabilidade do código.
-- **AsyncStorage** - Persistência de dados locais (banco de dados do protótipo).
-- **React Navigation** - Navegação fluida entre telas (Stack e Tabs).
+- **TypeScript** - Tipagem estática para maior segurança.
+- **AsyncStorage** - Persistência de dados locais (conforme exigência do Challenge).
+- **React Navigation** - Navegação fluida entre as mais de 5 rotas da aplicação.
 - **Bibliotecas Extras:**
   - `@expo/vector-icons` (MaterialCommunityIcons para iconografia)
   - `expo-image-picker` (Acesso à câmera/galeria)
@@ -35,13 +43,38 @@ O projeto foi construído utilizando as melhores práticas do ecossistema mobile
 
 ---
 
+## 📱 Como Executar o Projeto
+
+Siga os passos abaixo para rodar o projeto localmente em seu ambiente de desenvolvimento.
+
+### Pré-requisitos
+- Node.js instalado.
+- App do **Expo Go** instalado no seu smartphone (Android ou iOS), ou um emulador configurado no computador.
+
+### Passo a Passo
+
+1. **Clone o repositório**
+   git clone <link-do-seu-repositorio-github-classroom>
+
+2. **Acesse a pasta do projeto**
+   cd clyvo-vet
+
+3. **Instale as dependências**
+   npm install
+
+4. **Inicie o servidor do Expo**
+   npx expo start
+
+5. **Teste no dispositivo**
+   - Abra a câmera do seu celular (ou o app Expo Go no Android) e escaneie o **QR Code** exibido no terminal.
+   - Para rodar no emulador, pressione `a` (para Android) ou `i` (para iOS) no terminal.
+
+---
+
 ## 👥 Equipe de Desenvolvimento (FIAP)
 
-Projeto desenvolvido para o Challenge da FIAP - Curso de Análise e Desenvolvimento de Sistemas.
+Projeto desenvolvido para o Challenge da FIAP - Curso de Análise e Desenvolvimento de Sistemas (Turmas de Fevereiro).
 
 * **João Pedro Camilo** (RM 562005)
 * **Lucas Matsubara** (RM 565020)
 * **Pamella Christiny** (RM 565206)
-
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/GDVnG_N-)
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=23919760&assignment_repo_type=AssignmentRepo)
