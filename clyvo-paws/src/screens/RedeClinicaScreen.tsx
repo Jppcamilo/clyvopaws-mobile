@@ -28,8 +28,6 @@ export default function RedeClinicaScreen() {
           return;
         }
 
-        // 🛠️ CORREÇÃO DO GPS: Reduzindo a precisão para "Balanceada" (Usa Wi-Fi/Rede em vez de satélite).
-        // Isso resolve o problema de ficar carregando para sempre no emulador ou dentro de casa.
         let location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced, 
         });
@@ -43,12 +41,11 @@ export default function RedeClinicaScreen() {
           const local = endereco[0];
           setLocalizacaoTexto(`${local.subregion || local.city || 'Sua região'} - ${local.region || ''}`);
         } else {
-          setLocalizacaoTexto('São Paulo - SP'); // Fallback amigável
+          setLocalizacaoTexto('São Paulo - SP');
         }
       } catch (error) {
         console.error("Erro ao buscar localização: ", error);
-        setLocalizacaoTexto('São Paulo - SP'); // Se o emulador falhar mesmo assim, mostra um lugar padrão
-      } finally {
+        setLocalizacaoTexto('São Paulo - SP'); } finally {
         setCarregandoLocal(false);
       }
     })();
