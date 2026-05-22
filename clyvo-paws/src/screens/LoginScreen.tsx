@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   },
   bgDiagonal: { 
     position: 'absolute', 
-    top: -150, 
+    top: -230,
     left: -100, 
     width: 600, 
     height: 450, 
@@ -102,17 +102,15 @@ const styles = StyleSheet.create({
     flex: 1, 
     justifyContent: 'center', 
     paddingHorizontal: 30, 
-    paddingTop: 100 
+    paddingTop: 130
   },
-    logoContainer: { 
-      borderColor: '#3b82f6', 
-    borderWidth: 1, 
+  logoContainer: { 
     paddingVertical: 10, 
     marginBottom: 40, 
     alignItems: 'center', 
-    backgroundColor: colors.branco 
   },
-  logoTexto: { fontSize: 32, 
+  logoTexto: { 
+    fontSize: 32, 
     fontWeight: '900', 
     color: colors.roxoMuitoEscuro, 
     textTransform: 'uppercase', 
