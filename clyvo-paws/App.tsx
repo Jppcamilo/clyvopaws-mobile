@@ -35,14 +35,27 @@ function TabNavigator() {
         headerShown: false,
         tabBarActiveTintColor: colors.verdeEscuro, 
         tabBarInactiveTintColor: colors.cinza,
-        tabBarStyle: { height: 90, paddingBottom: 20, paddingTop: 10, backgroundColor: colors.branco, borderTopWidth: 1, borderTopColor: '#E0E0E0' },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '900', marginTop: 4 },
+        
+        tabBarStyle: { 
+          height: 100, 
+          paddingBottom: 30,
+          paddingTop: 10, 
+          backgroundColor: colors.branco, 
+          borderTopWidth: 1, 
+          borderTopColor: '#E0E0E0' 
+        },
+        tabBarLabelStyle: { 
+          fontSize: 12, 
+          fontWeight: '900', 
+          marginTop: 2
+        },
         tabBarIcon: ({ color }) => {
           let iconName: keyof typeof MaterialCommunityIcons.glyphMap = 'home';
           if (route.name === 'Home') iconName = 'home-outline';
           else if (route.name === 'Servicos') iconName = 'view-grid-outline';
           else if (route.name === 'Ajuda') iconName = 'help-circle-outline';
-          return <MaterialCommunityIcons name={iconName} size={34} color={color} />;
+
+          return <MaterialCommunityIcons name={iconName} size={30} color={color} />;
         },
       })}
     >
