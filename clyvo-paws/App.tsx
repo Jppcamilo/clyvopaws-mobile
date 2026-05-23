@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from './src/theme/colors';
-
+import { StatusBar } from 'expo-status-bar';
 
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
@@ -30,6 +30,7 @@ const Stack = createNativeStackNavigator();
 
 function TabNavigator() {
   return (
+
     <Tab.Navigator 
       screenOptions={({ route }) => ({
         headerShown: false,
@@ -69,28 +70,32 @@ function TabNavigator() {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-        
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
+    <> 
+      <StatusBar style="dark" backgroundColor="transparent" />
 
-        <Stack.Screen name="MainTabs" component={TabNavigator} />
-        <Stack.Screen name="PetForm" component={PetFormScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="Pets" component={PetsScreen} />
-        <Stack.Screen name="PetDetails" component={PetDetailsScreen} />
-        <Stack.Screen name="Consultas" component={ConsultasScreen} />
-        <Stack.Screen name="RedeClinica" component={RedeClinicaScreen} />
-        <Stack.Screen name="Produtos" component={ProdutosScreen} />
-        <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
-        <Stack.Screen name="MeusMedicamentos" component={MeusMedicamentosScreen} />
-        <Stack.Screen name="Enderecos" component={EnderecosScreen} />
-        <Stack.Screen name="Contatos" component={ContatosScreen} />
-        <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="InfoRaca" component={InfoRacaScreen} />
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+          
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
 
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Screen name="MainTabs" component={TabNavigator} />
+          <Stack.Screen name="PetForm" component={PetFormScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="Pets" component={PetsScreen} />
+          <Stack.Screen name="PetDetails" component={PetDetailsScreen} />
+          <Stack.Screen name="Consultas" component={ConsultasScreen} />
+          <Stack.Screen name="RedeClinica" component={RedeClinicaScreen} />
+          <Stack.Screen name="Produtos" component={ProdutosScreen} />
+          <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+          <Stack.Screen name="MeusMedicamentos" component={MeusMedicamentosScreen} />
+          <Stack.Screen name="Enderecos" component={EnderecosScreen} />
+          <Stack.Screen name="Contatos" component={ContatosScreen} />
+          <Stack.Screen name="Chat" component={ChatScreen} />
+          <Stack.Screen name="InfoRaca" component={InfoRacaScreen} />
+
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 }
