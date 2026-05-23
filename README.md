@@ -8,7 +8,7 @@ O **Clyvo VET** é um aplicativo mobile desenvolvido para revolucionar o acompan
 
 **[CLIQUE AQUI PARA ASSISTIR AO VÍDEO DE DEMONSTRAÇÃO NO YOUTUBE](https://youtu.be/3h39EdDvMd8)**
 
-> *Vídeo narrado demonstrando todas as telas, fluxo de navegação, funcionamento dos formulários com manipulação de estado (useState) e a persistência de dados utilizando AsyncStorage (incluindo a restauração dos dados ao reiniciar o app).*
+> *Vídeo narrado demonstrando funcionamento do aplicativo e suas principais funcionalidades para o desafio proposto pela empresa Clyvo*
 
 ---
 
