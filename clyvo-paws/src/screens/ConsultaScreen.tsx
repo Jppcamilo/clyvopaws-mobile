@@ -4,7 +4,9 @@ import {
   Text, 
   StyleSheet, 
   ScrollView, 
-  TouchableOpacity, 
+  TouchableOpacity,
+  Linking,
+  Alert 
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -12,6 +14,18 @@ import { colors } from '../theme/colors';
 
 export default function ConsultasScreen() {
   const navigation = useNavigation<any>();
+
+  const abrirWhatsApp = (numero: string, nomeClinica: string) => {
+    const numeroLimpo = numero.replace(/\D/g, ''); 
+    const mensagem = `Olá ${nomeClinica}! Sou do app Clyvo VET e gostaria de marcar uma consulta para o meu pet.`; 
+    
+    const url = `https://wa.me/${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
+
+    Linking.openURL(url).catch((err) => {
+      console.error('Erro ao abrir o WhatsApp', err);
+      Alert.alert('Erro', 'Não foi possível redirecionar para o WhatsApp.');
+    });
+  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -27,34 +41,55 @@ export default function ConsultasScreen() {
 
       <View style={styles.listaClinicas}>
         
-        <TouchableOpacity style={styles.cardClinica} activeOpacity={0.8}>
+        <TouchableOpacity 
+          style={styles.cardClinica} 
+          activeOpacity={0.8}
+          onPress={() => abrirWhatsApp('5511999724459', 'Dr. Pet Domiciliar')}
+        >
           <View style={styles.tagNome}>
             <Text style={styles.textoTag}>Dr. Pet Domiciliar</Text>
           </View>
           <Text style={styles.textoDescricao}>
             Atendimento veterinário completo no conforto do seu lar. Sem estresse para o seu pet.
           </Text>
-          <Text style={styles.textoTelefone}>(11) 99999-0001</Text>
+          <View style={styles.boxTelefone}>
+            <MaterialCommunityIcons name="whatsapp" size={20} color={colors.verdeClaro} />
+            <Text style={styles.textoTelefone}>(11) 99972-4459</Text>
+          </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cardClinica} activeOpacity={0.8}>
+        <TouchableOpacity 
+          style={styles.cardClinica} 
+          activeOpacity={0.8}
+          onPress={() => abrirWhatsApp('5511999724459', 'SERES')}
+        >
           <View style={styles.tagNome}>
             <Text style={styles.textoTag}>SERES</Text>
           </View>
           <Text style={styles.textoDescricao}>
             Centro veterinário com infraestrutura de ponta e atendimento emergencial 24h.
           </Text>
-          <Text style={styles.textoTelefone}>(11) 99999-0002</Text>
+          <View style={styles.boxTelefone}>
+            <MaterialCommunityIcons name="whatsapp" size={20} color={colors.verdeClaro} />
+            <Text style={styles.textoTelefone}>(11) 99972-4459</Text>
+          </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cardClinica} activeOpacity={0.8}>
+        <TouchableOpacity 
+          style={styles.cardClinica} 
+          activeOpacity={0.8}
+          onPress={() => abrirWhatsApp('5511999724459', 'VET DOMICÍLIO SP')}
+        >
           <View style={styles.tagNome}>
             <Text style={styles.textoTag}>VET DOMICÍLIO SP</Text>
           </View>
           <Text style={styles.textoDescricao}>
             Especialistas em felinos e caninos. Realizamos vacinas, exames e check-ups em casa.
           </Text>
-          <Text style={styles.textoTelefone}>(11) 99999-0003</Text>
+          <View style={styles.boxTelefone}>
+            <MaterialCommunityIcons name="whatsapp" size={20} color={colors.verdeClaro} />
+            <Text style={styles.textoTelefone}>(11) 99972-4459</Text>
+          </View>
         </TouchableOpacity>
 
       </View>
@@ -133,10 +168,15 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     textTransform: 'uppercase',
   },
+  boxTelefone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
   textoTelefone: {
     color: colors.verdeClaro,
     fontWeight: '900',
     fontSize: 14,
-    textAlign: 'right',
+    marginLeft: 8,
   }
 });
