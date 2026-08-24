@@ -41,7 +41,7 @@ export default function ServicesScreen() {
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Planos')}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="shield-check-outline" size={35} color={colors.roxoMuitoEscuro} />
           </View>
