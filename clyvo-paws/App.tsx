@@ -24,6 +24,7 @@ import EnderecosScreen from './src/screens/EnderecosScreen';
 import ContatosScreen from './src/screens/ContatosScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import InfoRacaScreen from './src/screens/InfoRacaScreen';
+import PlanosScreen from './src/screens/PlanosScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -78,7 +79,7 @@ export default function App() {
           
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-
+          <Stack.Screen name="Planos" component={PlanosScreen} />
           <Stack.Screen name="MainTabs" component={TabNavigator} />
           <Stack.Screen name="PetForm" component={PetFormScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
