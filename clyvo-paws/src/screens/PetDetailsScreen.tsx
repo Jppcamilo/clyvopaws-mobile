@@ -13,10 +13,20 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
+import * as Notifications from 'expo-notifications'; // <-- IMPORTAÇÃO AQUI
 import { colors } from '../theme/colors';
 import { Pet } from '../types';
 import { DADOS_RACAS } from '../data/racas';
 import { calcularIdade } from '../utils/dateUtils';
+
+// Configura como a notificação aparece se o app já estiver aberto
+Notifications.setNotificationHandler({
+  handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  } as Notifications.NotificationBehavior),
+});
 
 LocaleConfig.locales['pt-br'] = {
   monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -110,6 +120,49 @@ export default function PetDetailsScreen() {
       carregarPet();
     }, [petId])
   );
+
+  const ativarAlertas = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Atenção', 'Você precisa permitir as notificações para receber os lembretes do seu pet.');
+      return;
+    }
+
+    let agendados = 0;
+
+    for (const lembrete of lembretes) {
+      if (lembrete.data && lembrete.horario) {
+        const [ano, mes, dia] = lembrete.data.split('-').map(Number);
+        const [hora, minuto] = lembrete.horario.split(':').map(Number);
+
+        const dataConsulta = new Date(ano, mes - 1, dia, hora, minuto);
+        
+        const dataAlarme = new Date(dataConsulta.getTime() - 2 * 60 * 60 * 1000);
+
+        if (dataAlarme > new Date()) {
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: "🐾 Lembrete de Consulta!",
+              body: `A consulta do ${pet?.nome} está chegando! Não se esqueça.`,
+              sound: true,
+            },
+            trigger: {
+              type: Notifications.SchedulableTriggerInputTypes.DATE,
+              date: dataAlarme,
+            },
+          });
+          agendados++;
+        }
+      }
+    }
+
+    if (agendados > 0) {
+      Alert.alert('Sucesso!', `Foram ativados ${agendados} alertas para os próximos compromissos do(a) ${pet?.nome}. Você será avisado 2h antes.`);
+    } else {
+      Alert.alert('Aviso', 'Não há compromissos futuros para agendar alertas.');
+    }
+  };
 
   const handleExcluirPet = () => {
     Alert.alert(
@@ -257,7 +310,14 @@ export default function PetDetailsScreen() {
       </View>
 
       <View style={styles.secao}>
-        <Text style={styles.tituloSecao}>STATUS DO PET</Text>
+        <View style={styles.headerTituloIcone}>
+          <Text style={styles.tituloSecao}>STATUS DO PET</Text>
+          <TouchableOpacity onPress={ativarAlertas} style={styles.botaoSininho}>
+            <MaterialCommunityIcons name="bell-ring-outline" size={20} color={colors.roxoMuitoEscuro} />
+            <Text style={styles.textoSininho}>Alertas</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.cardStatus}>
           <Text style={styles.tituloCardStatus}>VACINAS / LEMBRETES</Text>
           <Text style={styles.subtituloCardStatus}>Pendente</Text>
@@ -407,6 +467,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', 
     alignItems: 'center', 
     marginBottom: 10 
+  },
+  headerTituloIcone: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  botaoSininho: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.verdeClaro,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 15,
+  },
+  textoSininho: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: colors.roxoMuitoEscuro,
+    marginLeft: 4,
   },
   tituloSecao: { 
     fontSize: 16, 
