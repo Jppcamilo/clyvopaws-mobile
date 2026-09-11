@@ -7,13 +7,16 @@ import {
   TouchableOpacity, 
   ScrollView, 
   Image, 
-  Alert 
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker'; 
+import { useMutation } from '@tanstack/react-query';
 import { colors } from '../theme/colors';
+import api from '../services/api';
+import * as SecureStore from 'expo-secure-store';
 
 export default function RegisterScreen() {
   const navigation = useNavigation<any>();
@@ -22,7 +25,6 @@ export default function RegisterScreen() {
   const [cpf, setCpf] = useState('');
   const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
-  const [endereco, setEndereco] = useState('');
   const [senha, setSenha] = useState('');
   const [foto, setFoto] = useState<string | null>(null); 
 
@@ -46,21 +48,43 @@ export default function RegisterScreen() {
     }
   };
 
+  const registerMutation = useMutation({
+    mutationFn: async (novoTutor: any) => {
+      const response = await api.post('/tutores', novoTutor);
+      return response.data;
+    },
+    onSuccess: () => {
+      Alert.alert('Sucesso!', 'Cadastro realizado. Faça o login para entrar.');
+      navigation.goBack();
+    },
+    onError: (error) => {
+      console.error('Erro no cadastro:', error);
+      Alert.alert('Erro', 'Não foi possível salvar seu cadastro. Tente novamente mais tarde.');
+    }
+  });
+
   const handleCadastrar = async () => {
     if (!nome.trim() || !email.trim() || !senha.trim()) {
       Alert.alert('Erro', 'Nome, Email e Senha são obrigatórios!');
       return;
     }
 
-    const novoTutor = { nome, cpf, telefone, email, endereco, senha, foto };
-
     try {
-      await AsyncStorage.setItem('@tutor_clyvo', JSON.stringify(novoTutor));
-      Alert.alert('Sucesso!', 'Cadastro realizado. Faça o login para entrar.');
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar seu cadastro.');
+      await SecureStore.deleteItemAsync('clyvo_token');
+    } catch (e) {
+      console.log('Nenhum token para limpar');
     }
+
+    const novoTutor = {
+      nomeCompleto: nome,
+      cpf: cpf,
+      telefone: telefone,
+      email: email,
+      senha: senha,
+      fotoUrl: foto
+    };
+
+    registerMutation.mutate(novoTutor);
   };
 
   return (
@@ -79,7 +103,6 @@ export default function RegisterScreen() {
           <MaterialCommunityIcons name="upload" size={20} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
         
-        {/* 👇 AQUI: Trocamos o link do freepik pelo placeholder profissional */}
         {foto ? (
           <Image source={{ uri: foto }} style={styles.imagemPerfil} />
         ) : (
@@ -102,14 +125,19 @@ export default function RegisterScreen() {
       <Text style={styles.labelSecao}>EMAIL</Text>
       <TextInput style={styles.input} placeholder="SEU@EMAIL.COM" placeholderTextColor={colors.roxoMuitoEscuro} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="center" />
 
-      <Text style={styles.labelSecao}>ENDEREÇO</Text>
-      <TextInput style={styles.input} placeholder="RUA TAL, 1002" placeholderTextColor={colors.roxoMuitoEscuro} value={endereco} onChangeText={setEndereco} textAlign="center" />
-
       <Text style={styles.labelSecao}>SENHA</Text>
       <TextInput style={styles.input} placeholder="CRIE SUA SENHA" placeholderTextColor={colors.roxoMuitoEscuro} value={senha} onChangeText={setSenha} secureTextEntry textAlign="center" />
 
-      <TouchableOpacity style={styles.botaoCadastrar} onPress={handleCadastrar}>
-        <Text style={styles.textoBotaoCadastrar}>CADASTRAR</Text>
+      <TouchableOpacity 
+        style={styles.botaoCadastrar} 
+        onPress={handleCadastrar}
+        disabled={registerMutation.isPending}
+      >
+        {registerMutation.isPending ? (
+          <ActivityIndicator color={colors.roxoMuitoEscuro} />
+        ) : (
+          <Text style={styles.textoBotaoCadastrar}>CADASTRAR</Text>
+        )}
       </TouchableOpacity>
 
       <View style={{ height: 60 }} />
@@ -123,12 +151,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.branco, 
     paddingHorizontal: 20, 
     paddingTop: 50 
-    
   },
   header: { 
     marginBottom: 30, 
     alignItems: 'flex-start' 
-    
   },
   botaoVoltar: { 
     backgroundColor: colors.verdeMedio, 
@@ -138,21 +164,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
     marginBottom: 20 
-    
   },
   titulo: { 
     fontSize: 20, 
     fontWeight: '900', 
     color: colors.roxoMuitoEscuro, 
     textTransform: 'uppercase' 
-    
   },
   labelSecao: { 
     fontSize: 14, 
     fontWeight: '900', 
     color: colors.verdeMedio, 
     marginBottom: 5 
-    
   },
   boxFoto: { 
     borderColor: colors.roxoMuitoEscuro, 
@@ -161,7 +184,6 @@ const styles = StyleSheet.create({
     padding: 15, 
     alignItems: 'center', 
     marginBottom: 20 
-    
   },
   botaoUpload: { 
     backgroundColor: colors.verdeClaro, 
@@ -171,17 +193,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
     alignSelf: 'flex-start', 
-    marginBottom: 10 },
-  
+    marginBottom: 10 
+  },
   imagemPerfil: { 
     width: 180, 
     height: 120, 
     borderRadius: 10, 
     backgroundColor: '#E0E0E0' 
-
   },
-  
-  
   placeholderImagem: { 
     width: 180, 
     height: 120, 
@@ -193,15 +212,12 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: colors.cinza 
   },
-
   textoPlaceholder: { 
     color: colors.cinza, 
     fontSize: 12, 
     fontWeight: 'bold', 
     marginTop: 5 
-
   },
-  
   input: { 
     borderColor: colors.roxoMuitoEscuro, 
     borderWidth: 1, 
@@ -210,23 +226,19 @@ const styles = StyleSheet.create({
     marginBottom: 20, 
     color: colors.roxoMuitoEscuro, 
     fontWeight: '900', 
-    fontSize: 14, 
-    textTransform: 'uppercase' 
+    fontSize: 14
   },
-
   botaoCadastrar: { 
     backgroundColor: colors.verdeClaro, 
     borderRadius: 25, 
     paddingVertical: 18, 
     alignItems: 'center', 
     marginTop: 10 
-
   },
   textoBotaoCadastrar: { 
     color: colors.roxoMuitoEscuro, 
     fontWeight: '900', 
     fontSize: 18, 
     textTransform: 'uppercase' 
-
   }
 });

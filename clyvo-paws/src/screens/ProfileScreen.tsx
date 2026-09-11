@@ -1,40 +1,66 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  Alert, 
+  Image,
+  ActivityIndicator
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; 
 import { colors } from '../theme/colors';
+import api from '../services/api'; 
 
 export default function ProfileScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+  const queryClient = useQueryClient();
 
+  const [tutorId, setTutorId] = useState<string | null>(null);
+  
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [cpf, setCpf] = useState('');
   const [telefone, setTelefone] = useState('');
-  const [endereco, setEndereco] = useState('');
   const [foto, setFoto] = useState<string | null>(null);
 
   useEffect(() => {
-    const carregarDadosPerfil = async () => {
-      try {
-        const dadosSalvos = await AsyncStorage.getItem('@tutor_clyvo');
-        if (dadosSalvos) {
-          const tutor = JSON.parse(dadosSalvos);
-          setNome(tutor.nome || '');
-          setEmail(tutor.email || '');
-          setCpf(tutor.cpf || '');
-          setTelefone(tutor.telefone || '');
-          setEndereco(tutor.endereco || '');
-          setFoto(tutor.foto || null);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar perfil', error);
+    const buscarIdLocal = async () => {
+      const dadosSalvos = await AsyncStorage.getItem('@tutor_clyvo');
+      if (dadosSalvos) {
+        const tutor = JSON.parse(dadosSalvos);
+        setTutorId(tutor.id || tutor.user_id); 
       }
     };
-    carregarDadosPerfil();
+    buscarIdLocal();
   }, []);
+
+  const { data: tutorProfile, isLoading: carregando } = useQuery({
+    queryKey: ['perfil-tutor', tutorId],
+    queryFn: async () => {
+      const response = await api.get(`/tutores/${tutorId}`);
+      return response.data;
+    },
+    enabled: !!tutorId,
+  });
+
+useEffect(() => {
+    if (tutorProfile) {
+      setNome(tutorProfile.nome || tutorProfile.nomeCompleto || '');
+      
+      setEmail(tutorProfile.telefone || tutorProfile.celular || '');
+      setCpf(tutorProfile.cpf || '');
+      setTelefone(tutorProfile.email || tutorProfile.emailUsuario || '');
+      
+      setFoto(tutorProfile.foto || tutorProfile.fotoUrl || null);
+    }
+  }, [tutorProfile]);
 
   const escolherFoto = async () => {
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -53,25 +79,79 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleSalvar = async () => {
+  const updateMutation = useMutation({
+    mutationFn: async (dadosAtualizados: any) => {
+      const response = await api.put(`/tutores/${tutorId}`, dadosAtualizados);
+      return response.data;
+    },
+    onSuccess: async (dadosRetornados) => {
+      queryClient.invalidateQueries({ queryKey: ['perfil-tutor', tutorId] });
+      await AsyncStorage.setItem('@tutor_clyvo', JSON.stringify(dadosRetornados));
+
+      Alert.alert('Sucesso!', 'Seus dados foram atualizados com sucesso.');
+      navigation.goBack();
+    },
+    onError: (error) => {
+      console.error('Erro ao atualizar perfil:', error);
+      Alert.alert('Erro', 'Não foi possível salvar os dados. Tente novamente.');
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await api.delete(`/tutores/${tutorId}`);
+    },
+    onSuccess: async () => {
+      await AsyncStorage.removeItem('@tutor_clyvo');
+      Alert.alert('Conta Excluída', 'Sua conta foi apagada com sucesso.');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    },
+    onError: (error) => {
+      console.error('Erro ao excluir conta:', error);
+      Alert.alert('Erro', 'Não foi possível excluir a sua conta. Tente novamente.');
+    }
+  });
+
+  const confirmarExclusao = () => {
+    Alert.alert(
+      'Excluir Conta',
+      'Tem certeza de que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Excluir', 
+          style: 'destructive', 
+          onPress: () => deleteMutation.mutate() 
+        }
+      ]
+    );
+  };
+
+  const handleSalvar = () => {
     if (!nome.trim() || !email.trim()) {
       Alert.alert('Atenção', 'Nome e E-mail são obrigatórios!');
       return;
     }
 
-    try {
-      // Pega a senha antiga para não apagar
-      const dadosAntigos = await AsyncStorage.getItem('@tutor_clyvo');
-      const senhaAntiga = dadosAntigos ? JSON.parse(dadosAntigos).senha : '';
-
-      const dadosTutor = { nome, email, cpf, telefone, endereco, foto, senha: senhaAntiga };
-      await AsyncStorage.setItem('@tutor_clyvo', JSON.stringify(dadosTutor));
-      Alert.alert('Sucesso!', 'Seus dados foram atualizados com sucesso.');
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar os dados.');
-    }
+    updateMutation.mutate({ 
+      nomeCompleto: nome,
+      email: email.toLowerCase().trim(), 
+      cpf: cpf, 
+      telefone: telefone,
+      foto: foto
+    });
   };
+
+  if (carregando) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.verdeEscuro} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -119,15 +199,30 @@ export default function ProfileScreen() {
         <TextInput style={styles.input} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" placeholderTextColor={colors.cinza} />
       </View>
 
-      <Text style={styles.labelSecao}>ENDEREÇO</Text>
-      <View style={styles.inputContainer}>
-        <MaterialCommunityIcons name="map-marker-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput style={styles.input} value={endereco} onChangeText={setEndereco} placeholderTextColor={colors.cinza} />
-      </View>
-
-      <TouchableOpacity style={styles.botaoSalvar} onPress={handleSalvar}>
-        <Text style={styles.textoBotaoSalvar}>SALVAR ALTERAÇÕES</Text>
+      <TouchableOpacity 
+        style={styles.botaoSalvar} 
+        onPress={handleSalvar}
+        disabled={updateMutation.isPending}
+      >
+        {updateMutation.isPending ? (
+          <ActivityIndicator color={colors.branco} />
+        ) : (
+          <Text style={styles.textoBotaoSalvar}>SALVAR ALTERAÇÕES</Text>
+        )}
       </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.botaoDeletar} 
+        onPress={confirmarExclusao}
+        disabled={deleteMutation.isPending}
+      >
+        {deleteMutation.isPending ? (
+          <ActivityIndicator color="#FFF" />
+        ) : (
+          <Text style={styles.textoBotaoDeletar}>EXCLUIR CONTA</Text>
+        )}
+      </TouchableOpacity>
+      
       <View style={{ height: 100 }} />
     </ScrollView>
   );
@@ -204,10 +299,22 @@ const styles = StyleSheet.create({
     borderRadius: 25, 
     paddingVertical: 15, 
     alignItems: 'center', 
-    marginTop: 10, 
-    marginBottom: 40 },
+    marginTop: 10 },
   textoBotaoSalvar: { 
     color: colors.branco, 
     fontWeight: '900', 
-    fontSize: 16 }
+    fontSize: 16 },
+  botaoDeletar: { 
+    backgroundColor: '#D9534F', 
+    borderRadius: 25, 
+    paddingVertical: 15, 
+    alignItems: 'center', 
+    marginTop: 15, 
+    marginBottom: 40 
+  },
+  textoBotaoDeletar: { 
+    color: '#FFF', 
+    fontWeight: '900', 
+    fontSize: 16 
+  }
 });
