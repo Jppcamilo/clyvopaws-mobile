@@ -5,38 +5,88 @@ import {
   TextInput, 
   StyleSheet, 
   TouchableOpacity, 
-  Alert 
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useMutation } from '@tanstack/react-query';
 import { colors } from '../theme/colors';
+import api from '../services/api';
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const navigation = useNavigation<any>();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const emailLimpo = email.trim().toLowerCase();
 
-  const handleLogin = async () => {
-    try {
-      const dadosSalvos = await AsyncStorage.getItem('@tutor_clyvo');
-      
-      if (dadosSalvos) {
-        const tutor = JSON.parse(dadosSalvos);
-        
-        if (tutor.email.toLowerCase() === email.toLowerCase().trim() && tutor.senha === senha) {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'MainTabs' }],
-          });
-        } else {
-          Alert.alert('Erro', 'E-mail ou senha incorretos.');
+const loginMutation = useMutation({
+    mutationFn: async (credentials: any) => {
+      const response = await api.post('/login', credentials, {
+        headers: {
+          Authorization: false
+        }
+      });
+      return response.data;
+    },
+    onSuccess: async (data) => {
+      if (data.token) {
+        await SecureStore.setItemAsync('clyvo_token', data.token);
+      }
+
+      const tutorDados = {
+        id: data.id,
+        nomeCompleto: data.nomeCompleto,
+        fotoUrl: data.fotoUrl
+      };
+      await AsyncStorage.setItem('@tutor_clyvo', JSON.stringify(tutorDados));
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
+    },
+    onError: (error: any) => {
+      console.error('Erro no login:', error);
+
+      let mensagemAmigavel = 'E-mail ou senha incorretos. Verifique seus dados.';
+
+      if (error.response) {
+        const status = error.response.status;
+        if (status === 401) {
+          mensagemAmigavel = 'E-mail ou senha inválidos.';
+        } else if (status === 500) {
+          mensagemAmigavel = 'E-mail ou senha inválidos.';
         }
       } else {
-        Alert.alert('Erro', 'Nenhum usuário cadastrado. Por favor, cadastre-se primeiro.');
+        mensagemAmigavel = 'Não foi possível conectar ao servidor. Verifique sua conexão.';
       }
-    } catch (error) {
-      console.error('Erro no login:', error);
+
+      Alert.alert('Atenção', mensagemAmigavel);
     }
+  });
+
+const handleLogin = async () => {
+    if (!email.trim() || !senha.trim()) {
+      Alert.alert('Atenção', 'Preencha o e-mail e a senha!');
+      return;
+    }
+
+    try {
+      await SecureStore.deleteItemAsync('clyvo_token');
+      delete api.defaults.headers.common['Authorization'];
+    } catch (e) {
+      console.log('Nenhum token velho para limpar');
+    }
+    const emailLimpo = email.trim().toLowerCase(); 
+    
+    console.log(`Tentando logar com -> E-mail: '${emailLimpo}' | Senha: '${senha}'`);
+
+    loginMutation.mutate({ 
+      username: emailLimpo, 
+      password: senha 
+    });
   };
 
   return (
@@ -48,16 +98,18 @@ export default function LoginScreen() {
           <Text style={styles.logoTexto}>CLYVOPAWS</Text>
         </View>
 
+
         <TextInput 
-          style={styles.input} 
-          placeholder="EMAIL..." 
-          placeholderTextColor={colors.roxoMuitoEscuro} 
-          value={email} 
-          onChangeText={setEmail} 
-          keyboardType="email-address" 
-          autoCapitalize="none"
-          textAlign="center"
-        />
+        style={styles.input} 
+        placeholder="E-MAIL..." 
+        value={email} 
+        placeholderTextColor={colors.roxoMuitoEscuro}
+        onChangeText={setEmail} 
+        keyboardType="email-address" 
+        autoCapitalize="none" 
+        autoCorrect={false} 
+        textAlign='center'
+      />
 
         <TextInput 
           style={styles.input} 
@@ -69,8 +121,16 @@ export default function LoginScreen() {
           textAlign="center"
         />
 
-        <TouchableOpacity style={styles.botaoLogar} onPress={handleLogin}>
-          <Text style={styles.textoBotaoLogar}>LOGAR</Text>
+        <TouchableOpacity 
+          style={styles.botaoLogar} 
+          onPress={handleLogin}
+          disabled={loginMutation.isPending}
+        >
+          {loginMutation.isPending ? (
+            <ActivityIndicator color={colors.roxoMuitoEscuro} />
+          ) : (
+            <Text style={styles.textoBotaoLogar}>LOGAR</Text>
+          )}
         </TouchableOpacity>
 
         <Text style={styles.textoAviso}>
@@ -124,8 +184,7 @@ const styles = StyleSheet.create({
     marginBottom: 25, 
     color: colors.roxoMuitoEscuro, 
     fontWeight: '900', 
-    fontSize: 16, 
-    textTransform: 'uppercase', 
+    fontSize: 16,
     backgroundColor: colors.branco 
   },
   botaoLogar: { 
