@@ -254,7 +254,7 @@ const handleSalvar = async () => {
                <TouchableOpacity 
                 key={index} 
                 style={[styles.tagRaca, racaSelecionada?.nome === item.nome && styles.tagRacaAtiva]}
-                onPress={() => setRacaSelecionada(item)} // 👈 Atualiza a raça selecionada
+                onPress={() => setRacaSelecionada(item)}
                 >
           <Text style={[styles.textoRaca, racaSelecionada?.nome === item.nome && { color: colors.branco }]}>
               {item.nome}

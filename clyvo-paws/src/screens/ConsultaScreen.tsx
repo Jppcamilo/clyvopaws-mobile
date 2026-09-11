@@ -56,7 +56,7 @@ export default function ConsultasScreen() {
       setModalVisivel(false);
       setHorarioSelecionado('');
       setMotivo('');
-      queryClient.invalidateQueries({ queryKey: ['agendamentos-pet'] }); // 👈 Faz a mágica da atualização automática!
+      queryClient.invalidateQueries({ queryKey: ['agendamentos-pet'] });
     },
     onError: (error) => {
       console.error('Erro ao agendar:', error);
@@ -64,7 +64,6 @@ export default function ConsultasScreen() {
     }
   });
 
-  // 1. Busca os Pets do Tutor
   const { data: listaPets = [] } = useQuery({
     queryKey: ['meus-pets'],
     queryFn: async () => {
@@ -73,7 +72,6 @@ export default function ConsultasScreen() {
     }
   });
 
-  // 2. Busca os Horários Disponíveis do Médico
   const { data: listaAgendas = [], isFetching: carregandoAgendas } = useQuery({
     queryKey: ['agendas', veterinarioAtual],
     queryFn: async () => {
@@ -84,7 +82,6 @@ export default function ConsultasScreen() {
     enabled: !!veterinarioAtual,
   });
 
-  // Função para deixar a data bonita na tela (ex: 15/11 às 10:00)
   const formatarDataHora = (dataString: string) => {
     const data = new Date(dataString);
     const dia = String(data.getDate()).padStart(2, '0');
@@ -98,7 +95,6 @@ export default function ConsultasScreen() {
     setClinicaSelecionada(nomeClinica);
     setVeterinarioAtual(clinicasDB[nomeClinica]?.veterinarioId || null);
     
-    // Limpa os dados velhos ao abrir um modal novo
     setHorarioSelecionado('');
     setMotivo('');
     setPetSelecionado(null);
@@ -122,7 +118,7 @@ export default function ConsultasScreen() {
     const dadosClinica = clinicasDB[clinicaSelecionada];
 
     agendarMutation.mutate({
-      dataHora: horarioSelecionado, // Enviamos exatamente como veio do banco!
+      dataHora: horarioSelecionado,
       titulo: `Consulta na ${clinicaSelecionada}`,
       descricao: motivo,
       status: 'AGENDADA',
@@ -254,7 +250,6 @@ export default function ConsultasScreen() {
               </ScrollView>
             )}
 
-            {/* 👇 Motivo mantido normal */}
             <View style={styles.inputContainer}>
               <TextInput 
                 style={styles.input} 
@@ -265,7 +260,6 @@ export default function ConsultasScreen() {
               />
             </View>
 
-            {/* 👇 Seleção do Pet */}
             <Text style={styles.modalLabel}>SELECIONE O PET:</Text>
             <ScrollView 
               horizontal 

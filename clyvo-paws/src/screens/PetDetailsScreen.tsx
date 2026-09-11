@@ -46,7 +46,6 @@ export default function PetDetailsScreen() {
   const [datasMarcadas, setDatasMarcadas] = useState<any>({});
   const [racaInfo, setRacaInfo] = useState<any>(null);
   
-  // 1. Busca os Dados do Pet
   const { data: pet, isLoading: carregandoPet } = useQuery({
     queryKey: ['pet-details', petId],
     queryFn: async () => {
@@ -55,7 +54,6 @@ export default function PetDetailsScreen() {
     }
   });
 
-  // 👇 2. NOVA BUSCA: Traz os agendamentos reais do banco!
   const { data: agendamentos, isLoading: carregandoAgendamentos } = useQuery({
     queryKey: ['agendamentos-pet', petId],
     queryFn: async () => {
@@ -79,7 +77,6 @@ export default function PetDetailsScreen() {
     }
   });
 
-  // Atualiza as Raças
   useEffect(() => {
     if (pet) {
       let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === pet.raca);

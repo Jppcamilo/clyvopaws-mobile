@@ -18,7 +18,6 @@ export default function MedicamentosScreen() {
   const navigation = useNavigation<any>();
   const [tutorId, setTutorId] = useState<string | null>(null);
 
-  // 1. Busca o ID do Tutor logado
   useEffect(() => {
     const buscarIdLocal = async () => {
       const dadosSalvos = await AsyncStorage.getItem('@tutor_clyvo');
@@ -30,18 +29,15 @@ export default function MedicamentosScreen() {
     buscarIdLocal();
   }, []);
 
-  // 2. Busca os medicamentos no Back-end
-  // Adapte a rota '/medicamentos' caso o seu Java utilize uma rota diferente, como '/tutores/{id}/medicamentos'
   const { data: medicamentos, isLoading, isError } = useQuery({
     queryKey: ['meus-medicamentos', tutorId],
     queryFn: async () => {
       const response = await api.get('/medicamentos'); 
       return response.data;
     },
-    enabled: !!tutorId, // Só roda a query quando tiver o ID do tutor
+    enabled: !!tutorId,
   });
 
-  // Função para renderizar a tela verde vazia (quando não houver dados)
   const renderEmptyState = () => (
     <View style={styles.emptyCard}>
       <MaterialCommunityIcons name="medical-bag" size={60} color={colors.verdeClaro} style={{ marginBottom: 15 }} />
@@ -51,7 +47,7 @@ export default function MedicamentosScreen() {
       </Text>
       <TouchableOpacity 
         style={styles.botaoCadastrarPet}
-        onPress={() => navigation.navigate('PetForm')} // Ajuste para o nome real da sua rota de cadastro de pet
+        onPress={() => navigation.navigate('PetForm')}
       >
         <Text style={styles.textoBotaoCadastrar}>CADASTRAR PET</Text>
       </TouchableOpacity>
@@ -60,7 +56,6 @@ export default function MedicamentosScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
@@ -71,17 +66,14 @@ export default function MedicamentosScreen() {
         </View>
       </View>
 
-      {/* Loading State */}
       {isLoading ? (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={colors.verdeEscuro} />
           <Text style={{ marginTop: 10, color: colors.cinza, fontWeight: 'bold' }}>Buscando tratamentos...</Text>
         </View>
       ) : isError || !medicamentos || !medicamentos.content || medicamentos.content.length === 0 ? (
-        /* Renderiza a tela verde se não houver dados ou der erro na rota */
         renderEmptyState()
       ) : (
-        /* Renderiza a lista de medicamentos vindos do banco de dados */
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
          
           {medicamentos.content.map((med: any, index: number) => (
@@ -93,7 +85,6 @@ export default function MedicamentosScreen() {
                   <Text style={styles.medNome}>{med.nome}</Text>
                 </View>
                 
-                {/* Lógica para a cor do Status baseado na sua tabela do banco (EM_DIA ou CONCLUIDO) */}
                 <View style={[styles.badgeStatus, { backgroundColor: med.status === 'CONCLUIDO' ? '#D3D3D3' : colors.verdeClaro }]}>
                   <Text style={[styles.textoStatus, { color: med.status === 'CONCLUIDO' ? '#666' : colors.roxoMuitoEscuro }]}>
                     {med.status === 'CONCLUIDO' ? 'CONCLUÍDO' : 'EM DIA'}
@@ -170,9 +161,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   
-  /* ESTILOS DA TELA VERDE (EMPTY STATE) */
   emptyCard: {
-    backgroundColor: colors.verdeMedio, // Ajuste para o tom exato do seu print
+    backgroundColor: colors.verdeMedio,
     borderRadius: 25,
     padding: 30,
     alignItems: 'center',
@@ -205,7 +195,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  /* ESTILOS DOS CARTÕES DE MEDICAMENTO */
   medCard: {
     borderColor: colors.roxoMuitoEscuro,
     borderWidth: 1,

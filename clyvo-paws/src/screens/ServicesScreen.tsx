@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around', // Mantém os itens agrupados e mais próximos ao centro sem colar nas bordas
+    justifyContent: 'space-around',
   },
   gridItem: {
     width: '30%',
