@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -9,43 +9,33 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQuery } from '@tanstack/react-query';
 import { colors } from '../theme/colors';
 import CardPet from '../components/CardPet';
 import { Pet } from '../types';
+import api from '../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PetsScreen() {
   const navigation = useNavigation<any>();
-  const [listaPets, setListaPets] = useState<Pet[]>([]);
-  const [carregando, setCarregando] = useState(true);
 
-  const carregarPets = async () => {
-    try {
-      setCarregando(true);
-      
+const { data: listaPets = [], isLoading: carregando, refetch } = useQuery({
+    queryKey: ['meus-pets'],
+    queryFn: async () => {
       const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
-      if (dadosTutor) {
-        const tutor = JSON.parse(dadosTutor);
-        const chavePets = `@pets_${tutor.email}`;
+      const tutor = dadosTutor ? JSON.parse(dadosTutor) : null;
 
-        const petsSalvos = await AsyncStorage.getItem(chavePets);
-        if (petsSalvos) {
-          setListaPets(JSON.parse(petsSalvos));
-        } else {
-          setListaPets([]);
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar os pets:', error);
-    } finally {
-      setCarregando(false);
+      if (!tutor || !tutor.id) return [];
+
+      const response = await api.get(`/pets/tutor/${tutor.id}`);
+      return response.data;
     }
-  };
+  });
 
   useFocusEffect(
     useCallback(() => {
-      carregarPets();
-    }, [])
+      refetch();
+    }, [refetch])
   );
 
   return (
@@ -65,7 +55,7 @@ export default function PetsScreen() {
         </View>
       ) : listaPets.length > 0 ? (
         <ScrollView style={styles.scrollList} showsVerticalScrollIndicator={false}>
-          {listaPets.map((pet) => (
+          {listaPets.map((pet: Pet) => (
             <TouchableOpacity 
               key={pet.id} 
               activeOpacity={0.7}
@@ -100,11 +90,13 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: colors.branco, 
     paddingHorizontal: 20, 
-    paddingTop: 50 },
+    paddingTop: 50 
+  },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    marginBottom: 20 },
+    marginBottom: 20 
+  },
   botaoVoltar: { 
     backgroundColor: colors.verdeMedio, 
     width: 46, 
@@ -112,37 +104,44 @@ const styles = StyleSheet.create({
     borderRadius: 23, 
     justifyContent: 'center', 
     alignItems: 'center', 
-    marginRight: 15 },
+    marginRight: 15 
+  },
   titulo: { 
     fontSize: 22, 
     fontWeight: '900', 
-    color: colors.roxoMuitoEscuro },
+    color: colors.roxoMuitoEscuro 
+  },
   subtitulo: { 
     fontSize: 12, 
     fontWeight: 'bold', 
     color: colors.cinza, 
     marginBottom: 30, 
-    textTransform: 'uppercase' },
+    textTransform: 'uppercase' 
+  },
   scrollList: { 
     flex: 1, 
-    marginBottom: 90 },
+    marginBottom: 90 
+  },
   containerCentro: { 
     flex: 1, 
     justifyContent: 'center', 
     alignItems: 'center', 
     paddingHorizontal: 30, 
-    marginBottom: 100 },
+    marginBottom: 100 
+  },
   textoVazio: { 
     fontSize: 16, 
     fontWeight: '900', 
     color: colors.roxoMuitoEscuro, 
     marginTop: 15, 
-    marginBottom: 5 },
+    marginBottom: 5 
+  },
   subtextoVazio: { 
     fontSize: 12, 
     color: colors.cinza, 
     textAlign: 'center', 
-    fontWeight: 'bold' },
+    fontWeight: 'bold' 
+  },
   botaoFlutuante: { 
     position: 'absolute', 
     bottom: 30, 
@@ -152,16 +151,18 @@ const styles = StyleSheet.create({
     borderRadius: 25, 
     paddingVertical: 15, 
     flexDirection: 'row',
-     alignItems: 'center', 
-     justifyContent: 'center', 
-     elevation: 4, 
-     shadowColor: '#000', 
-     shadowOffset: { width: 0, height: 2 }, 
-     shadowOpacity: 0.23, 
-     shadowRadius: 2.62 },
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    elevation: 4, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.23, 
+    shadowRadius: 2.62 
+  },
   textoBotaoFlutuante: { 
     color: colors.branco, 
     fontWeight: '900', 
     fontSize: 16, 
-    marginLeft: 8 },
+    marginLeft: 8 
+  },
 });

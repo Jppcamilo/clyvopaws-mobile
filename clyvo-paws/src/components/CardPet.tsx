@@ -11,9 +11,10 @@ type Props = {
 
 export default function CardPet({ pet }: Props) {
 
-  const fotoUri = pet.foto 
-    ? pet.foto 
-    : 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
+  const fotoUri: string =
+    pet.foto ||
+    pet.fotoUrl ||
+    'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
 
   return (
     <View style={styles.container}>

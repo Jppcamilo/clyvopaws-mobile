@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -10,16 +10,15 @@ import {
   Alert 
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'; 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useRoute } from '@react-navigation/native'; 
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import * as Notifications from 'expo-notifications'; // <-- IMPORTAÇÃO AQUI
+import * as Notifications from 'expo-notifications';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; 
 import { colors } from '../theme/colors';
-import { Pet } from '../types';
 import { DADOS_RACAS } from '../data/racas';
 import { calcularIdade } from '../utils/dateUtils';
+import api from '../services/api'; 
 
-// Configura como a notificação aparece se o app já estiver aberto
 Notifications.setNotificationHandler({
   handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
     shouldShowAlert: true,
@@ -41,85 +40,94 @@ export default function PetDetailsScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { petId } = route.params;
+  const queryClient = useQueryClient(); 
 
-  const [pet, setPet] = useState<Pet | null>(null);
-  const [carregando, setCarregando] = useState(true);
-  
   const [lembretes, setLembretes] = useState<any[]>([]);
   const [datasMarcadas, setDatasMarcadas] = useState<any>({});
   const [racaInfo, setRacaInfo] = useState<any>(null);
   
-  useFocusEffect(
-    useCallback(() => {
-      const carregarPet = async () => {
-        try {
-          const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
-          
-          if (dadosTutor) {
-            const tutor = JSON.parse(dadosTutor);
-            const chavePets = `@pets_${tutor.email}`; 
+  // 1. Busca os Dados do Pet
+  const { data: pet, isLoading: carregandoPet } = useQuery({
+    queryKey: ['pet-details', petId],
+    queryFn: async () => {
+      const response = await api.get(`/pets/${petId}`);
+      return response.data;
+    }
+  });
 
-            const petsSalvos = await AsyncStorage.getItem(chavePets);
-            if (petsSalvos) {
-              const listaPets: Pet[] = JSON.parse(petsSalvos);
-              const petEncontrado = listaPets.find(p => p.id === petId);
-              
-              if (petEncontrado) {
-                setPet(petEncontrado);
-                let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === petEncontrado.raca);
-                if (!dadosMedicos) {
-                  dadosMedicos = DADOS_RACAS.GATO.find((r: any) => r.nome === petEncontrado.raca);
-                }
-                setRacaInfo(dadosMedicos);
+  // 👇 2. NOVA BUSCA: Traz os agendamentos reais do banco!
+  const { data: agendamentos, isLoading: carregandoAgendamentos } = useQuery({
+    queryKey: ['agendamentos-pet', petId],
+    queryFn: async () => {
+      const response = await api.get(`/agendamentos/pet/${petId}`);
+      return response.data;
+    }
+  });
 
-                const hoje = new Date();
-                const ano = hoje.getFullYear();
-                const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-                const dia = String(hoje.getDate()).padStart(2, '0');
-                const dataHojeString = `${ano}-${mes}-${dia}`;
-                const mesAtual = `${ano}-${mes}`;
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await api.delete(`/pets/${petId}`);
+    },
+    onSuccess: () => {
+      Alert.alert('Sucesso', 'Pet removido com sucesso.');
+      queryClient.invalidateQueries({ queryKey: ['meus-pets'] });
+      navigation.goBack(); 
+    },
+    onError: (error) => {
+      console.error('Erro ao excluir pet:', error);
+      Alert.alert('Erro', 'Não foi possível excluir o pet. Tente novamente.');
+    }
+  });
 
-                const lembretesMock = [
-                  { data: `${mesAtual}-05`, tarefa: 'Vacina V10', horario: '14:30' },
-                  { data: `${mesAtual}-12`, tarefa: 'Consulta de Rotina', horario: '10:00' },
-                  { data: `${mesAtual}-19`, tarefa: 'Vermífugo Drontal', horario: '08:00' }
-                ];
+  // Atualiza as Raças
+  useEffect(() => {
+    if (pet) {
+      let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === pet.raca);
+      if (!dadosMedicos) {
+        dadosMedicos = DADOS_RACAS.GATO.find((r: any) => r.nome === pet.raca);
+      }
+      setRacaInfo(dadosMedicos);
+    }
+  }, [pet]);
 
-                const lembretesAtuais = (petEncontrado.lembretes && petEncontrado.lembretes.length > 0) 
-                  ? petEncontrado.lembretes 
-                  : lembretesMock;
 
-                setLembretes(lembretesAtuais);
+useEffect(() => {
+    if (!agendamentos) return;
 
-                let marcacoes: any = {};
-                lembretesAtuais.forEach(lembrete => {
-                  if (lembrete.data) {
-                    marcacoes[lembrete.data] = { marked: true, dotColor: colors.verdeMedio };
-                  }
-                });
+    let marcacoes: any = {};
+    const hoje = new Date();
+    const dataHojeString = hoje.toISOString().split('T')[0];
 
-                marcacoes[dataHojeString] = {
-                  ...marcacoes[dataHojeString],
-                  selected: true,
-                  selectedColor: colors.verdeMedio,
-                  marked: marcacoes[dataHojeString]?.marked || false,
-                  dotColor: colors.branco
-                };
-
-                setDatasMarcadas(marcacoes);
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Erro ao buscar detalhes do pet:', error);
-        } finally {
-          setCarregando(false);
-        }
+    const lembretesFormatados = agendamentos.map((ag: any) => {
+      const dataCompleta = new Date(ag.dataHora);
+      const dataStr = dataCompleta.toISOString().split('T')[0];
+      const horarioStr = `${String(dataCompleta.getHours()).padStart(2, '0')}:${String(dataCompleta.getMinutes()).padStart(2, '0')}`;
+      
+      return {
+         data: dataStr,
+         tarefa: ag.titulo,
+         horario: horarioStr
       };
+    });
 
-      carregarPet();
-    }, [petId])
-  );
+    setLembretes(lembretesFormatados);
+
+    lembretesFormatados.forEach((lembrete: any) => {
+      if (lembrete.data) {
+        marcacoes[lembrete.data] = { marked: true, dotColor: colors.verdeMedio };
+      }
+    });
+
+    marcacoes[dataHojeString] = {
+      ...marcacoes[dataHojeString],
+      selected: true,
+      selectedColor: colors.verdeMedio,
+      marked: marcacoes[dataHojeString]?.marked || false,
+      dotColor: colors.branco
+    };
+
+    setDatasMarcadas(marcacoes);
+  }, [agendamentos]);
 
   const ativarAlertas = async () => {
     const { status } = await Notifications.requestPermissionsAsync();
@@ -137,7 +145,6 @@ export default function PetDetailsScreen() {
         const [hora, minuto] = lembrete.horario.split(':').map(Number);
 
         const dataConsulta = new Date(ano, mes - 1, dia, hora, minuto);
-        
         const dataAlarme = new Date(dataConsulta.getTime() - 2 * 60 * 60 * 1000);
 
         if (dataAlarme > new Date()) {
@@ -173,34 +180,13 @@ export default function PetDetailsScreen() {
         { 
           text: 'Excluir', 
           style: 'destructive',
-          onPress: async () => {
-            try {
-              const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
-              if (dadosTutor) {
-                const tutor = JSON.parse(dadosTutor);
-                const chavePets = `@pets_${tutor.email}`;
-                const petsSalvos = await AsyncStorage.getItem(chavePets);
-                
-                if (petsSalvos) {
-                  const listaPets: Pet[] = JSON.parse(petsSalvos);
-                  const listaAtualizada = listaPets.filter(p => p.id !== petId);
-                  await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtualizada));
-                  
-                  Alert.alert('Sucesso', 'Pet removido com sucesso.');
-                  navigation.goBack(); 
-                }
-              }
-            } catch (error) {
-              console.error('Erro ao excluir pet:', error);
-              Alert.alert('Erro', 'Não foi possível excluir o pet.');
-            }
-          }
+          onPress: () => deleteMutation.mutate()
         }
       ]
     );
   };
 
-  if (carregando) {
+  if (carregandoPet || carregandoAgendamentos) {
     return (
       <View style={styles.containerCentro}>
         <ActivityIndicator size="large" color={colors.verdeEscuro} />
@@ -219,8 +205,7 @@ export default function PetDetailsScreen() {
     );
   }
 
-  const fotoUri = pet.foto || 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
-
+const fotoUri = pet.foto || pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
@@ -238,8 +223,16 @@ export default function PetDetailsScreen() {
             <MaterialCommunityIcons name="pencil-outline" size={24} color={colors.verdeEscuro} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.botaoDeletar} onPress={handleExcluirPet}>
-            <MaterialCommunityIcons name="trash-can-outline" size={24} color="#FF3B30" />
+          <TouchableOpacity 
+            style={styles.botaoDeletar} 
+            onPress={handleExcluirPet}
+            disabled={deleteMutation.isPending}
+          >
+            {deleteMutation.isPending ? (
+              <ActivityIndicator color="#FF3B30" />
+            ) : (
+              <MaterialCommunityIcons name="trash-can-outline" size={24} color="#FF3B30" />
+            )}
           </TouchableOpacity>
           
         </View>

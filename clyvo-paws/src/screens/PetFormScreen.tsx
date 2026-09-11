@@ -7,23 +7,27 @@ import {
   TouchableOpacity, 
   ScrollView, 
   Image, 
-  Alert 
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker'; 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useMutation, useQueryClient } from '@tanstack/react-query'; 
 import { colors } from '../theme/colors';
 import { DADOS_RACAS } from '../data/racas';
+import api from '../services/api'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PetFormScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
+  const queryClient = useQueryClient();
   
   const petParaEditar = route.params?.pet;
 
-   let especieInicial: 'CACHORRO' | 'GATO' | null = null;
+  let especieInicial: 'CACHORRO' | 'GATO' | null = null;
   if (petParaEditar) {
     const isCachorro = DADOS_RACAS.CACHORRO.some((r: any) => r.nome === petParaEditar.raca);
     especieInicial = isCachorro ? 'CACHORRO' : 'GATO';
@@ -59,56 +63,76 @@ export default function PetFormScreen() {
     if (!resultado.canceled) setFoto(resultado.assets[0].uri);
   };
 
-  const handleSalvar = async () => {
+const savePetMutation = useMutation({
+    mutationFn: async (petData: any) => {
+      if (petParaEditar) {
+        const response = await api.put(`/pets/${petParaEditar.id}`, petData);
+        return response.data;
+      } else {
+        const response = await api.post('/pets', petData);
+        return response.data;
+      }
+    },
+    onSuccess: (dataCriada) => {
+      if (petParaEditar) {
+        queryClient.invalidateQueries({ queryKey: ['meus-pets'] });
+        queryClient.invalidateQueries({ queryKey: ['pet-details', petParaEditar.id] });
+        Alert.alert('Sucesso', 'Dados do pet atualizados com sucesso!');
+        navigation.goBack(); 
+      } else {
+        queryClient.setQueryData(['meus-pets'], (oldData: any) => {
+          if (!oldData) return [dataCriada];
+          if (Array.isArray(oldData)) return [...oldData, dataCriada];
+          return oldData;
+        });
 
+        Alert.alert('Sucesso', 'Pet cadastrado com sucesso!');
+        navigation.replace('InfoRaca', { racaData: racaSelecionada }); 
+      }
+    },
+    onError: (error) => {
+      console.error('Erro ao salvar o pet:', error);
+      Alert.alert('Erro', 'Não foi possível salvar os dados do pet. Verifique sua conexão.');
+    }
+  });
+
+const handleSalvar = async () => {
     if (!nome.trim() || !peso.trim() || !sexo || !especie || !racaSelecionada) {
-      Alert.alert('Atenção', 'Preencha todos os campos obrigatórios (Nome, Peso, Sexo, Espécie e Raça)!');
+      Alert.alert('Atenção', 'Preencha todos os campos obrigatórios!');
       return;
     }
 
-    const hoje = new Date();
-    const ano = hoje.getFullYear();
-    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-    const dia = String(hoje.getDate()).padStart(2, '0');
-    const dataHoje = `${ano}-${mes}-${dia}`;
- 
-    const petAtualizado = {
-      id: petParaEditar ? petParaEditar.id : Date.now().toString(),
-      nome, 
-      dataNascimento: dataNascimento.toISOString(),
-      peso,
-      sexo,
-      raca: racaSelecionada.nome, 
-      descricao, 
-      foto, 
-      lembretes: petParaEditar ? petParaEditar.lembretes : [
-        { data: dataHoje, tarefa: 'Avaliação Preventiva Inicial', horario: '14:30' }
-      ]
-    };
-
     try {
       const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
-      if (dadosTutor) {
-        const tutor = JSON.parse(dadosTutor);
-        const chavePets = `@pets_${tutor.email}`;
-        const petsSalvos = await AsyncStorage.getItem(chavePets);
-        let listaAtual = petsSalvos ? JSON.parse(petsSalvos) : [];
-        
-        if (petParaEditar) {
-          listaAtual = listaAtual.map((p: any) => p.id === petParaEditar.id ? petAtualizado : p);
-          await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtual));
-          Alert.alert('Sucesso', 'Dados do pet atualizados com sucesso!');
-          
-          navigation.goBack(); 
-        } else {
-          listaAtual.push(petAtualizado);
-          await AsyncStorage.setItem(chavePets, JSON.stringify(listaAtual));
-          
-          navigation.replace('InfoRaca', { racaData: racaSelecionada }); 
-        }
+      const tutor = dadosTutor ? JSON.parse(dadosTutor) : null;
+
+      if (!tutor || !tutor.id) {
+        Alert.alert('Erro', 'Sessão expirada. Faça o login novamente.');
+        return;
       }
+
+      const ano = dataNascimento.getFullYear();
+      const mes = String(dataNascimento.getMonth() + 1).padStart(2, '0');
+      const dia = String(dataNascimento.getDate()).padStart(2, '0');
+      const dataFormatada = `${ano}-${mes}-${dia}`;
+
+      const petPayload = {
+        nome, 
+        dataNascimento: dataFormatada,
+        peso: parseFloat(peso.replace(',', '.')), 
+        
+        sexo: sexo === 'FÊMEA' ? 'FEMEA' : 'MACHO', 
+        
+        raca: racaSelecionada.nome, 
+        especie,
+        descricao, 
+        fotoUrl: foto, 
+        tutorId: tutor.id 
+      };
+
+      savePetMutation.mutate(petPayload);
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar os dados do pet.');
+      console.error('Erro ao recuperar dados:', error);
     }
   };
 
@@ -222,25 +246,33 @@ export default function PetFormScreen() {
         <>
           <Text style={styles.labelSecao}>RAÇA</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollRacas}>
-            {DADOS_RACAS[especie].map((item: any, index: number) => (
-              <TouchableOpacity 
+             {DADOS_RACAS[especie].map((item: any, index: number) => (
+               <TouchableOpacity 
                 key={index} 
                 style={[styles.tagRaca, racaSelecionada?.nome === item.nome && styles.tagRacaAtiva]}
-                onPress={() => setRacaSelecionada(item)}
-              >
-                <Text style={[styles.textoRaca, racaSelecionada?.nome === item.nome && { color: colors.branco }]}>
-                  {item.nome}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                onPress={() => setRacaSelecionada(item)} // 👈 Atualiza a raça selecionada
+                >
+          <Text style={[styles.textoRaca, racaSelecionada?.nome === item.nome && { color: colors.branco }]}>
+              {item.nome}
+           </Text>
+          </TouchableOpacity>
+        ))}
           </ScrollView>
         </>
       )}
 
-      <TouchableOpacity style={styles.botaoCadastrar} onPress={handleSalvar}>
-        <Text style={styles.textoBotaoCadastrar}>
-          {petParaEditar ? 'SALVAR ALTERAÇÕES' : 'CADASTRAR E VER PREVENÇÃO'}
-        </Text>
+      <TouchableOpacity 
+        style={styles.botaoCadastrar} 
+        onPress={handleSalvar}
+        disabled={savePetMutation.isPending} 
+      >
+        {savePetMutation.isPending ? (
+          <ActivityIndicator color={colors.roxoMuitoEscuro} />
+        ) : (
+          <Text style={styles.textoBotaoCadastrar}>
+            {petParaEditar ? 'SALVAR ALTERAÇÕES' : 'CADASTRAR E VER PREVENÇÃO'}
+          </Text>
+        )}
       </TouchableOpacity>
 
       <View style={{ height: 100 }} />
