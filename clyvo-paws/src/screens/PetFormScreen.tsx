@@ -33,15 +33,19 @@ export default function PetFormScreen() {
     especieInicial = isCachorro ? 'CACHORRO' : 'GATO';
   }
 
-  const [nome, setNome] = useState(petParaEditar?.nome || '');
+ const [nome, setNome] = useState(petParaEditar?.nome || '');
   const [dataNascimento, setDataNascimento] = useState<Date>(
     petParaEditar && petParaEditar.dataNascimento ? new Date(petParaEditar.dataNascimento) : new Date()
   );
   const [mostraCalendario, setMostraCalendario] = useState(false);
-  const [peso, setPeso] = useState(petParaEditar?.peso || '');
-  const [sexo, setSexo] = useState<'MACHO' | 'FÊMEA' | null>(petParaEditar?.sexo || null);
+  const [peso, setPeso] = useState(petParaEditar?.peso ? String(petParaEditar.peso) : '');
+  
+  const [sexo, setSexo] = useState<'MACHO' | 'FÊMEA' | null>(
+    petParaEditar?.sexo === 'FEMEA' ? 'FÊMEA' : (petParaEditar?.sexo || null)
+  );
+  
   const [descricao, setDescricao] = useState(petParaEditar?.descricao || '');
-  const [foto, setFoto] = useState<string | null>(petParaEditar?.foto || null);
+  const [foto, setFoto] = useState<string | null>(petParaEditar?.fotoUrl || petParaEditar?.foto || null);
   
   const [especie, setEspecie] = useState<'CACHORRO' | 'GATO' | null>(especieInicial);
   const [racaSelecionada, setRacaSelecionada] = useState<any>(
