@@ -1,9 +1,11 @@
 export type Usuario = {
-  nome: string;
+  nomeCompleto: string; 
   email: string;
   cpf: string;
   telefone: string;
-  foto?: string;
+  senha?: string;  
+  fotoUrl?: string;   
+  endereco?: any;       
 };
 
 export type Lembrete = {
@@ -20,7 +22,8 @@ export type Pet = {
   peso?: string;
   sexo?: 'MACHO' | 'FÊMEA';
   descricao: string;
-  foto: string | null;
+  foto?: string | null;
+  fotoUrl?: string | null; 
   lembretes: Lembrete[]; 
 };
 
