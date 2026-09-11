@@ -5,33 +5,28 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 
 export default function ServicesScreen() {
-
   const navigation = useNavigation<any>();
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
-
       <View style={styles.header}>
         <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
       </View>
 
-
       <Text style={styles.titulo}>NOSSOS SERVIÇOS</Text>
       <Text style={styles.subtitulo}>TUDO PARA VOCÊ CUIDAR DA SAÚDE DO SEU PET</Text>
 
       <View style={styles.gridContainer}>
         
-
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('RedeClinica')}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="home-outline" size={35} color={colors.roxoMuitoEscuro} />
           </View>
           <Text style={styles.textoIcone}>REDE{"\n"}CLINICA</Text>
         </TouchableOpacity>
-
 
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('MeusMedicamentos')}>
           <View style={styles.circuloIcone}>
@@ -40,40 +35,26 @@ export default function ServicesScreen() {
           <Text style={styles.textoIcone}>MEUS{"\n"}MEDICAMENTOS</Text>
         </TouchableOpacity>
 
-
-        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Planos')}>
-          <View style={styles.circuloIcone}>
-            <MaterialCommunityIcons name="shield-check-outline" size={35} color={colors.roxoMuitoEscuro} />
-          </View>
-          <Text style={styles.textoIcone}>COBERTURA{"\n"}DE PLANOS</Text>
-        </TouchableOpacity>
-
-
-        <TouchableOpacity 
-          style={styles.gridItem} 
-          onPress={() => navigation.navigate('Pets')}
-        >
+        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Pets')}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="paw" size={35} color={colors.roxoMuitoEscuro} />
           </View>
           <Text style={styles.textoIcone}>MEUS PETS</Text>
         </TouchableOpacity>
 
-
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Produtos')}>
           <View style={styles.circuloIcone}>
-          <MaterialCommunityIcons name="percent" size={35} color={colors.roxoMuitoEscuro} />
+            <MaterialCommunityIcons name="percent" size={35} color={colors.roxoMuitoEscuro} />
           </View>
-           <Text style={styles.textoIcone}>MEDICAMENTOS{"\n"}COM DESCONTO</Text>
+          <Text style={styles.textoIcone}>MEDICAMENTOS{"\n"}COM DESCONTO</Text>
         </TouchableOpacity>
 
-
-       <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Consultas')}>
-        <View style={styles.circuloIcone}>
-         <MaterialCommunityIcons name="forum-outline" size={35} color={colors.roxoMuitoEscuro} />
-        </View>
-        <Text style={styles.textoIcone}>MARCAR{"\n"}CONSULTAS</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Consultas')}>
+          <View style={styles.circuloIcone}>
+            <MaterialCommunityIcons name="forum-outline" size={35} color={colors.roxoMuitoEscuro} />
+          </View>
+          <Text style={styles.textoIcone}>MARCAR{"\n"}CONSULTAS</Text>
+        </TouchableOpacity>
 
       </View>
 
@@ -119,7 +100,7 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around', // Mantém os itens agrupados e mais próximos ao centro sem colar nas bordas
   },
   gridItem: {
     width: '30%',

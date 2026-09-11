@@ -6,6 +6,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from './src/theme/colors';
 import { StatusBar } from 'expo-status-bar';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import HomeScreen from './src/screens/HomeScreen';
@@ -24,14 +26,14 @@ import EnderecosScreen from './src/screens/EnderecosScreen';
 import ContatosScreen from './src/screens/ContatosScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import InfoRacaScreen from './src/screens/InfoRacaScreen';
-import PlanosScreen from './src/screens/PlanosScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+const queryClient = new QueryClient();
+
 function TabNavigator() {
   return (
-
     <Tab.Navigator 
       screenOptions={({ route }) => ({
         headerShown: false,
@@ -68,18 +70,16 @@ function TabNavigator() {
   );
 }
 
-
 export default function App() {
   return (
-    <> 
-      <StatusBar style="dark" backgroundColor="transparent" />
+    <QueryClientProvider client={queryClient}>
+      <StatusBar style="dark"/>
 
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
           
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen name="Planos" component={PlanosScreen} />
           <Stack.Screen name="MainTabs" component={TabNavigator} />
           <Stack.Screen name="PetForm" component={PetFormScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
@@ -97,6 +97,6 @@ export default function App() {
 
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </QueryClientProvider>
   );
 }
