@@ -125,7 +125,6 @@ function obterEspecieInicial(pet: any): EspeciePet | null {
 function obterDataInicial(valor?: string): Date {
   if (!valor) return new Date();
 
-  // Evita que uma data sem horário seja deslocada pelo fuso horário.
   const data = new Date(`${valor.slice(0, 10)}T00:00:00`);
 
   return Number.isNaN(data.getTime()) ? new Date() : data;
@@ -475,7 +474,6 @@ export default function PetFormScreen() {
     salvamentoEmCurso.current = true;
     setSalvando(true);
 
-    // Invalida qualquer confirmação de análise anterior.
     versaoFoto.current += 1;
 
     try {
@@ -831,7 +829,7 @@ export default function PetFormScreen() {
                <TouchableOpacity 
                 key={index} 
                 style={[styles.tagRaca, racaSelecionada?.nome === item.nome && styles.tagRacaAtiva]}
-                onPress={() => setRacaSelecionada(item)} // 👈 Atualiza a raça selecionada
+                onPress={() => setRacaSelecionada(item)}
                 >
           <Text style={[styles.textoRaca, racaSelecionada?.nome === item.nome && { color: colors.branco }]}>
               {item.nome}
