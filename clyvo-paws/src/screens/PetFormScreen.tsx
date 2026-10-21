@@ -826,38 +826,18 @@ export default function PetFormScreen() {
       {especie && (
         <>
           <Text style={styles.labelSecao}>RAÇA</Text>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.scrollRacas}
-          >
-            {listarRacasParaSelecao(especie, racaSelecionada).map((item) => {
-              const selecionada =
-                normalizarRaca(racaSelecionada?.nome ?? '') ===
-                normalizarRaca(item.nome);
-
-              return (
-                <TouchableOpacity
-                  key={item.nome}
-                  style={[
-                    styles.tagRaca,
-                    selecionada && styles.tagRacaAtiva,
-                  ]}
-                  onPress={() => setRacaSelecionada(item)}
-                  disabled={ocupado}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollRacas}>
+             {DADOS_RACAS[especie].map((item: any, index: number) => (
+               <TouchableOpacity 
+                key={index} 
+                style={[styles.tagRaca, racaSelecionada?.nome === item.nome && styles.tagRacaAtiva]}
+                onPress={() => setRacaSelecionada(item)} // 👈 Atualiza a raça selecionada
                 >
-                  <Text
-                    style={[
-                      styles.textoRaca,
-                      selecionada && styles.textoAtivo,
-                    ]}
-                  >
-                    {item.nome}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+          <Text style={[styles.textoRaca, racaSelecionada?.nome === item.nome && { color: colors.branco }]}>
+              {item.nome}
+           </Text>
+          </TouchableOpacity>
+        ))}
           </ScrollView>
 
           <View style={styles.inputContainer}>

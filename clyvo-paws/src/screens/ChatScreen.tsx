@@ -33,7 +33,6 @@ export default function ChatScreen() {
     { id: '4', texto: 'Escolha uma das opções abaixo ou digite o que deseja:', remetente: 'bot', hora: '20:34' }
   ]);
  
-  // 1. Carrega o nome real do tutor logado
   useEffect(() => {
     const carregarNomeTutor = async () => {
       try {
@@ -45,7 +44,6 @@ export default function ChatScreen() {
           
           setNomeTutor(primeiroNome);
 
-          // Atualiza a saudação inicial do bot com o nome real
           setMensagens((prev) =>
             prev.map((msg) =>
               msg.id === '1'
@@ -69,7 +67,6 @@ export default function ChatScreen() {
     'FALAR COM ESPECIALISTA VETERINÁRIO'
   ];
 
-  // 2. Lógica para o Bot responder interativamente
   const gerarRespostaBot = (textoUsuario: string) => {
     setTimeout(() => {
       let respostaTexto = `Entendido, ${nomeTutor}! Nossa equipe analisará sua solicitação em breve.`;
@@ -95,7 +92,7 @@ export default function ChatScreen() {
       };
 
       setMensagens((prev) => [...prev, respostaBot]);
-    }, 1000); // Responde após 1 segundo para simular digitação
+    }, 1000);
   };
  
   const enviarMensagem = (texto: string) => {
@@ -111,7 +108,6 @@ export default function ChatScreen() {
     setMensagens((prev) => [...prev, novaMensagem]);
     setTextoInput('');
 
-    // Dispara a resposta inteligente do bot
     gerarRespostaBot(texto);
   };
  
@@ -158,7 +154,6 @@ export default function ChatScreen() {
           </View>
         ))}
  
-        {/* Renderiza as opções rápidas apenas no início ou quando desejar */}
         <View style={styles.containerOpcoes}>
           {opcoesRapidas.map((opcao, index) => (
             <TouchableOpacity
