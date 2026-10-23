@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Pressable } from 'react-native';
 import { colors } from '../theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CardPet from './CardPet';
-import { Pet } from '../types';
+import type { Pet } from '../types';
 import { useNavigation } from '@react-navigation/native';
 
 type Props = {
@@ -20,16 +20,21 @@ export default function PopPets({ visivel, fecharModal, listaPets }: Props) {
     navigation.navigate('PetForm');
   };
 
-const irParaDetalhesPet = (petId: string) => {
+  const irParaDetalhesPet = (petId: Pet['id']) => {
     fecharModal(); 
     navigation.navigate('PetDetails', { petId: petId }); 
   };
 
   return (
-    <Modal visible={visivel} transparent={true} animationType="slide">
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={fecharModal}>
-        
-        <View style={styles.bottomSheet} onStartShouldSetResponder={() => true}>
+    <Modal visible={visivel} transparent animationType="slide" onRequestClose={fecharModal}>
+      <View style={styles.overlay}>
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={fecharModal}
+          accessibilityRole="button"
+          accessibilityLabel="Fechar lista de pets"
+        />
+        <View style={styles.bottomSheet} accessibilityViewIsModal>
           <View style={styles.handleBar} />
           
           <View style={styles.header}>
@@ -44,11 +49,18 @@ const irParaDetalhesPet = (petId: string) => {
           </Text>
 
           <ScrollView style={styles.listaScroll} showsVerticalScrollIndicator={false}>
+            {listaPets.length === 0 && (
+              <Text style={styles.descricao}>
+                Você ainda não cadastrou nenhum pet. Toque em CADASTRAR para adicionar o primeiro.
+              </Text>
+            )}
             {listaPets.map(pet => (
               <TouchableOpacity 
                 key={pet.id} 
                 activeOpacity={0.7} 
                 onPress={() => irParaDetalhesPet(pet.id)}
+                accessibilityRole="button"
+                accessibilityLabel={`Ver detalhes de ${pet.nome}`}
               >
                 <CardPet pet={pet} />
               </TouchableOpacity>
@@ -60,7 +72,7 @@ const irParaDetalhesPet = (petId: string) => {
           </TouchableOpacity>
 
         </View>
-      </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
