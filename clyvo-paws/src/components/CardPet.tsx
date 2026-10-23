@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { Pet } from '../types';
+import type { Pet } from '../types';
 import { colors } from '../theme/colors';
 import { calcularIdade } from '../utils/dateUtils';
-import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type Props = {
   pet: Pet;
@@ -12,9 +12,12 @@ type Props = {
 export default function CardPet({ pet }: Props) {
 
   const fotoUri: string =
-    pet.foto ||
     pet.fotoUrl ||
     'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
+
+  // Aceita a grafia antiga FÊMEA e o valor FEMEA enviado pelo Java.
+  const sexo = pet.sexo?.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const sexoInformado = sexo === 'MACHO' || sexo === 'FEMEA';
 
   return (
     <View style={styles.container}>
@@ -24,16 +27,16 @@ export default function CardPet({ pet }: Props) {
       />
       
       <View style={styles.infoContainer}>
-        <Text style={styles.nomePet}>{pet.nome}</Text>
-        <Text style={styles.textoInfo}>Idade: {calcularIdade(pet.dataNascimento)}</Text>
-        <Text style={styles.textoInfo}>Raça: {pet.raca}</Text>
+        <Text style={styles.nomePet} numberOfLines={2}>{pet.nome}</Text>
+        <Text style={styles.textoInfo}>Idade: {pet.dataNascimento ? calcularIdade(pet.dataNascimento) : 'Não informada'}</Text>
+        <Text style={styles.textoInfo}>Raça: {pet.raca || 'Não informada'}</Text>
         <View style={styles.containerSexo}>
           <MaterialCommunityIcons 
-            name={pet.sexo === 'MACHO' ? 'gender-male' : 'gender-female'} 
+            name={sexo === 'MACHO' ? 'gender-male' : sexo === 'FEMEA' ? 'gender-female' : 'help-circle-outline'}
             size={14} 
             color={colors.roxoMuitoEscuro} 
           />
-          <Text style={styles.textoSexo}>{pet.sexo || 'N/A'}</Text>
+          <Text style={styles.textoSexo}>{sexoInformado ? (sexo === 'MACHO' ? 'Macho' : 'Fêmea') : 'Não informado'}</Text>
         </View>
       </View>
     </View>
