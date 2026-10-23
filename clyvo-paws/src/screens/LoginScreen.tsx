@@ -1,93 +1,28 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Alert,
-  ActivityIndicator
+import React from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useMutation } from '@tanstack/react-query';
+
 import { colors } from '../theme/colors';
-import api from '../services/api';
-import * as SecureStore from 'expo-secure-store';
+import { useLogin } from '../hooks/useLogin';
 
 export default function LoginScreen() {
-  const navigation = useNavigation<any>();
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const emailLimpo = email.trim().toLowerCase();
+  const {
+    navigation,
+    email,
+    setEmail,
+    senha,
+    setSenha,
+    loginMutation,
+    handleLogin,
+  } = useLogin();
 
-const loginMutation = useMutation({
-    mutationFn: async (credentials: any) => {
-      const response = await api.post('/login', credentials, {
-        headers: {
-          Authorization: false
-        }
-      });
-      return response.data;
-    },
-    onSuccess: async (data) => {
-      if (data.token) {
-        await SecureStore.setItemAsync('clyvo_token', data.token);
-      }
-
-      const tutorDados = {
-        id: data.id,
-        nomeCompleto: data.nomeCompleto,
-        fotoUrl: data.fotoUrl
-      };
-      await AsyncStorage.setItem('@tutor_clyvo', JSON.stringify(tutorDados));
-
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainTabs' }],
-      });
-    },
-    onError: (error: any) => {
-      console.error('Erro no login:', error);
-
-      let mensagemAmigavel = 'E-mail ou senha incorretos. Verifique seus dados.';
-
-      if (error.response) {
-        const status = error.response.status;
-        if (status === 401) {
-          mensagemAmigavel = 'E-mail ou senha inválidos.';
-        } else if (status === 500) {
-          mensagemAmigavel = 'E-mail ou senha inválidos.';
-        }
-      } else {
-        mensagemAmigavel = 'Não foi possível conectar ao servidor. Verifique sua conexão.';
-      }
-
-      Alert.alert('Atenção', mensagemAmigavel);
-    }
-  });
-
-const handleLogin = async () => {
-    if (!email.trim() || !senha.trim()) {
-      Alert.alert('Atenção', 'Preencha o e-mail e a senha!');
-      return;
-    }
-
-    try {
-      await SecureStore.deleteItemAsync('clyvo_token');
-      delete api.defaults.headers.common['Authorization'];
-    } catch (e) {
-      console.log('Nenhum token velho para limpar');
-    }
-    const emailLimpo = email.trim().toLowerCase(); 
-    
-    console.log(`Tentando logar com -> E-mail: '${emailLimpo}' | Senha: '${senha}'`);
-
-    loginMutation.mutate({ 
-      username: emailLimpo, 
-      password: senha 
-    });
-  };
+  const carregando = loginMutation.isPending;
 
   return (
     <View style={styles.container}>
@@ -98,35 +33,51 @@ const handleLogin = async () => {
           <Text style={styles.logoTexto}>CLYVOPAWS</Text>
         </View>
 
-
-        <TextInput 
-        style={styles.input} 
-        placeholder="E-MAIL..." 
-        value={email} 
-        placeholderTextColor={colors.roxoMuitoEscuro}
-        onChangeText={setEmail} 
-        keyboardType="email-address" 
-        autoCapitalize="none" 
-        autoCorrect={false} 
-        textAlign='center'
-      />
-
-        <TextInput 
-          style={styles.input} 
-          placeholder="SENHA..." 
-          placeholderTextColor={colors.roxoMuitoEscuro} 
-          value={senha} 
-          onChangeText={setSenha} 
-          secureTextEntry
+        <TextInput
+          style={styles.input}
+          placeholder="E-MAIL..."
+          placeholderTextColor={colors.roxoMuitoEscuro}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
           textAlign="center"
+          editable={!carregando}
+          accessibilityLabel="E-mail"
         />
 
-        <TouchableOpacity 
-          style={styles.botaoLogar} 
+        <TextInput
+          style={styles.input}
+          placeholder="SENHA..."
+          placeholderTextColor={colors.roxoMuitoEscuro}
+          value={senha}
+          onChangeText={setSenha}
+          secureTextEntry
+          autoCapitalize="none"
+          autoCorrect={false}
+          textAlign="center"
+          editable={!carregando}
+          returnKeyType="go"
+          onSubmitEditing={() => {
+            if (!carregando) {
+              void handleLogin();
+            }
+          }}
+          accessibilityLabel="Senha"
+        />
+
+        <TouchableOpacity
+          style={[
+            styles.botaoLogar,
+            carregando && styles.botaoDesabilitado,
+          ]}
           onPress={handleLogin}
-          disabled={loginMutation.isPending}
+          disabled={carregando}
+          accessibilityRole="button"
+          accessibilityLabel="Entrar na conta"
         >
-          {loginMutation.isPending ? (
+          {carregando ? (
             <ActivityIndicator color={colors.roxoMuitoEscuro} />
           ) : (
             <Text style={styles.textoBotaoLogar}>LOGAR</Text>
@@ -134,11 +85,22 @@ const handleLogin = async () => {
         </TouchableOpacity>
 
         <Text style={styles.textoAviso}>
-          CASO NÃO POSSUA LOGIN CLIQUE{"\n"}NO BOTÃO ABAIXO
+          CASO NÃO POSSUA LOGIN CLIQUE{'\n'}NO BOTÃO ABAIXO
         </Text>
 
-        <TouchableOpacity style={styles.botaoCadastrar} onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.textoBotaoCadastrar}>CADASTRAR</Text>
+        <TouchableOpacity
+          style={[
+            styles.botaoCadastrar,
+            carregando && styles.botaoDesabilitado,
+          ]}
+          onPress={() => navigation.navigate('Register')}
+          disabled={carregando}
+          accessibilityRole="button"
+          accessibilityLabel="Criar uma conta"
+        >
+          <Text style={styles.textoBotaoCadastrar}>
+            CADASTRAR
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -146,75 +108,92 @@ const handleLogin = async () => {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, backgroundColor: colors.branco 
+  container: {
+    flex: 1,
+    backgroundColor: colors.branco,
   },
-  bgDiagonal: { 
-    position: 'absolute', 
+
+  bgDiagonal: {
+    position: 'absolute',
     top: -230,
-    left: -100, 
-    width: 600, 
-    height: 450, 
-    backgroundColor: colors.verdeMedio, 
-    transform: [{ rotate: '-20deg' }] 
+    left: -100,
+    width: 600,
+    height: 450,
+    backgroundColor: colors.verdeMedio,
+    transform: [{ rotate: '-20deg' }],
   },
-  content: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    paddingHorizontal: 30, 
-    paddingTop: 130
+
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+    paddingTop: 130,
   },
-  logoContainer: { 
-    paddingVertical: 10, 
-    marginBottom: 40, 
-    alignItems: 'center', 
+
+  logoContainer: {
+    paddingVertical: 10,
+    marginBottom: 40,
+    alignItems: 'center',
   },
-  logoTexto: { 
-    fontSize: 32, 
-    fontWeight: '900', 
-    color: colors.roxoMuitoEscuro, 
-    textTransform: 'uppercase', 
-    letterSpacing: 2 
+
+  logoTexto: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: colors.roxoMuitoEscuro,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
   },
-  input: { 
-    borderColor: colors.roxoMuitoEscuro, 
-    borderWidth: 1, 
-    borderRadius: 25, 
-    height: 60, 
-    marginBottom: 25, 
-    color: colors.roxoMuitoEscuro, 
-    fontWeight: '900', 
+
+  input: {
+    borderColor: colors.roxoMuitoEscuro,
+    borderWidth: 1,
+    borderRadius: 25,
+    height: 60,
+    marginBottom: 25,
+    color: colors.roxoMuitoEscuro,
+    fontWeight: '900',
     fontSize: 16,
-    backgroundColor: colors.branco 
+    backgroundColor: colors.branco,
   },
-  botaoLogar: { 
-    backgroundColor: colors.verdeClaro, 
-    borderRadius: 25, 
-    paddingVertical: 18, 
-    alignItems: 'center', 
-    marginBottom: 30 
+
+  botaoLogar: {
+    backgroundColor: colors.verdeClaro,
+    borderRadius: 25,
+    paddingVertical: 18,
+    alignItems: 'center',
+    marginBottom: 30,
   },
-  textoBotaoLogar: { 
-    color: colors.roxoMuitoEscuro, 
-    fontWeight: '900', 
-    fontSize: 18, 
-    textTransform: 'uppercase' 
+
+  botaoDesabilitado: {
+    opacity: 0.6,
   },
-  textoAviso: { 
-    textAlign: 'center', 
-    color: colors.roxoMuitoEscuro, 
-    fontWeight: '900', 
-    fontSize: 12, marginBottom: 20 
+
+  textoBotaoLogar: {
+    color: colors.roxoMuitoEscuro,
+    fontWeight: '900',
+    fontSize: 18,
+    textTransform: 'uppercase',
   },
-  botaoCadastrar: { 
-    backgroundColor: colors.verdeClaro, 
-    borderRadius: 25, 
-    paddingVertical: 18, 
-    alignItems: 'center' 
+
+  textoAviso: {
+    textAlign: 'center',
+    color: colors.roxoMuitoEscuro,
+    fontWeight: '900',
+    fontSize: 12,
+    marginBottom: 20,
   },
-  textoBotaoCadastrar: { 
-    color: colors.roxoMuitoEscuro, 
-    fontWeight: '900', 
-    fontSize: 18, textTransform: 'uppercase' 
-  }
+
+  botaoCadastrar: {
+    backgroundColor: colors.verdeClaro,
+    borderRadius: 25,
+    paddingVertical: 18,
+    alignItems: 'center',
+  },
+
+  textoBotaoCadastrar: {
+    color: colors.roxoMuitoEscuro,
+    fontWeight: '900',
+    fontSize: 18,
+    textTransform: 'uppercase',
+  },
 });
