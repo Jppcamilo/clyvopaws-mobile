@@ -1,55 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  ActivityIndicator
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import * as Location from 'expo-location'; 
 import { colors } from '../theme/colors';
+import { useRedeClinica } from '../hooks/useRedeClinica';
 
 export default function RedeClinicaScreen() {
-  const navigation = useNavigation<any>();
-
-  const [localizacaoTexto, setLocalizacaoTexto] = useState<string>('Buscando região...');
-  const [carregandoLocal, setCarregandoLocal] = useState<boolean>(true);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setLocalizacaoTexto('Permissão negada. Mostrando rede geral.');
-          setCarregandoLocal(false);
-          return;
-        }
-
-        let location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced, 
-        });
-
-        let endereco = await Location.reverseGeocodeAsync({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-
-        if (endereco && endereco.length > 0) {
-          const local = endereco[0];
-          setLocalizacaoTexto(`${local.subregion || local.city || 'Sua região'} - ${local.region || ''}`);
-        } else {
-          setLocalizacaoTexto('São Paulo - SP');
-        }
-      } catch (error) {
-        console.error("Erro ao buscar localização: ", error);
-        setLocalizacaoTexto('São Paulo - SP'); } finally {
-        setCarregandoLocal(false);
-      }
-    })();
-  }, []);
+  const {
+    navigation, localizacaoTexto, carregandoLocal, erroLocalizacao, buscarLocalizacao
+  } = useRedeClinica();
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -73,6 +31,15 @@ export default function RedeClinicaScreen() {
           )}
         </View>
       </View>
+
+      {erroLocalizacao && (
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ color: colors.cinza }}>{erroLocalizacao}</Text>
+          <TouchableOpacity onPress={() => { void buscarLocalizacao(); }} disabled={carregandoLocal} style={{ paddingVertical: 12 }}>
+            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR LOCALIZAÇÃO NOVAMENTE</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={styles.listaClinicas}>
 
