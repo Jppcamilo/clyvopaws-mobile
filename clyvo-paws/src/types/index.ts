@@ -15,16 +15,21 @@ export type Lembrete = {
 };
 
 export type Pet = {
-  id: string;
+  id: number;
   nome: string;
+  especie: 'CACHORRO' | 'GATO';
   dataNascimento: string;
   raca: string;
-  peso?: string;
-  sexo?: 'MACHO' | 'FÊMEA';
-  descricao: string;
+  peso: number | null;
+  sexo: 'MACHO' | 'FEMEA' | null;
+  descricao: string | null;
+  fotoUrl: string | null;
+  tutor: {
+    id: number;
+    nomeCompleto: string;
+  };
   foto?: string | null;
-  fotoUrl?: string | null; 
-  lembretes: Lembrete[]; 
+  lembretes?: Lembrete[];
 };
 
 export type Produto = {
