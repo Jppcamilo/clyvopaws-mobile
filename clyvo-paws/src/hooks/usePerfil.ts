@@ -206,10 +206,6 @@ export function usePerfil() {
         : 'Sua conta foi excluída com sucesso.',
     );
 
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
   };
 
   const confirmarExclusao = () => {
