@@ -1,149 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  Alert, 
-  Image,
-  ActivityIndicator
-} from 'react-native';
+import React from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as ImagePicker from 'expo-image-picker';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; 
 import { colors } from '../theme/colors';
-import api from '../services/api'; 
+import { usePerfil } from '../hooks/usePerfil';
 
 export default function ProfileScreen() {
-  const navigation = useNavigation<any>();
-  const queryClient = useQueryClient();
-
-  const [tutorId, setTutorId] = useState<string | null>(null);
-  
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [cpf, setCpf] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [foto, setFoto] = useState<string | null>(null);
-
-  useEffect(() => {
-    const buscarIdLocal = async () => {
-      const dadosSalvos = await AsyncStorage.getItem('@tutor_clyvo');
-      if (dadosSalvos) {
-        const tutor = JSON.parse(dadosSalvos);
-        setTutorId(tutor.id || tutor.user_id); 
-      }
-    };
-    buscarIdLocal();
-  }, []);
-
-  const { data: tutorProfile, isLoading: carregando } = useQuery({
-    queryKey: ['perfil-tutor', tutorId],
-    queryFn: async () => {
-      const response = await api.get(`/tutores/${tutorId}`);
-      return response.data;
-    },
-    enabled: !!tutorId,
-  });
-
-useEffect(() => {
-    if (tutorProfile) {
-      setNome(tutorProfile.nome || tutorProfile.nomeCompleto || '');
-      
-      setEmail(tutorProfile.telefone || tutorProfile.celular || '');
-      setCpf(tutorProfile.cpf || '');
-      setTelefone(tutorProfile.email || tutorProfile.emailUsuario || '');
-      
-      setFoto(tutorProfile.foto || tutorProfile.fotoUrl || null);
-    }
-  }, [tutorProfile]);
-
-  const escolherFoto = async () => {
-    const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissao.status !== 'granted') {
-      Alert.alert('Atenção', 'Precisamos de permissão para acessar sua galeria!');
-      return;
-    }
-    const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    if (!resultado.canceled) {
-      setFoto(resultado.assets[0].uri);
-    }
-  };
-
-  const updateMutation = useMutation({
-    mutationFn: async (dadosAtualizados: any) => {
-      const response = await api.put(`/tutores/${tutorId}`, dadosAtualizados);
-      return response.data;
-    },
-    onSuccess: async (dadosRetornados) => {
-      queryClient.invalidateQueries({ queryKey: ['perfil-tutor', tutorId] });
-      await AsyncStorage.setItem('@tutor_clyvo', JSON.stringify(dadosRetornados));
-
-      Alert.alert('Sucesso!', 'Seus dados foram atualizados com sucesso.');
-      navigation.goBack();
-    },
-    onError: (error) => {
-      console.error('Erro ao atualizar perfil:', error);
-      Alert.alert('Erro', 'Não foi possível salvar os dados. Tente novamente.');
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async () => {
-      await api.delete(`/tutores/${tutorId}`);
-    },
-    onSuccess: async () => {
-      await AsyncStorage.removeItem('@tutor_clyvo');
-      Alert.alert('Conta Excluída', 'Sua conta foi apagada com sucesso.');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    },
-    onError: (error) => {
-      console.error('Erro ao excluir conta:', error);
-      Alert.alert('Erro', 'Não foi possível excluir a sua conta. Tente novamente.');
-    }
-  });
-
-  const confirmarExclusao = () => {
-    Alert.alert(
-      'Excluir Conta',
-      'Tem certeza de que deseja excluir sua conta? Esta ação não pode ser desfeita.',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Excluir', 
-          style: 'destructive', 
-          onPress: () => deleteMutation.mutate() 
-        }
-      ]
-    );
-  };
-
-  const handleSalvar = () => {
-    if (!nome.trim() || !email.trim()) {
-      Alert.alert('Atenção', 'Nome e E-mail são obrigatórios!');
-      return;
-    }
-
-    updateMutation.mutate({ 
-      nomeCompleto: nome,
-      email: email.toLowerCase().trim(), 
-      cpf: cpf, 
-      telefone: telefone,
-      foto: foto
-    });
-  };
+  const {
+    navigation, carregando, isError, tentarNovamente, nome, setNome, email, setEmail,
+    cpf, setCpf, telefone, setTelefone, foto, escolherFoto, escolhendoFoto,
+    updateMutation, deleteMutation, confirmarExclusao, handleSalvar
+  } = usePerfil();
+  const ocupado = updateMutation.isPending || deleteMutation.isPending || escolhendoFoto;
 
   if (carregando) {
     return (
@@ -153,10 +20,26 @@ useEffect(() => {
     );
   }
 
+  if (isError) {
+    return (
+      <View style={styles.container}>
+        <View style={{ padding: 20, alignItems: 'center' }}>
+          <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => { void tentarNovamente(); }} style={{ padding: 16 }}>
+            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity onPress={() => navigation.goBack()} disabled={ocupado} style={{ padding: 16 }}>
+          <Text style={{ color: colors.roxoMuitoEscuro }}>VOLTAR</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()} disabled={ocupado}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
         <Text style={styles.titulo}>DADOS PESSOAIS</Text>
@@ -169,7 +52,7 @@ useEffect(() => {
           source={{ uri: foto ? foto : 'https://img.freepik.com/vetores-gratis/homem-jovem-com-telefone-inteligente_23-2148506899.jpg' }} 
           style={styles.imagemPerfil} 
         />
-        <TouchableOpacity style={styles.botaoAlterarFoto} onPress={escolherFoto}>
+        <TouchableOpacity style={styles.botaoAlterarFoto} onPress={escolherFoto} disabled={ocupado}>
           <MaterialCommunityIcons name="camera-outline" size={20} color={colors.branco} />
           <Text style={styles.textoBotaoFoto}>Alterar Foto</Text>
         </TouchableOpacity>
@@ -178,31 +61,31 @@ useEffect(() => {
       <Text style={styles.labelSecao}>NOME COMPLETO</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="account-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput style={styles.input} value={nome} onChangeText={setNome} placeholderTextColor={colors.cinza} />
+        <TextInput editable={!ocupado} style={styles.input} value={nome} onChangeText={setNome} placeholderTextColor={colors.cinza} />
       </View>
 
       <Text style={styles.labelSecao}>E-MAIL</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="email-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor={colors.cinza} />
+        <TextInput editable={!ocupado} style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor={colors.cinza} />
       </View>
 
       <Text style={styles.labelSecao}>CPF</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="card-account-details-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput style={styles.input} value={cpf} onChangeText={setCpf} keyboardType="numeric" placeholderTextColor={colors.cinza} />
+        <TextInput editable={!ocupado} style={styles.input} value={cpf} onChangeText={setCpf} keyboardType="numeric" placeholderTextColor={colors.cinza} />
       </View>
 
       <Text style={styles.labelSecao}>TELEFONE</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="phone-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput style={styles.input} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" placeholderTextColor={colors.cinza} />
+        <TextInput editable={!ocupado} style={styles.input} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" placeholderTextColor={colors.cinza} />
       </View>
 
       <TouchableOpacity 
         style={styles.botaoSalvar} 
         onPress={handleSalvar}
-        disabled={updateMutation.isPending}
+        disabled={ocupado}
       >
         {updateMutation.isPending ? (
           <ActivityIndicator color={colors.branco} />
@@ -214,7 +97,7 @@ useEffect(() => {
       <TouchableOpacity 
         style={styles.botaoDeletar} 
         onPress={confirmarExclusao}
-        disabled={deleteMutation.isPending}
+        disabled={ocupado}
       >
         {deleteMutation.isPending ? (
           <ActivityIndicator color="#FFF" />
