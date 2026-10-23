@@ -1,49 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  ActivityIndicator
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useQuery } from '@tanstack/react-query';
 import { colors } from '../theme/colors';
-import api from '../services/api';
+import { useMedicamentos } from '../hooks/useMedicamento';
+import { useNavigation } from '@react-navigation/native';
 
-export default function MedicamentosScreen() {
+export default function MeusMedicamentosScreen() {
+  const {
+    medicamentos, isLoading, isFetching, isError, refetch, pagina, anterior, proxima
+  } = useMedicamentos();
   const navigation = useNavigation<any>();
-  const [tutorId, setTutorId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const buscarIdLocal = async () => {
-      const dadosSalvos = await AsyncStorage.getItem('@tutor_clyvo');
-      if (dadosSalvos) {
-        const tutor = JSON.parse(dadosSalvos);
-        setTutorId(tutor.id || tutor.user_id);
-      }
-    };
-    buscarIdLocal();
-  }, []);
-
-  const { data: medicamentos, isLoading, isError } = useQuery({
-    queryKey: ['meus-medicamentos', tutorId],
-    queryFn: async () => {
-      const response = await api.get('/medicamentos'); 
-      return response.data;
-    },
-    enabled: !!tutorId,
-  });
 
   const renderEmptyState = () => (
     <View style={styles.emptyCard}>
       <MaterialCommunityIcons name="medical-bag" size={60} color={colors.verdeClaro} style={{ marginBottom: 15 }} />
-      <Text style={styles.emptyTitle}>Nenhum tratamento ativo</Text>
+      <Text style={styles.emptyTitle}>Nenhum medicamento encontrado</Text>
       <Text style={styles.emptyText}>
-        Você ainda não possui tratamentos ou pets cadastrados. Cadastre seu pet para gerenciar os medicamentos e laudos médicos!
+        Não há medicamentos nesta página. Os tratamentos prescritos aparecem aqui quando disponíveis.
       </Text>
       <TouchableOpacity 
         style={styles.botaoCadastrarPet}
@@ -71,13 +44,20 @@ export default function MedicamentosScreen() {
           <ActivityIndicator size="large" color={colors.verdeEscuro} />
           <Text style={{ marginTop: 10, color: colors.cinza, fontWeight: 'bold' }}>Buscando tratamentos...</Text>
         </View>
-      ) : isError || !medicamentos || !medicamentos.content || medicamentos.content.length === 0 ? (
+      ) : isError ? (
+        <View style={{ padding: 20, alignItems: 'center' }}>
+          <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => { void refetch(); }} style={{ padding: 16 }}>
+            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+          </TouchableOpacity>
+        </View>
+      ) : !medicamentos || medicamentos.content.length === 0 ? (
         renderEmptyState()
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
          
-          {medicamentos.content.map((med: any, index: number) => (
-            <View key={med.id || index} style={styles.medCard}>
+          {medicamentos.content.map((med) => (
+            <View key={med.id} style={styles.medCard}>
               
               <View style={styles.medHeader}>
                 <View style={styles.nomeContainer}>
@@ -87,7 +67,7 @@ export default function MedicamentosScreen() {
                 
                 <View style={[styles.badgeStatus, { backgroundColor: med.status === 'CONCLUIDO' ? '#D3D3D3' : colors.verdeClaro }]}>
                   <Text style={[styles.textoStatus, { color: med.status === 'CONCLUIDO' ? '#666' : colors.roxoMuitoEscuro }]}>
-                    {med.status === 'CONCLUIDO' ? 'CONCLUÍDO' : 'EM DIA'}
+                    {med.status === 'CONCLUIDO' ? 'CONCLUÍDO' : med.status === 'ATRASADO' ? 'ATRASADO' : 'EM DIA'}
                   </Text>
                 </View>
               </View>
@@ -107,7 +87,7 @@ export default function MedicamentosScreen() {
                 </View>
                 <View style={styles.detalheItem}>
                   <Text style={styles.detalheLabel}>Duração:</Text>
-                  <Text style={styles.detalheValor}>{med.duracaoDias} dias</Text>
+                  <Text style={styles.detalheValor}>{med.duracaoDias != null ? `${med.duracaoDias} dias` : 'Não informada'}</Text>
                 </View>
                 <View style={styles.detalheItem}>
                   <Text style={styles.detalheLabel}>Início:</Text>
@@ -118,6 +98,17 @@ export default function MedicamentosScreen() {
             </View>
           ))}
         </ScrollView>
+      )}
+      {!isError && medicamentos && medicamentos.totalPages > 1 && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, marginBottom: 24 }}>
+          <TouchableOpacity onPress={anterior} disabled={isFetching || pagina === 0} style={{ padding: 12, opacity: isFetching || pagina === 0 ? 0.4 : 1 }}>
+            <Text style={{ color: colors.roxoMuitoEscuro }}>ANTERIOR</Text>
+          </TouchableOpacity>
+          <Text style={{ color: colors.roxoMuitoEscuro }}>{pagina + 1} / {medicamentos.totalPages}</Text>
+          <TouchableOpacity onPress={proxima} disabled={isFetching || medicamentos.last} style={{ padding: 12, opacity: isFetching || medicamentos.last ? 0.4 : 1 }}>
+            <Text style={{ color: colors.roxoMuitoEscuro }}>PRÓXIMA</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
