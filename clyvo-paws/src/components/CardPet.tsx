@@ -15,7 +15,6 @@ export default function CardPet({ pet }: Props) {
     pet.fotoUrl ||
     'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
 
-  // Aceita a grafia antiga FÊMEA e o valor FEMEA enviado pelo Java.
   const sexo = pet.sexo?.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const sexoInformado = sexo === 'MACHO' || sexo === 'FEMEA';
 
