@@ -1,42 +1,16 @@
-import React, { useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  ActivityIndicator 
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useQuery } from '@tanstack/react-query';
 import { colors } from '../theme/colors';
+import { useMeusPets } from '../hooks/useMeusPets';
+import { useNavigation } from '@react-navigation/native';
 import CardPet from '../components/CardPet';
-import { Pet } from '../types';
-import api from '../services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PetsScreen() {
+  const {
+    data: listaPets = [], isLoading: carregando, isError, refetch
+  } = useMeusPets();
   const navigation = useNavigation<any>();
-
-const { data: listaPets = [], isLoading: carregando, refetch } = useQuery({
-    queryKey: ['meus-pets'],
-    queryFn: async () => {
-      const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
-      const tutor = dadosTutor ? JSON.parse(dadosTutor) : null;
-
-      if (!tutor || !tutor.id) return [];
-
-      const response = await api.get(`/pets/tutor/${tutor.id}`);
-      return response.data;
-    }
-  });
-
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch])
-  );
 
   return (
     <View style={styles.container}>
@@ -53,9 +27,16 @@ const { data: listaPets = [], isLoading: carregando, refetch } = useQuery({
         <View style={styles.containerCentro}>
           <ActivityIndicator size="large" color={colors.verdeEscuro} />
         </View>
+      ) : isError ? (
+        <View style={{ padding: 20, alignItems: 'center' }}>
+          <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => { void refetch(); }} style={{ padding: 16 }}>
+            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+          </TouchableOpacity>
+        </View>
       ) : listaPets.length > 0 ? (
         <ScrollView style={styles.scrollList} showsVerticalScrollIndicator={false}>
-          {listaPets.map((pet: Pet) => (
+          {listaPets.map((pet) => (
             <TouchableOpacity 
               key={pet.id} 
               activeOpacity={0.7}
