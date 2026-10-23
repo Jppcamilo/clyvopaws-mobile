@@ -1,97 +1,21 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  Image, 
-  Alert,
-  ActivityIndicator
-} from 'react-native';
+import React from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import * as ImagePicker from 'expo-image-picker'; 
-import { useMutation } from '@tanstack/react-query';
 import { colors } from '../theme/colors';
-import api from '../services/api';
-import * as SecureStore from 'expo-secure-store';
+import { useCadastro } from '../hooks/useCadastro';
 
 export default function RegisterScreen() {
-  const navigation = useNavigation<any>();
-
-  const [nome, setNome] = useState('');
-  const [cpf, setCpf] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [foto, setFoto] = useState<string | null>(null); 
-
-  const escolherFoto = async () => {
-    const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (permissao.status !== 'granted') {
-      Alert.alert('Atenção', 'Precisamos de permissão para acessar sua galeria!');
-      return;
-    }
-
-    const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!resultado.canceled) {
-      setFoto(resultado.assets[0].uri);
-    }
-  };
-
-  const registerMutation = useMutation({
-    mutationFn: async (novoTutor: any) => {
-      const response = await api.post('/tutores', novoTutor);
-      return response.data;
-    },
-    onSuccess: () => {
-      Alert.alert('Sucesso!', 'Cadastro realizado. Faça o login para entrar.');
-      navigation.goBack();
-    },
-    onError: (error) => {
-      console.error('Erro no cadastro:', error);
-      Alert.alert('Erro', 'Não foi possível salvar seu cadastro. Tente novamente mais tarde.');
-    }
-  });
-
-  const handleCadastrar = async () => {
-    if (!nome.trim() || !email.trim() || !senha.trim()) {
-      Alert.alert('Erro', 'Nome, Email e Senha são obrigatórios!');
-      return;
-    }
-
-    try {
-      await SecureStore.deleteItemAsync('clyvo_token');
-    } catch (e) {
-      console.log('Nenhum token para limpar');
-    }
-
-    const novoTutor = {
-      nomeCompleto: nome,
-      cpf: cpf,
-      telefone: telefone,
-      email: email,
-      senha: senha,
-      fotoUrl: foto
-    };
-
-    registerMutation.mutate(novoTutor);
-  };
+  const {
+    navigation, nome, setNome, cpf, setCpf, telefone, setTelefone, email, setEmail,
+    senha, setSenha, foto, escolherFoto, escolhendoFoto, registerMutation, handleCadastrar
+  } = useCadastro();
+  const ocupado = registerMutation.isPending || escolhendoFoto;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
       <View style={styles.header}>
-        <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()} disabled={ocupado}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
         <Text style={styles.titulo}>CADASTRO</Text>
@@ -99,7 +23,7 @@ export default function RegisterScreen() {
 
       <Text style={styles.labelSecao}>FOTO</Text>
       <View style={styles.boxFoto}>
-        <TouchableOpacity style={styles.botaoUpload} onPress={escolherFoto}>
+        <TouchableOpacity style={styles.botaoUpload} onPress={escolherFoto} disabled={ocupado}>
           <MaterialCommunityIcons name="upload" size={20} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
         
@@ -114,24 +38,24 @@ export default function RegisterScreen() {
       </View>
 
       <Text style={styles.labelSecao}>NOME</Text>
-      <TextInput style={styles.input} placeholder="NOME COMPLETO" placeholderTextColor={colors.roxoMuitoEscuro} value={nome} onChangeText={setNome} textAlign="center" />
+      <TextInput editable={!ocupado} style={styles.input} placeholder="NOME COMPLETO" placeholderTextColor={colors.roxoMuitoEscuro} value={nome} onChangeText={setNome} textAlign="center" />
 
       <Text style={styles.labelSecao}>CPF</Text>
-      <TextInput style={styles.input} placeholder="000.000.000-00" placeholderTextColor={colors.roxoMuitoEscuro} value={cpf} onChangeText={setCpf} keyboardType="numeric" textAlign="center" />
+      <TextInput editable={!ocupado} style={styles.input} placeholder="000.000.000-00" placeholderTextColor={colors.roxoMuitoEscuro} value={cpf} onChangeText={setCpf} keyboardType="numeric" textAlign="center" />
 
       <Text style={styles.labelSecao}>TELEFONE</Text>
-      <TextInput style={styles.input} placeholder="+55 11 90000-0000" placeholderTextColor={colors.roxoMuitoEscuro} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" textAlign="center" />
+      <TextInput editable={!ocupado} style={styles.input} placeholder="+55 11 90000-0000" placeholderTextColor={colors.roxoMuitoEscuro} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" textAlign="center" />
 
       <Text style={styles.labelSecao}>EMAIL</Text>
-      <TextInput style={styles.input} placeholder="SEU@EMAIL.COM" placeholderTextColor={colors.roxoMuitoEscuro} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="center" />
+      <TextInput editable={!ocupado} style={styles.input} placeholder="SEU@EMAIL.COM" placeholderTextColor={colors.roxoMuitoEscuro} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="center" />
 
       <Text style={styles.labelSecao}>SENHA</Text>
-      <TextInput style={styles.input} placeholder="CRIE SUA SENHA" placeholderTextColor={colors.roxoMuitoEscuro} value={senha} onChangeText={setSenha} secureTextEntry textAlign="center" />
+      <TextInput editable={!ocupado} style={styles.input} placeholder="CRIE SUA SENHA" placeholderTextColor={colors.roxoMuitoEscuro} value={senha} onChangeText={setSenha} secureTextEntry textAlign="center" />
 
       <TouchableOpacity 
         style={styles.botaoCadastrar} 
         onPress={handleCadastrar}
-        disabled={registerMutation.isPending}
+        disabled={ocupado}
       >
         {registerMutation.isPending ? (
           <ActivityIndicator color={colors.roxoMuitoEscuro} />
