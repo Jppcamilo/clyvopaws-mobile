@@ -1,98 +1,17 @@
-import React, { useState, useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  Image,
-  ActivityIndicator
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
-import { useQuery } from '@tanstack/react-query'; 
 import { colors } from '../theme/colors';
+import { useHome } from '../hooks/useHome';
 import PopPerfil from '../components/PopPerfil';
 import PopPets from '../components/PopPets';
-import { Pet } from '../types';
-import api from '../services/api';
 
 export default function HomeScreen() {
-  const navigation = useNavigation<any>(); 
-
-  const [modalPerfilVisivel, setModalPerfilVisivel] = useState(false);
-  const [modalPetsVisivel, setModalPetsVisivel] = useState(false);
-  
-  const [nomeTutor, setNomeTutor] = useState('');
-  const [fotoTutor, setFotoTutor] = useState<string | null>(null);
-  const [tutorId, setTutorId] = useState<number | null>(null);
-
-  const carregarTutorLocal = async () => {
-    try {
-      const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
-      if (dadosTutor) {
-        const tutor = JSON.parse(dadosTutor);
-        const nomeReal = tutor.nomeCompleto || tutor.nome || 'Tutor';
-        setNomeTutor(nomeReal.split(' ')[0]); 
-        setFotoTutor(tutor.fotoUrl || tutor.foto);
-        setTutorId(tutor.id || tutor.user_id);
-      }
-    } catch (error) {
-      console.error('Erro ao carregar dados locais do tutor:', error);
-    }
-  };
-
-  const { data: listaPets = [], refetch: refetchPets } = useQuery({
-    queryKey: ['meus-pets'],
-    queryFn: async () => {
-      const dadosTutor = await AsyncStorage.getItem('@tutor_clyvo');
-      const tutor = dadosTutor ? JSON.parse(dadosTutor) : null;
-      if (!tutor || !tutor.id) return [];
-      const response = await api.get(`/pets/tutor/${tutor.id}`);
-      return response.data;
-    },
-    staleTime: 0,
-    refetchOnMount: 'always'
-  });
-
-  const { data: agendamentosGerais = [], isLoading: carregandoAgendamentos, refetch: refetchAgendamentos } = useQuery({
-    queryKey: ['agendamentos-tutor', tutorId],
-    queryFn: async () => {
-      if (!tutorId) return [];
-      const response = await api.get(`/agendamentos/tutor/${tutorId}`);
-      return response.data;
-    },
-    enabled: !!tutorId
-  });
-
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-      const fetchData = async () => {
-        await carregarTutorLocal();
-        if (isActive) {
-           refetchPets();
-           refetchAgendamentos();
-        }
-      };
-      fetchData();
-      return () => {
-        isActive = false;
-      };
-    }, [refetchPets, refetchAgendamentos])
-  );
-
-  const formatarData = (dataHoraString: string) => {
-    const data = new Date(dataHoraString);
-    const dia = String(data.getDate()).padStart(2, '0');
-    const mes = String(data.getMonth() + 1).padStart(2, '0');
-    const hora = String(data.getHours()).padStart(2, '0');
-    const min = String(data.getMinutes()).padStart(2, '0');
-    return `${dia}/${mes} às ${hora}:${min}`;
-  };
-
-  const imagemExibicao = fotoTutor ? { uri: fotoTutor } : { uri: 'https://img.freepik.com/vetores-gratis/homem-jovem-com-telefone-inteligente_23-2148506899.jpg' };
+  const {
+    navigation, modalPerfilVisivel, setModalPerfilVisivel, modalPetsVisivel,
+    setModalPetsVisivel, nomeTutor, fotoTutor, listaPets, agendamentosGerais,
+    carregandoAgendamentos, carregandoPets, isError, tentarNovamente, formatarData, imagemExibicao
+  } = useHome();
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -108,22 +27,28 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.secaoLembretes}>
-        {carregandoAgendamentos ? (
+        {carregandoAgendamentos || carregandoPets ? (
            <View style={[styles.secaoVazia, { backgroundColor: 'transparent' }]}>
              <ActivityIndicator size="small" color={colors.verdeEscuro} />
            </View>
+        ) : isError ? (
+        <View style={{ padding: 20, alignItems: 'center' }}>
+          <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => { void tentarNovamente(); }} style={{ padding: 16 }}>
+            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+          </TouchableOpacity>
+        </View>
         ) : agendamentosGerais.length > 0 ? (
           <>
-            <Text style={styles.tituloSecao}>LEMBRETES DO DIA</Text>
+            <Text style={styles.tituloSecao}>LEMBRETES</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, paddingHorizontal: 20 }}>
-              {agendamentosGerais.map((ag: any, index: number) => {
-                 const idDoPet = ag.petId || ag.pet?.id || ag.consulta?.petId || ag.consulta?.pet?.id;
-                 const petDoAgendamento = listaPets.find((p: Pet) => String(p.id) === String(idDoPet));
-                 const nomePet = ag.petNome || ag.petName || ag.pet?.nome || ag.consulta?.pet?.nome || petDoAgendamento?.nome || 'Meu Pet';
-                 const fotoUri = ag.petFoto || ag.petFotoUrl || ag.pet?.foto || ag.pet?.fotoUrl || ag.consulta?.pet?.foto || ag.consulta?.pet?.fotoUrl || petDoAgendamento?.foto || petDoAgendamento?.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
+              {agendamentosGerais.map((ag) => {
+                 const petDoAgendamento = listaPets.find((p) => p.id === ag.petId);
+                 const nomePet = petDoAgendamento?.nome || ag.consulta?.nomePet || 'Meu Pet';
+                 const fotoUri = petDoAgendamento?.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
 
                  return (
-                  <View key={index} style={styles.cardAgendamentoHome}>
+                  <View key={ag.id} style={styles.cardAgendamentoHome}>
                     <Image source={{ uri: fotoUri }} style={styles.fotoMiniPet} />
                     <View style={{ flex: 1 }}>
                       <Text style={styles.nomePetCard}>{nomePet}</Text>
@@ -142,7 +67,7 @@ export default function HomeScreen() {
           </>
         ) : (
           <View style={styles.secaoVazia}>
-            <Text style={styles.textoVazio}>Nenhum lembrete para hoje! 🎉</Text>
+            <Text style={styles.textoVazio}>Nenhum agendamento encontrado.</Text>
           </View>
         )}
       </View>
@@ -157,7 +82,7 @@ export default function HomeScreen() {
           <Text style={styles.legendaIcone}>REDE{"\n"}CLINICA</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.itemIconeScroll} onPress={() => setModalPetsVisivel(true)}>
+        <TouchableOpacity style={styles.itemIconeScroll} onPress={() => setModalPetsVisivel(true)} disabled={carregandoPets || isError}>
           <View style={styles.circuloIcone}>
             <MaterialCommunityIcons name="paw" size={30} color={colors.roxoMuitoEscuro} />
           </View>
@@ -186,7 +111,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      <TouchableOpacity style={styles.bannerPets} onPress={() => setModalPetsVisivel(true)}>
+      <TouchableOpacity style={styles.bannerPets} onPress={() => setModalPetsVisivel(true)} disabled={carregandoPets || isError}>
         <View style={styles.textoBanner}>
           <Text style={styles.tituloBanner}>PETS</Text>
           <Text style={styles.subtituloBanner}>VEJA SEUS PETS E{"\n"}CADASTRE ELES AQUI</Text>
