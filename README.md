@@ -7,13 +7,13 @@ O **Clyvo VET** é um aplicativo mobile completo desenvolvido para revolucionar 
 ## 🔗 Ecossistema do Projeto
 
 Este repositório contém apenas o **Front-end (Mobile)** da aplicação. O projeto consome uma API REST desenvolvida pela nossa equipe.
-* **Repositório Back-end (Java/Spring Boot):** [COLE O LINK DO GITHUB DO SEU BACK-END AQUI]
+* **Repositório Back-end (Java/Spring Boot):** [CLIQUE PARA SER DIRECIONADO PARA O REPOSITÓRIO DO BACKEND](https://github.com/LucasMatsubara/clyvopawsJavaChallenge)
 
 ---
 
 ## 🎥 Demonstração do Projeto
 
-**[CLIQUE AQUI PARA ASSISTIR AO VÍDEO DE DEMONSTRAÇÃO NO YOUTUBE](https://youtu.be/HWMv9Z7Wppk)**
+**[CLIQUE AQUI PARA ASSISTIR AO VÍDEO DE DEMONSTRAÇÃO NO YOUTUBE](https://youtu.be/0Srws2ukES0)**
 
 > *Vídeo demonstrando o funcionamento do aplicativo e suas integrações de ponta a ponta para o desafio proposto.*
 
