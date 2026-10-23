@@ -1,31 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  Image,
-  ActivityIndicator,
-  Alert 
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native'; 
-import { Calendar, LocaleConfig } from 'react-native-calendars';
-import * as Notifications from 'expo-notifications';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; 
 import { colors } from '../theme/colors';
-import { DADOS_RACAS } from '../data/racas';
+import { usePetDetails } from '../hooks/usePetDetails';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { calcularIdade } from '../utils/dateUtils';
-import api from '../services/api'; 
-
-Notifications.setNotificationHandler({
-  handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  } as Notifications.NotificationBehavior),
-});
 
 LocaleConfig.locales['pt-br'] = {
   monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -36,157 +15,34 @@ LocaleConfig.locales['pt-br'] = {
 };
 LocaleConfig.defaultLocale = 'pt-br';
 
+
 export default function PetDetailsScreen() {
-  const navigation = useNavigation<any>();
-  const route = useRoute<any>();
-  const { petId } = route.params;
-  const queryClient = useQueryClient(); 
-
-  const [lembretes, setLembretes] = useState<any[]>([]);
-  const [datasMarcadas, setDatasMarcadas] = useState<any>({});
-  const [racaInfo, setRacaInfo] = useState<any>(null);
-  
-  const { data: pet, isLoading: carregandoPet } = useQuery({
-    queryKey: ['pet-details', petId],
-    queryFn: async () => {
-      const response = await api.get(`/pets/${petId}`);
-      return response.data;
-    }
-  });
-
-  const { data: agendamentos, isLoading: carregandoAgendamentos } = useQuery({
-    queryKey: ['agendamentos-pet', petId],
-    queryFn: async () => {
-      const response = await api.get(`/agendamentos/pet/${petId}`);
-      return response.data;
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async () => {
-      await api.delete(`/pets/${petId}`);
-    },
-    onSuccess: () => {
-      Alert.alert('Sucesso', 'Pet removido com sucesso.');
-      queryClient.invalidateQueries({ queryKey: ['meus-pets'] });
-      navigation.goBack(); 
-    },
-    onError: (error) => {
-      console.error('Erro ao excluir pet:', error);
-      Alert.alert('Erro', 'Não foi possível excluir o pet. Tente novamente.');
-    }
-  });
-
-  useEffect(() => {
-    if (pet) {
-      let dadosMedicos = DADOS_RACAS.CACHORRO.find((r: any) => r.nome === pet.raca);
-      if (!dadosMedicos) {
-        dadosMedicos = DADOS_RACAS.GATO.find((r: any) => r.nome === pet.raca);
-      }
-      setRacaInfo(dadosMedicos);
-    }
-  }, [pet]);
-
-
-useEffect(() => {
-    if (!agendamentos) return;
-
-    let marcacoes: any = {};
-    const hoje = new Date();
-    const dataHojeString = hoje.toISOString().split('T')[0];
-
-    const lembretesFormatados = agendamentos.map((ag: any) => {
-      const dataCompleta = new Date(ag.dataHora);
-      const dataStr = dataCompleta.toISOString().split('T')[0];
-      const horarioStr = `${String(dataCompleta.getHours()).padStart(2, '0')}:${String(dataCompleta.getMinutes()).padStart(2, '0')}`;
-      
-      return {
-         data: dataStr,
-         tarefa: ag.titulo,
-         horario: horarioStr
-      };
-    });
-
-    setLembretes(lembretesFormatados);
-
-    lembretesFormatados.forEach((lembrete: any) => {
-      if (lembrete.data) {
-        marcacoes[lembrete.data] = { marked: true, dotColor: colors.verdeMedio };
-      }
-    });
-
-    marcacoes[dataHojeString] = {
-      ...marcacoes[dataHojeString],
-      selected: true,
-      selectedColor: colors.verdeMedio,
-      marked: marcacoes[dataHojeString]?.marked || false,
-      dotColor: colors.branco
-    };
-
-    setDatasMarcadas(marcacoes);
-  }, [agendamentos]);
-
-  const ativarAlertas = async () => {
-    const { status } = await Notifications.requestPermissionsAsync();
-    
-    if (status !== 'granted') {
-      Alert.alert('Atenção', 'Você precisa permitir as notificações para receber os lembretes do seu pet.');
-      return;
-    }
-
-    let agendados = 0;
-
-    for (const lembrete of lembretes) {
-      if (lembrete.data && lembrete.horario) {
-        const [ano, mes, dia] = lembrete.data.split('-').map(Number);
-        const [hora, minuto] = lembrete.horario.split(':').map(Number);
-
-        const dataConsulta = new Date(ano, mes - 1, dia, hora, minuto);
-        const dataAlarme = new Date(dataConsulta.getTime() - 2 * 60 * 60 * 1000);
-
-        if (dataAlarme > new Date()) {
-          await Notifications.scheduleNotificationAsync({
-            content: {
-              title: "🐾 Lembrete de Consulta!",
-              body: `A consulta do ${pet?.nome} está chegando! Não se esqueça.`,
-              sound: true,
-            },
-            trigger: {
-              type: Notifications.SchedulableTriggerInputTypes.DATE,
-              date: dataAlarme,
-            },
-          });
-          agendados++;
-        }
-      }
-    }
-
-    if (agendados > 0) {
-      Alert.alert('Sucesso!', `Foram ativados ${agendados} alertas para os próximos compromissos do(a) ${pet?.nome}. Você será avisado 2h antes.`);
-    } else {
-      Alert.alert('Aviso', 'Não há compromissos futuros para agendar alertas.');
-    }
-  };
-
-  const handleExcluirPet = () => {
-    Alert.alert(
-      'Excluir Pet',
-      `Tem certeza de que deseja remover o(a) ${pet?.nome} da família Clyvo?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Excluir', 
-          style: 'destructive',
-          onPress: () => deleteMutation.mutate()
-        }
-      ]
-    );
-  };
+  const {
+    navigation, pet, carregandoPet, carregandoAgendamentos, isError, tentarNovamente,
+    lembretes, datasMarcadas, racaInfo, deleteMutation, ativandoAlertas, ativarAlertas, handleExcluirPet
+  } = usePetDetails();
+  const ocupado = deleteMutation.isPending || ativandoAlertas;
 
   if (carregandoPet || carregandoAgendamentos) {
     return (
       <View style={styles.containerCentro}>
         <ActivityIndicator size="large" color={colors.verdeEscuro} />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.containerCentro}>
+        <View style={{ padding: 20, alignItems: 'center' }}>
+          <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => { void tentarNovamente(); }} style={{ padding: 16 }}>
+            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.botaoVoltarErro} onPress={() => navigation.goBack()}>
+          <Text style={styles.textoBotaoVoltar}>Voltar</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -202,7 +58,7 @@ useEffect(() => {
     );
   }
 
-const fotoUri = pet.foto || pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
+const fotoUri = pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-de-gato-e-cachorro-desenhado-a-mao_23-2150379255.jpg?w=150';
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
@@ -215,7 +71,8 @@ const fotoUri = pet.foto || pet.fotoUrl || 'https://img.freepik.com/vetores-grat
           
           <TouchableOpacity 
             style={styles.botaoEditar} 
-            onPress={() => navigation.navigate('PetForm', { pet: pet })}
+            onPress={() => navigation.navigate('PetForm', { pet })}
+            disabled={ocupado}
           >
             <MaterialCommunityIcons name="pencil-outline" size={24} color={colors.verdeEscuro} />
           </TouchableOpacity>
@@ -223,7 +80,7 @@ const fotoUri = pet.foto || pet.fotoUrl || 'https://img.freepik.com/vetores-grat
           <TouchableOpacity 
             style={styles.botaoDeletar} 
             onPress={handleExcluirPet}
-            disabled={deleteMutation.isPending}
+            disabled={ocupado}
           >
             {deleteMutation.isPending ? (
               <ActivityIndicator color="#FF3B30" />
@@ -302,23 +159,23 @@ const fotoUri = pet.foto || pet.fotoUrl || 'https://img.freepik.com/vetores-grat
       <View style={styles.secao}>
         <View style={styles.headerTituloIcone}>
           <Text style={styles.tituloSecao}>STATUS DO PET</Text>
-          <TouchableOpacity onPress={ativarAlertas} style={styles.botaoSininho}>
+          <TouchableOpacity onPress={ativarAlertas} disabled={ocupado} style={styles.botaoSininho}>
             <MaterialCommunityIcons name="bell-ring-outline" size={20} color={colors.roxoMuitoEscuro} />
-            <Text style={styles.textoSininho}>Alertas</Text>
+            <Text style={styles.textoSininho}>{ativandoAlertas ? 'Ativando...' : 'Alertas'}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.cardStatus}>
           <Text style={styles.tituloCardStatus}>VACINAS / LEMBRETES</Text>
-          <Text style={styles.subtituloCardStatus}>Pendente</Text>
+          <Text style={styles.subtituloCardStatus}>{lembretes.length > 0 ? 'Agendamentos' : 'Sem agendamentos'}</Text>
           
           {lembretes && lembretes.length > 0 ? (
-            lembretes.map((lembrete, index) => {
+            lembretes.map((lembrete) => {
               const dataQuebrada = lembrete.data ? lembrete.data.split('-') : [];
               const dataFormatada = dataQuebrada.length === 3 ? `${dataQuebrada[2]}/${dataQuebrada[1]}` : '';
 
               return (
-                <View key={index} style={styles.itemLembrete}>
+                <View key={lembrete.id} style={styles.itemLembrete}>
                   <View style={styles.bolinhaVerde} />
                   <Text style={styles.textoLembrete}>
                     {dataFormatada} - {lembrete.tarefa} ({lembrete.horario})
