@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Pet } from '../types';
+import type { Pet } from '../types';
 import { colors } from '../theme/colors';
 
 type Props = {
@@ -8,13 +8,19 @@ type Props = {
 };
 
 export default function CardLembrete({ pet }: Props) {
+  const lembretes = pet.lembretes ?? [];
+
   return (
     <View style={styles.cardContainer}>
       <View style={styles.tagNome}>
         <Text style={styles.textoNome}>{pet.nome}</Text>
       </View>
 
-      {pet.lembretes.map((lembrete, index) => (
+      {lembretes.length === 0 && (
+        <Text style={styles.textoLembrete}>Nenhum lembrete informado.</Text>
+      )}
+
+      {lembretes.map((lembrete, index) => (
         <View key={index} style={styles.lembrete}>
           <View style={styles.bolinha} />
           <Text style={styles.textoLembrete}>
