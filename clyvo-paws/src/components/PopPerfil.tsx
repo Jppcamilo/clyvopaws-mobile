@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, Pressable, ActivityIndicator } from 'react-native';
 import { colors } from '../theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useLogout } from '../hooks/useLogout';
 
 type Props = {
   visivel: boolean;
@@ -13,8 +14,14 @@ type Props = {
 
 export default function PopPerfil({ visivel, fecharModal, nomeTutor, fotoTutor }: Props) {
   const navigation = useNavigation<any>();
+  const { sair, saindo } = useLogout();
+
+  const solicitarFechamento = () => {
+    if (!saindo) fecharModal();
+  };
 
   const irParaDadosPessoais = () => {
+    if (saindo) return;
     fecharModal();
     navigation.navigate('Profile');
   };
@@ -24,9 +31,16 @@ export default function PopPerfil({ visivel, fecharModal, nomeTutor, fotoTutor }
     : { uri: 'https://img.freepik.com/vetores-gratis/homem-jovem-com-telefone-inteligente_23-2148506899.jpg' };
 
   return (
-    <Modal visible={visivel} transparent={true} animationType="slide">
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={fecharModal}>
-        <View style={styles.bottomSheet} onStartShouldSetResponder={() => true}>
+    <Modal visible={visivel} transparent animationType="slide" onRequestClose={solicitarFechamento}>
+      <View style={styles.overlay}>
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={solicitarFechamento}
+          disabled={saindo}
+          accessibilityRole="button"
+          accessibilityLabel="Fechar menu de perfil"
+        />
+        <View style={styles.bottomSheet} accessibilityViewIsModal>
           <View style={styles.handleBar} />
           
           <View style={styles.headerPerfil}>
@@ -35,14 +49,14 @@ export default function PopPerfil({ visivel, fecharModal, nomeTutor, fotoTutor }
               <Text style={styles.nomeTutor}>{nomeTutor}</Text>
               <Text style={styles.tagTutor}>TUTOR</Text>
             </View>
-            <TouchableOpacity style={styles.botaoContas}>
-              <Text style={styles.textoBotaoContas}>CONTAS</Text>
+            <TouchableOpacity style={styles.botaoContas} onPress={irParaDadosPessoais} disabled={saindo}>
+              <Text style={styles.textoBotaoContas}>PERFIL</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.divisor} />
 
-          <TouchableOpacity style={styles.opcaoMenu} onPress={irParaDadosPessoais}>
+          <TouchableOpacity style={styles.opcaoMenu} onPress={irParaDadosPessoais} disabled={saindo}>
             <Text style={styles.textoOpcao}>DADOS PESSOAIS</Text>
             <View style={styles.iconeFundo}>
               <MaterialCommunityIcons name="cog" size={20} color={colors.roxoMuitoEscuro} />
@@ -51,17 +65,25 @@ export default function PopPerfil({ visivel, fecharModal, nomeTutor, fotoTutor }
 
           <View style={styles.divisor} />
 
-          <TouchableOpacity style={styles.opcaoMenu} onPress={() => {
-            fecharModal();
-            navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
-          }}>
-            <Text style={styles.textoOpcao}>SAIR</Text>
+          <TouchableOpacity
+            style={styles.opcaoMenu}
+            onPress={() => { void sair(); }}
+            disabled={saindo}
+            accessibilityRole="button"
+            accessibilityLabel="Sair da conta"
+            accessibilityState={{ disabled: saindo, busy: saindo }}
+          >
+            <Text style={styles.textoOpcao}>{saindo ? 'SAINDO...' : 'SAIR'}</Text>
             <View style={styles.iconeFundo}>
-              <MaterialCommunityIcons name="logout" size={20} color={colors.roxoMuitoEscuro} />
+              {saindo ? (
+                <ActivityIndicator color={colors.roxoMuitoEscuro} />
+              ) : (
+                <MaterialCommunityIcons name="logout" size={20} color={colors.roxoMuitoEscuro} />
+              )}
             </View>
           </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
