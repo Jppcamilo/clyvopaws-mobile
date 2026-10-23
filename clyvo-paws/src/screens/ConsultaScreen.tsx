@@ -1,133 +1,16 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity,
-  Linking,
-  Alert,
-  Modal,
-  TextInput,
-  ActivityIndicator
-} from 'react-native';
+import React from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { colors } from '../theme/colors';
-import api from '../services/api';
+import { useConsultas } from '../hooks/useConsultas';
 
-const clinicasDB: { [key: string]: { clinicaId: number, veterinarioId: number } } = {
-  'Clínica Paws Care Matriz': { clinicaId: 1, veterinarioId: 1 },
-  'Hospital Veterinário Vida Animal': { clinicaId: 2, veterinarioId: 2 },
-  'Pet Care Morumbi': { clinicaId: 3, veterinarioId: 3 }
-};
-
-export default function ConsultasScreen() {
-  const navigation = useNavigation<any>();
-  const queryClient = useQueryClient();
-
-  const [modalVisivel, setModalVisivel] = useState(false);
-  const [clinicaSelecionada, setClinicaSelecionada] = useState('');
-  const [veterinarioAtual, setVeterinarioAtual] = useState<number | null>(null);
-  const [horarioSelecionado, setHorarioSelecionado] = useState('');
-  const [motivo, setMotivo] = useState('');
-  const [petSelecionado, setPetSelecionado] = useState<number | null>(null);
-
-  const abrirWhatsApp = (numero: string, nomeClinica: string) => {
-    const numeroLimpo = numero.replace(/\D/g, ''); 
-    const mensagem = `Olá ${nomeClinica}! Sou do app Clyvo VET e gostaria de marcar uma consulta para o meu pet.`; 
-    
-    const url = `https://wa.me/${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
-
-    Linking.openURL(url).catch((err) => {
-      console.error('Erro ao abrir o WhatsApp', err);
-      Alert.alert('Erro', 'Não foi possível redirecionar para o WhatsApp.');
-    });
-  };
-
-  const agendarMutation = useMutation({
-    mutationFn: async (dadosAgendamento: any) => {
-      const response = await api.post('/agendamentos', dadosAgendamento);
-      return response.data;
-    },
-    onSuccess: () => {
-      Alert.alert('Sucesso!', `Sua consulta na ${clinicaSelecionada} foi registrada no sistema!`);
-      setModalVisivel(false);
-      setHorarioSelecionado('');
-      setMotivo('');
-      queryClient.invalidateQueries({ queryKey: ['agendamentos-pet'] });
-    },
-    onError: (error) => {
-      console.error('Erro ao agendar:', error);
-      Alert.alert('Erro', 'Não foi possível registrar o agendamento no sistema.');
-    }
-  });
-
-  const { data: listaPets = [] } = useQuery({
-    queryKey: ['meus-pets'],
-    queryFn: async () => {
-      const response = await api.get('/pets');
-      return response.data;
-    }
-  });
-
-  const { data: listaAgendas = [], isFetching: carregandoAgendas } = useQuery({
-    queryKey: ['agendas', veterinarioAtual],
-    queryFn: async () => {
-      if (!veterinarioAtual) return [];
-      const response = await api.get(`/agendas/veterinario/${veterinarioAtual}`);
-      return response.data;
-    },
-    enabled: !!veterinarioAtual,
-  });
-
-  const formatarDataHora = (dataString: string) => {
-    const data = new Date(dataString);
-    const dia = String(data.getDate()).padStart(2, '0');
-    const mes = String(data.getMonth() + 1).padStart(2, '0');
-    const horas = String(data.getHours()).padStart(2, '0');
-    const minutos = String(data.getMinutes()).padStart(2, '0');
-    return `${dia}/${mes} às ${horas}:${minutos}`;
-  };
-
-  const abrirModalAgendamento = (nomeClinica: string) => {
-    setClinicaSelecionada(nomeClinica);
-    setVeterinarioAtual(clinicasDB[nomeClinica]?.veterinarioId || null);
-    
-    setHorarioSelecionado('');
-    setMotivo('');
-    setPetSelecionado(null);
-    setModalVisivel(true);
-  };
-
-  const handleAgendarApp = () => {
-    if (!horarioSelecionado) {
-      Alert.alert('Atenção', 'Por favor, selecione um horário disponível.');
-      return;
-    }
-    if (!petSelecionado) {
-      Alert.alert('Atenção', 'Por favor, selecione qual pet será consultado.');
-      return;
-    }
-    if (!motivo.trim()) {
-      Alert.alert('Atenção', 'Preencha o motivo da consulta.');
-      return;
-    }
-
-    const dadosClinica = clinicasDB[clinicaSelecionada];
-
-    agendarMutation.mutate({
-      dataHora: horarioSelecionado,
-      titulo: `Consulta na ${clinicaSelecionada}`,
-      descricao: motivo,
-      status: 'AGENDADA',
-      consultaId: null,
-      petId: petSelecionado,
-      clinicaId: dadosClinica.clinicaId,  
-      veterinarioId: dadosClinica.veterinarioId 
-    });
-  };
+export default function ConsultaScreen() {
+  const {
+    navigation, modalVisivel, setModalVisivel, clinicaSelecionada, horarioSelecionado,
+    setHorarioSelecionado, motivo, setMotivo, petSelecionado, setPetSelecionado,
+    listaPets, listaAgendas, carregandoPets, carregandoAgendas, isError, tentarNovamente,
+    agendarMutation, abrirWhatsApp, formatarDataHora, abrirModalAgendamento, handleAgendarApp
+  } = useConsultas();
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.branco }}>
@@ -209,18 +92,25 @@ export default function ConsultasScreen() {
         animationType="slide"
         transparent={true}
         visible={modalVisivel}
-        onRequestClose={() => setModalVisivel(false)}
+        onRequestClose={() => { if (!agendarMutation.isPending) setModalVisivel(false); }}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitulo}>AGENDAR CONSULTA</Text>
             <Text style={styles.modalSubtitulo}>{clinicaSelecionada}</Text>
 
-            {/* 👇 Nova Seleção de Horários (Veio do Banco) */}
+            {isError && (
+              <View style={{ padding: 20, alignItems: 'center' }}>
+          <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => { void tentarNovamente(); }} style={{ padding: 16 }}>
+            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+          </TouchableOpacity>
+        </View>
+            )}
             <Text style={styles.modalLabel}>SELECIONE O HORÁRIO:</Text>
             {carregandoAgendas ? (
               <ActivityIndicator color={colors.verdeMedio} style={{ marginBottom: 15 }} />
-            ) : listaAgendas.length === 0 ? (
+            ) : isError ? null : listaAgendas.length === 0 ? (
               <Text style={{ color: colors.cinza, marginBottom: 15, fontSize: 12 }}>
                 Nenhum horário disponível no momento.
               </Text>
@@ -230,7 +120,7 @@ export default function ConsultasScreen() {
                 showsHorizontalScrollIndicator={false} 
                 style={styles.scrollPets}
               >
-                {listaAgendas.map((agenda: any) => (
+                {listaAgendas.map((agenda) => (
                   <TouchableOpacity
                     key={agenda.id}
                     style={[
@@ -238,6 +128,7 @@ export default function ConsultasScreen() {
                       horarioSelecionado === agenda.dataHoraInicio && styles.petChipAtivo
                     ]}
                     onPress={() => setHorarioSelecionado(agenda.dataHoraInicio)}
+                    disabled={agendarMutation.isPending || isError}
                   >
                     <Text style={[
                       styles.textoPetChip,
@@ -257,16 +148,22 @@ export default function ConsultasScreen() {
                 placeholderTextColor={colors.cinza}
                 value={motivo}
                 onChangeText={setMotivo}
+                editable={!agendarMutation.isPending}
               />
             </View>
 
             <Text style={styles.modalLabel}>SELECIONE O PET:</Text>
+            {carregandoPets ? (
+              <ActivityIndicator color={colors.verdeEscuro} />
+            ) : !isError && listaPets.length === 0 ? (
+              <Text style={{ color: colors.cinza, marginBottom: 15 }}>Cadastre um pet antes de agendar.</Text>
+            ) : null}
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false} 
               style={styles.scrollPets}
             >
-              {listaPets.map((pet: any) => (
+              {listaPets.map((pet) => (
                 <TouchableOpacity
                   key={pet.id}
                   style={[
@@ -274,6 +171,7 @@ export default function ConsultasScreen() {
                     petSelecionado === pet.id && styles.petChipAtivo
                   ]}
                   onPress={() => setPetSelecionado(pet.id)}
+                  disabled={agendarMutation.isPending || isError}
                 >
                   <Text style={[
                     styles.textoPetChip,
@@ -288,7 +186,7 @@ export default function ConsultasScreen() {
             <TouchableOpacity 
               style={styles.botaoConfirmarModal} 
               onPress={handleAgendarApp}
-              disabled={agendarMutation.isPending}
+              disabled={agendarMutation.isPending || carregandoPets || carregandoAgendas || isError || !horarioSelecionado || !petSelecionado}
             >
               {agendarMutation.isPending ? (
                 <ActivityIndicator color={colors.roxoMuitoEscuro} />
