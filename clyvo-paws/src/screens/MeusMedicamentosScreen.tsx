@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useMedicamentos } from '../hooks/useMedicamento';
 import { useNavigation } from '@react-navigation/native';
 
 export default function MeusMedicamentosScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     medicamentos, isLoading, isFetching, isError, refetch, pagina, anterior, proxima
   } = useMedicamentos();
@@ -13,7 +15,7 @@ export default function MeusMedicamentosScreen() {
 
   const renderEmptyState = () => (
     <View style={styles.emptyCard}>
-      <MaterialCommunityIcons name="medical-bag" size={60} color={colors.verdeClaro} style={{ marginBottom: 15 }} />
+      <MaterialCommunityIcons name="medical-bag" size={60} color={colors.destaque} style={{ marginBottom: 15 }} />
       <Text style={styles.emptyTitle}>Nenhum medicamento encontrado</Text>
       <Text style={styles.emptyText}>
         Não há medicamentos nesta página. Os tratamentos prescritos aparecem aqui quando disponíveis.
@@ -41,14 +43,14 @@ export default function MeusMedicamentosScreen() {
 
       {isLoading ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color={colors.verdeEscuro} />
+          <ActivityIndicator size="large" color={colors.destaque} />
           <Text style={{ marginTop: 10, color: colors.cinza, fontWeight: 'bold' }}>Buscando tratamentos...</Text>
         </View>
       ) : isError ? (
         <View style={{ padding: 20, alignItems: 'center' }}>
           <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
           <TouchableOpacity accessibilityRole="button" onPress={() => { void refetch(); }} style={{ padding: 16 }}>
-            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+            <Text style={{ color: colors.destaque, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
           </TouchableOpacity>
         </View>
       ) : !medicamentos || medicamentos.content.length === 0 ? (
@@ -65,8 +67,8 @@ export default function MeusMedicamentosScreen() {
                   <Text style={styles.medNome}>{med.nome}</Text>
                 </View>
                 
-                <View style={[styles.badgeStatus, { backgroundColor: med.status === 'CONCLUIDO' ? '#D3D3D3' : colors.verdeClaro }]}>
-                  <Text style={[styles.textoStatus, { color: med.status === 'CONCLUIDO' ? '#666' : colors.roxoMuitoEscuro }]}>
+                <View style={[styles.badgeStatus, { backgroundColor: med.status === 'CONCLUIDO' ? colors.superficieSecundaria : colors.verdeClaro }]}>
+                  <Text style={[styles.textoStatus, { color: med.status === 'CONCLUIDO' ? colors.cinza : colors.roxoMuitoEscuro }]}>
                     {med.status === 'CONCLUIDO' ? 'CONCLUÍDO' : med.status === 'ATRASADO' ? 'ATRASADO' : 'EM DIA'}
                   </Text>
                 </View>
@@ -114,10 +116,10 @@ export default function MeusMedicamentosScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
   subtitulo: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: colors.verdeMedio,
+    color: colors.destaque,
   },
   centerContainer: {
     flex: 1,
@@ -187,12 +189,12 @@ const styles = StyleSheet.create({
   },
 
   medCard: {
-    borderColor: colors.roxoMuitoEscuro,
+    borderColor: colors.borda,
     borderWidth: 1,
     borderRadius: 20,
     padding: 15,
     marginBottom: 15,
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
   },
   medHeader: {
     flexDirection: 'row',
@@ -222,7 +224,7 @@ const styles = StyleSheet.create({
   petNome: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: colors.verdeEscuro,
+    color: colors.destaque,
     marginBottom: 10,
   },
   medDetalhes: {
