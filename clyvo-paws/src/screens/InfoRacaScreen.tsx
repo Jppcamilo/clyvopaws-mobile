@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 
 export default function InfoRacaScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { racaData } = route.params;
@@ -19,7 +21,7 @@ export default function InfoRacaScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.iconeAlerta}>
-          <MaterialCommunityIcons name="shield-check" size={50} color={colors.verdeEscuro} />
+          <MaterialCommunityIcons name="shield-check" size={50} color={colors.destaque} />
         </View>
 
         <Text style={styles.titulo}>PLANO PREVENTIVO</Text>
@@ -54,7 +56,7 @@ export default function InfoRacaScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerPrincipal: { 
     flex: 1, 
     backgroundColor: colors.verdeClaro, 
@@ -64,7 +66,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end', 
     marginBottom: 10 },
   botaoVoltar: { 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     width: 40, 
     height: 40, 
     borderRadius: 20, 
@@ -86,7 +88,7 @@ const styles = StyleSheet.create({
     marginBottom: 30, 
     fontWeight: '500' },
   cardInfo: { 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     borderRadius: 15, 
     padding: 20, 
     marginBottom: 15, 
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
   labelSecao: { 
     fontSize: 12, 
     fontWeight: '900', 
-    color: colors.verdeMedio, 
+    color: colors.destaque, 
     marginBottom: 8 },
   textoDestaque: { 
     fontSize: 18, 
