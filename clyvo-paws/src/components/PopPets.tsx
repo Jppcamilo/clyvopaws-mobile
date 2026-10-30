@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Pressable } from 'react-native';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CardPet from './CardPet';
 import type { Pet } from '../types';
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export default function PopPets({ visivel, fecharModal, listaPets }: Props) {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
 
   const irParaCadastro = () => {
@@ -77,14 +79,14 @@ export default function PopPets({ visivel, fecharModal, listaPets }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   bottomSheet: {
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 20,
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
   handleBar: {
     width: 60,
     height: 5,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: colors.superficieSecundaria,
     borderRadius: 5,
     alignSelf: 'center',
     marginBottom: 15,
@@ -136,3 +138,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   }
 });
+
