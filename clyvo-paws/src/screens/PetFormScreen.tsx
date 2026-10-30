@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { usePetForm } from '../hooks/usePetForm';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function PetFormScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     navigation, petParaEditar, nome, setNome, dataNascimento, setDataNascimento,
     mostraCalendario, setMostraCalendario, peso, setPeso, sexo, setSexo, descricao,
@@ -111,7 +113,7 @@ export default function PetFormScreen() {
       <Text style={styles.labelSecao}>NOME DO PET</Text>
 
       <View style={styles.inputContainer}>
-        <TextInput
+        <TextInput keyboardAppearance={modo}
           style={styles.input}
           placeholder="EX: REX"
           placeholderTextColor={colors.cinza}
@@ -135,6 +137,9 @@ export default function PetFormScreen() {
 
       {mostraCalendario && (
         <DateTimePicker
+          themeVariant={modo}
+          accentColor={colors.destaque}
+          textColor={colors.roxoMuitoEscuro}
           value={dataNascimento}
           mode="date"
           display="default"
@@ -152,7 +157,7 @@ export default function PetFormScreen() {
       <Text style={styles.labelSecao}>PESO (KG)</Text>
 
       <View style={styles.inputContainer}>
-        <TextInput
+        <TextInput keyboardAppearance={modo}
           style={styles.input}
           placeholder="EX: 5.5"
           placeholderTextColor={colors.cinza}
@@ -224,7 +229,7 @@ export default function PetFormScreen() {
       <Text style={styles.labelSecao}>DESCRIÇÃO</Text>
 
       <View style={[styles.inputContainer, styles.inputDescricaoContainer]}>
-        <TextInput
+        <TextInput keyboardAppearance={modo}
           style={[styles.input, styles.inputArea]}
           placeholder="Descreva a personalidade do pet..."
           placeholderTextColor={colors.cinza}
@@ -332,7 +337,7 @@ export default function PetFormScreen() {
           </ScrollView>
 
           <View style={styles.inputContainer}>
-            <TextInput
+            <TextInput keyboardAppearance={modo}
               style={styles.input}
               placeholder="Digite ou ajuste a raça"
               placeholderTextColor={colors.cinza}
@@ -373,10 +378,10 @@ export default function PetFormScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
   },
   conteudo: {
     paddingHorizontal: 20,
@@ -406,12 +411,12 @@ const styles = StyleSheet.create({
   labelSecao: {
     fontSize: 14,
     fontWeight: '900',
-    color: colors.verdeMedio,
+    color: colors.destaque,
     marginBottom: 5,
     marginTop: 10,
   },
   boxFoto: {
-    borderColor: colors.roxoMuitoEscuro,
+    borderColor: colors.borda,
     borderWidth: 1,
     borderRadius: 20,
     padding: 15,
@@ -437,7 +442,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 100,
     borderRadius: 10,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: colors.superficieSecundaria,
     justifyContent: 'center',
     alignItems: 'center',
     borderStyle: 'dashed',
@@ -470,7 +475,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   inputContainer: {
-    borderColor: colors.roxoMuitoEscuro,
+    borderColor: colors.borda,
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 15,
@@ -501,7 +506,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderColor: colors.roxoMuitoEscuro,
+    borderColor: colors.borda,
     borderWidth: 1,
     height: 50,
     borderRadius: 25,
