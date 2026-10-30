@@ -56,37 +56,40 @@ export function useSessaoApp() {
     if (!token) return;
 
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let encerrado = false;
+    let verificando = false;
+    let ativo = AppState.currentState === 'active';
 
-    const verificar = () => {
+    const verificar = async () => {
       if (timer) clearTimeout(timer);
-
-      const restante = expiracaoToken(token) - Date.now();
-
-      if (restante <= 0) {
-        void sessaoService.invalidar(token).catch((falha: unknown) => {
-          Alert.alert(
-            'Atenção',
-            falha instanceof Error
-              ? falha.message
-              : 'Falha ao limpar a sessão.',
-          );
-        });
-      } else {
-        timer = setTimeout(verificar, Math.min(restante, 60000));
+      if (encerrado || !ativo || verificando) return;
+      verificando = true;
+      try {
+        await sessaoService.obterToken();
+      } catch {
+      } finally {
+        verificando = false;
+        if (!encerrado && ativo) {
+          const atual = sessaoService.obterEstado().token;
+          const restante = atual ? expiracaoToken(atual) - Date.now() - 30000 : 60000;
+          timer = setTimeout(() => { void verificar(); }, Math.max(15000, Math.min(restante, 60000)));
+        }
       }
     };
 
-    verificar();
-
+    void verificar();
     const assinatura = AppState.addEventListener('change', (estado) => {
-      if (estado === 'active') verificar();
+      ativo = estado === 'active';
+      if (timer) clearTimeout(timer);
+      if (ativo) void verificar();
     });
 
     return () => {
+      encerrado = true;
       if (timer) clearTimeout(timer);
       assinatura.remove();
     };
-  }, [sessao.token]);
+  }, [sessao.token, sessao.geracao]);
 
   return {
     sessao,
