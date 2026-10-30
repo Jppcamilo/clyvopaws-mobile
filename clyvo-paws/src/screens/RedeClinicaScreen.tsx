@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useRedeClinica } from '../hooks/useRedeClinica';
 
 export default function RedeClinicaScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     navigation, localizacaoTexto, carregandoLocal, erroLocalizacao, buscarLocalizacao
   } = useRedeClinica();
@@ -21,11 +23,11 @@ export default function RedeClinicaScreen() {
       <Text style={styles.titulo}>REDE CLÍNICA</Text>
 
       <View style={styles.boxLocalizacao}>
-        <MaterialCommunityIcons name="map-marker-radius" size={28} color={colors.verdeEscuro} />
+        <MaterialCommunityIcons name="map-marker-radius" size={28} color={colors.destaque} />
         <View style={styles.textosLocalizacao}>
           <Text style={styles.subtituloLocalizacao}>ENCONTRE CLÍNICAS PERTO DE VOCÊ:</Text>
           {carregandoLocal ? (
-            <ActivityIndicator size="small" color={colors.verdeEscuro} style={{ alignSelf: 'flex-start', marginTop: 5 }} />
+            <ActivityIndicator size="small" color={colors.destaque} style={{ alignSelf: 'flex-start', marginTop: 5 }} />
           ) : (
             <Text style={styles.textoEnderecoAtual}>{localizacaoTexto}</Text>
           )}
@@ -36,7 +38,7 @@ export default function RedeClinicaScreen() {
         <View style={{ marginBottom: 20 }}>
           <Text style={{ color: colors.cinza }}>{erroLocalizacao}</Text>
           <TouchableOpacity onPress={() => { void buscarLocalizacao(); }} disabled={carregandoLocal} style={{ paddingVertical: 12 }}>
-            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR LOCALIZAÇÃO NOVAMENTE</Text>
+            <Text style={{ color: colors.destaque, fontWeight: 'bold' }}>TENTAR LOCALIZAÇÃO NOVAMENTE</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -97,10 +99,10 @@ export default function RedeClinicaScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     paddingHorizontal: 20, 
     paddingTop: 50 
   },
@@ -139,7 +141,7 @@ const styles = StyleSheet.create({
   subtituloLocalizacao: { 
     fontSize: 12, 
     fontWeight: '900', 
-    color: colors.verdeEscuro, 
+    color: colors.destaque, 
     textTransform: 'uppercase' 
   },
   textoEnderecoAtual: { 
@@ -185,7 +187,7 @@ const styles = StyleSheet.create({
   tagDistancia: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     paddingHorizontal: 10, 
     paddingVertical: 5, 
     borderRadius: 15 
@@ -203,7 +205,7 @@ const styles = StyleSheet.create({
     lineHeight: 18 
   },
   textoTelefone: { 
-    color: colors.verdeClaro, 
+    color: colors.textoSobreVerde, 
     fontWeight: '900', 
     fontSize: 14, 
     textAlign: 'right' 
