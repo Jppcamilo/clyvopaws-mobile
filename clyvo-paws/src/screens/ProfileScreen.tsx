@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { usePerfil } from '../hooks/usePerfil';
 
 export default function ProfileScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     navigation, carregando, isError, tentarNovamente, nome, setNome, email, setEmail,
     cpf, setCpf, telefone, setTelefone, foto, escolherFoto, escolhendoFoto,
@@ -15,7 +17,7 @@ export default function ProfileScreen() {
   if (carregando) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color={colors.verdeEscuro} />
+        <ActivityIndicator size="large" color={colors.destaque} />
       </View>
     );
   }
@@ -26,7 +28,7 @@ export default function ProfileScreen() {
         <View style={{ padding: 20, alignItems: 'center' }}>
           <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
           <TouchableOpacity accessibilityRole="button" onPress={() => { void tentarNovamente(); }} style={{ padding: 16 }}>
-            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+            <Text style={{ color: colors.destaque, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={() => navigation.goBack()} disabled={ocupado} style={{ padding: 16 }}>
@@ -61,25 +63,25 @@ export default function ProfileScreen() {
       <Text style={styles.labelSecao}>NOME COMPLETO</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="account-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput editable={!ocupado} style={styles.input} value={nome} onChangeText={setNome} placeholderTextColor={colors.cinza} />
+        <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} value={nome} onChangeText={setNome} placeholderTextColor={colors.cinza} />
       </View>
 
       <Text style={styles.labelSecao}>E-MAIL</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="email-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput editable={!ocupado} style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor={colors.cinza} />
+        <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor={colors.cinza} />
       </View>
 
       <Text style={styles.labelSecao}>CPF</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="card-account-details-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput editable={!ocupado} style={styles.input} value={cpf} onChangeText={setCpf} keyboardType="numeric" placeholderTextColor={colors.cinza} />
+        <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} value={cpf} onChangeText={setCpf} keyboardType="numeric" placeholderTextColor={colors.cinza} />
       </View>
 
       <Text style={styles.labelSecao}>TELEFONE</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="phone-outline" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeInput} />
-        <TextInput editable={!ocupado} style={styles.input} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" placeholderTextColor={colors.cinza} />
+        <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" placeholderTextColor={colors.cinza} />
       </View>
 
       <TouchableOpacity 
@@ -111,10 +113,10 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     paddingHorizontal: 20, 
     paddingTop: 50 },
   header: { 
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     width: 100, 
     height: 100, 
     borderRadius: 50, 
-    backgroundColor: '#E0E0E0', 
+    backgroundColor: colors.superficieSecundaria, 
     marginBottom: 10 },
   botaoAlterarFoto: { 
     flexDirection: 'row', 
@@ -159,12 +161,12 @@ const styles = StyleSheet.create({
   labelSecao: { 
     fontSize: 14, 
     fontWeight: '900', 
-    color: colors.verdeMedio, 
+    color: colors.destaque, 
     marginBottom: 5 },
   inputContainer: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    borderColor: colors.roxoMuitoEscuro, 
+    borderColor: colors.borda, 
     borderWidth: 1, 
     borderRadius: 20, 
     paddingHorizontal: 15, 
@@ -188,7 +190,7 @@ const styles = StyleSheet.create({
     fontWeight: '900', 
     fontSize: 16 },
   botaoDeletar: { 
-    backgroundColor: '#D9534F', 
+    backgroundColor: colors.perigoFundo, 
     borderRadius: 25, 
     paddingVertical: 15, 
     alignItems: 'center', 
