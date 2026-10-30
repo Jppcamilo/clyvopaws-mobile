@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useChat } from '../hooks/useChat';
 
 export default function ChatScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     navigation, textoInput, setTextoInput, mensagens, opcoesRapidas, enviarMensagem
   } = useChat();
@@ -68,7 +70,7 @@ export default function ChatScreen() {
       </ScrollView>
  
       <View style={styles.footer}>
-        <TextInput
+        <TextInput keyboardAppearance={modo}
           style={styles.input}
           placeholder="Digite sua mensagem"
           placeholderTextColor={colors.cinza}
@@ -81,17 +83,17 @@ export default function ChatScreen() {
           onPress={() => enviarMensagem(textoInput)}
           disabled={!textoInput.trim()}
         >
-          <MaterialCommunityIcons name="send" size={24} color={colors.verdeEscuro} />
+          <MaterialCommunityIcons name="send" size={24} color={colors.destaque} />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 }
  
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerPrincipal: { 
     flex: 1, 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     paddingTop: 50 
   },
   header: { 
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
   },
   linhaDivisoria: { 
     height: 1, 
-    backgroundColor: '#EAEAEA', 
+    backgroundColor: colors.borda, 
     width: '100%' 
   },
   scrollContainer: { 
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     marginBottom: 5 
   },
   balaoBot: { 
-    backgroundColor: '#F0F4F8', 
+    backgroundColor: colors.superficieSecundaria, 
     padding: 12, 
     borderRadius: 15, 
     borderBottomLeftRadius: 5 
@@ -199,12 +201,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15, 
     paddingVertical: 10,
     borderTopWidth: 1, 
-    borderColor: '#EAEAEA', 
-    backgroundColor: colors.branco 
+    borderColor: colors.borda, 
+    backgroundColor: colors.superficie 
   },
   input: {
     flex: 1, 
-    backgroundColor: '#F5F5F5', 
+    backgroundColor: colors.superficieSecundaria, 
     borderRadius: 25, 
     paddingHorizontal: 20, 
     height: 50, 
