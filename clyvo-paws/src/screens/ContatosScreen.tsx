@@ -9,9 +9,11 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
  
 export default function ContatosScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
  
   const abrirLink = (url: string) => {
@@ -97,10 +99,10 @@ export default function ContatosScreen() {
   );
 }
  
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerPrincipal: { 
     flex: 1, 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     paddingHorizontal: 20, 
     paddingTop: 50 },
   scrollContainer: { 
@@ -134,12 +136,12 @@ const styles = StyleSheet.create({
     fontWeight: '500', 
     marginBottom: 15 },
   linkTexto: { 
-    color: colors.verdeEscuro, 
+    color: colors.destaque, 
     fontWeight: 'bold', 
     textDecorationLine: 'underline' },
   cardContato: { 
-    backgroundColor: colors.branco, 
-    borderColor: '#EAEAEA', 
+    backgroundColor: colors.superficie, 
+    borderColor: colors.borda, 
     borderWidth: 1, 
     borderRadius: 15, 
     padding: 20, 
@@ -155,12 +157,12 @@ const styles = StyleSheet.create({
     fontWeight: '500' },
   numeroTelefone: { 
     fontSize: 16, 
-    color: colors.verdeEscuro, 
+    color: colors.destaque, 
     fontWeight: 'bold', 
     textDecorationLine: 'underline' },
   linkTextoCard: { 
     fontSize: 16, 
-    color: colors.verdeEscuro, 
+    color: colors.destaque, 
     fontWeight: 'bold', 
     textDecorationLine: 'underline' },
   espaco: { 

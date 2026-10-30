@@ -8,9 +8,11 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
  
 export default function EnderecosScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
  
   return (
@@ -37,7 +39,7 @@ export default function EnderecosScreen() {
           <View style={styles.divisor} />
          
           <View style={styles.linhaHorario}>
-            <MaterialCommunityIcons name="clock-outline" size={16} color={colors.verdeEscuro} style={{ marginRight: 5 }} />
+            <MaterialCommunityIcons name="clock-outline" size={16} color={colors.destaque} style={{ marginRight: 5 }} />
             <Text style={styles.textoHorario}>Atendimento de 2ª a 6ª das 8h30 às 17h</Text>
           </View>
         </View>
@@ -51,7 +53,7 @@ export default function EnderecosScreen() {
           <View style={styles.divisor} />
          
           <View style={styles.linhaHorario}>
-            <MaterialCommunityIcons name="clock-outline" size={16} color={colors.verdeEscuro} style={{ marginRight: 5 }} />
+            <MaterialCommunityIcons name="clock-outline" size={16} color={colors.destaque} style={{ marginRight: 5 }} />
             <Text style={styles.textoHorario}>Atendimento de 2ª a 6ª das 8h30 às 17h</Text>
           </View>
         </View>
@@ -62,10 +64,10 @@ export default function EnderecosScreen() {
   );
 }
  
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerPrincipal: {
     flex: 1,
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
     paddingHorizontal: 20,
     paddingTop: 50
   },
@@ -105,8 +107,8 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   cardEndereco: {
-    backgroundColor: colors.branco,
-    borderColor: '#EAEAEA',
+    backgroundColor: colors.superficie,
+    borderColor: colors.borda,
     borderWidth: 1,
     borderRadius: 15,
     padding: 20,
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
   },
   divisor: {
     height: 1,
-    backgroundColor: '#EAEAEA',
+    backgroundColor: colors.borda,
     marginVertical: 15
   },
   linhaHorario: {
