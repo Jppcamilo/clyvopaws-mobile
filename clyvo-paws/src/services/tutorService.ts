@@ -1,4 +1,5 @@
 import api from './api';
+import { salvarComFoto } from './fotoService';
 import type {
   Id,
   Tutor,
@@ -31,7 +32,7 @@ function normalizarTutor(tutor: Tutor): Tutor {
 
 export const tutorService = {
   async cadastrar(dados: CadastroTutor): Promise<Tutor> {
-    const { data } = await api.post<Tutor>('/tutores', dados);
+    const data = await salvarComFoto<Tutor>('post', '/tutores', dados, 'fotoUrl');
 
     return normalizarTutor(data);
   },
@@ -46,10 +47,7 @@ export const tutorService = {
     id: Id,
     dados: AtualizacaoTutor,
   ): Promise<Tutor> {
-    const { data } = await api.put<Tutor>(
-      `/tutores/${id}`,
-      dados,
-    );
+    const data = await salvarComFoto<Tutor>('put', `/tutores/${id}`, dados, 'foto');
 
     return normalizarTutor(data);
   },
