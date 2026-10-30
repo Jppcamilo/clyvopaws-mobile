@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import type { Pet } from '../types';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { calcularIdade } from '../utils/dateUtils';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export default function CardPet({ pet }: Props) {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
 
   const fotoUri: string =
     pet.fotoUrl ||
@@ -42,11 +44,11 @@ export default function CardPet({ pet }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: {
     flexDirection: 'row', 
-    backgroundColor: colors.branco,
-    borderColor: colors.roxoMuitoEscuro,
+    backgroundColor: colors.superficie,
+    borderColor: colors.borda,
     borderWidth: 1,
     borderRadius: 20,
     padding: 15,
@@ -58,14 +60,14 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30, 
     marginRight: 15, 
-    backgroundColor: '#E0E0E0',
+    backgroundColor: colors.superficieSecundaria,
   },
   infoContainer: {
     flex: 1,
     justifyContent: 'center',
   },
   nomePet: {
-    color: colors.verdeEscuro,
+    color: colors.destaque,
     fontSize: 16,
     fontWeight: '900',
     marginBottom: 5,
@@ -94,3 +96,4 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase'
   }
 });
+
