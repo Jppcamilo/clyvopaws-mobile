@@ -1,4 +1,5 @@
 import api from './api';
+import { salvarComFoto } from './fotoService';
 import type { Pet } from '../types';
 import type { Id, PetPayload } from '../types/api';
 
@@ -17,13 +18,11 @@ export const petService = {
   },
 
   async cadastrar(dados: PetPayload) {
-    const { data } = await api.post<Pet>('/pets', dados);
-    return data;
+    return salvarComFoto<Pet>('post', '/pets', dados, 'fotoUrl');
   },
 
   async atualizar(id: Id, dados: PetPayload) {
-    const { data } = await api.put<Pet>(`/pets/${id}`, dados);
-    return data;
+    return salvarComFoto<Pet>('put', `/pets/${id}`, dados, 'fotoUrl');
   },
 
   async excluir(id: Id) {
