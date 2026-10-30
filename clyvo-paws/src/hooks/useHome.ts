@@ -22,7 +22,7 @@ export function useHome() {
   const nomeTutor =
     sessao.data?.nomeCompleto.trim().split(/\s+/)[0] ?? '';
   const fotoTutor = sessao.data?.fotoUrl ?? null;
-
+  
   const listaPets = petsQuery.data ?? [];
 
   const agendamentosQuery = useQuery({

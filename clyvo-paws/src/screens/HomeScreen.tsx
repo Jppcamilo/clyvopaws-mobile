@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useHome } from '../hooks/useHome';
 import PopPerfil from '../components/PopPerfil';
 import PopPets from '../components/PopPets';
 
 export default function HomeScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     navigation, modalPerfilVisivel, setModalPerfilVisivel, modalPetsVisivel,
     setModalPetsVisivel, nomeTutor, fotoTutor, listaPets, agendamentosGerais,
@@ -29,13 +31,13 @@ export default function HomeScreen() {
       <View style={styles.secaoLembretes}>
         {carregandoAgendamentos || carregandoPets ? (
            <View style={[styles.secaoVazia, { backgroundColor: 'transparent' }]}>
-             <ActivityIndicator size="small" color={colors.verdeEscuro} />
+             <ActivityIndicator size="small" color={colors.destaque} />
            </View>
         ) : isError ? (
         <View style={{ padding: 20, alignItems: 'center' }}>
           <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
           <TouchableOpacity accessibilityRole="button" onPress={() => { void tentarNovamente(); }} style={{ padding: 16 }}>
-            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+            <Text style={{ color: colors.destaque, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
           </TouchableOpacity>
         </View>
         ) : agendamentosGerais.length > 0 ? (
@@ -56,7 +58,7 @@ export default function HomeScreen() {
                         {ag.titulo}
                       </Text>
                       <View style={styles.linhaDataHora}>
-                        <MaterialCommunityIcons name="calendar-clock" size={14} color={colors.verdeMedio} />
+                        <MaterialCommunityIcons name="calendar-clock" size={14} color={colors.destaque} />
                         <Text style={styles.textoDataHora}>{formatarData(ag.dataHora)}</Text>
                       </View>
                     </View>
@@ -141,22 +143,22 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.branco, paddingHorizontal: 20, paddingTop: 50 },
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.superficie, paddingHorizontal: 20, paddingTop: 50 },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 40 },
-  fotoPerfil: { width: 90, height: 90, borderRadius: 45, marginRight: 20, backgroundColor: '#E0E0E0' },
+  fotoPerfil: { width: 90, height: 90, borderRadius: 45, marginRight: 20, backgroundColor: colors.superficieSecundaria },
   containerSaudacao: { justifyContent: 'center' },
-  labelMenu: { color: colors.verdeMedio, fontWeight: 'bold', fontSize: 17 },
+  labelMenu: { color: colors.destaque, fontWeight: 'bold', fontSize: 17 },
   tituloNome: { fontSize: 25, fontWeight: '900', color: colors.roxoMuitoEscuro },
   secaoLembretes: { marginBottom: 30 },
-  secaoVazia: { backgroundColor: '#f0f0f0', padding: 15, borderRadius: 15, alignItems: 'center' },
+  secaoVazia: { backgroundColor: colors.superficieSecundaria, padding: 15, borderRadius: 15, alignItems: 'center' },
   textoVazio: { color: colors.cinza, fontWeight: 'bold' },
   tituloSecao: { fontSize: 18, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 15 },
-  cardAgendamentoHome: { flexDirection: 'row', backgroundColor: colors.branco, borderColor: colors.roxoMuitoEscuro, borderWidth: 1, borderRadius: 15, padding: 15, marginRight: 15, width: 250, alignItems: 'center' },
+  cardAgendamentoHome: { flexDirection: 'row', backgroundColor: colors.superficie, borderColor: colors.borda, borderWidth: 1, borderRadius: 15, padding: 15, marginRight: 15, width: 250, alignItems: 'center' },
   fotoMiniPet: { width: 45, height: 45, borderRadius: 22.5, marginRight: 12 },
   tituloAgendamento: { fontSize: 14, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 4 },
   linhaDataHora: { flexDirection: 'row', alignItems: 'center' },
-  textoDataHora: { fontSize: 12, fontWeight: 'bold', color: colors.verdeMedio, marginLeft: 5 },
+  textoDataHora: { fontSize: 12, fontWeight: 'bold', color: colors.destaque, marginLeft: 5 },
   scrollIcones: { flexDirection: 'row', marginBottom: 40, marginHorizontal: -20, paddingHorizontal: 20 },
   itemIconeScroll: { alignItems: 'center', width: 85, marginRight: 10 },
   circuloIcone: { width: 70, height: 70, borderRadius: 35, backgroundColor: colors.verdeEscuro, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
@@ -164,10 +166,10 @@ const styles = StyleSheet.create({
   bannerPets: { backgroundColor: colors.verdeEscuro, borderRadius: 20, padding: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 30 },
   textoBanner: { flex: 1 },
   tituloBanner: { backgroundColor: colors.verdeClaro, alignSelf: 'flex-start', paddingHorizontal: 20, paddingVertical: 4, borderRadius: 15, fontSize: 16, fontWeight: '900', color: colors.roxoMuitoEscuro, marginBottom: 10 },
-  subtituloBanner: { color: colors.verdeClaro, fontSize: 10, fontWeight: '900' },
+  subtituloBanner: { color: colors.textoSobreVerde, fontSize: 10, fontWeight: '900' },
   circuloSeta: { backgroundColor: colors.verdeMedio, width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center' },
   containerDuplo: { flexDirection: 'row', justifyContent: 'space-between' },
   boxPequeno: { backgroundColor: colors.verdeEscuro, width: '47%', borderRadius: 15, padding: 15, height: 100, justifyContent: 'space-between' },
-  tituloBox: { color: colors.verdeClaro, fontSize: 12, fontWeight: '900' },
-  nomePetCard: { fontSize: 12, fontWeight: '900', color: colors.verdeMedio, textTransform: 'uppercase', marginBottom: 2 }
+  tituloBox: { color: colors.textoSobreVerde, fontSize: 12, fontWeight: '900' },
+  nomePetCard: { fontSize: 12, fontWeight: '900', color: colors.destaque, textTransform: 'uppercase', marginBottom: 2 }
 });
