@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useCadastro } from '../hooks/useCadastro';
 
 export default function RegisterScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     navigation, nome, setNome, cpf, setCpf, telefone, setTelefone, email, setEmail,
     senha, setSenha, foto, escolherFoto, escolhendoFoto, registerMutation, handleCadastrar
@@ -38,19 +40,19 @@ export default function RegisterScreen() {
       </View>
 
       <Text style={styles.labelSecao}>NOME</Text>
-      <TextInput editable={!ocupado} style={styles.input} placeholder="NOME COMPLETO" placeholderTextColor={colors.roxoMuitoEscuro} value={nome} onChangeText={setNome} textAlign="center" />
+      <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} placeholder="NOME COMPLETO" placeholderTextColor={colors.roxoMuitoEscuro} value={nome} onChangeText={setNome} textAlign="center" />
 
       <Text style={styles.labelSecao}>CPF</Text>
-      <TextInput editable={!ocupado} style={styles.input} placeholder="000.000.000-00" placeholderTextColor={colors.roxoMuitoEscuro} value={cpf} onChangeText={setCpf} keyboardType="numeric" textAlign="center" />
+      <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} placeholder="000.000.000-00" placeholderTextColor={colors.roxoMuitoEscuro} value={cpf} onChangeText={setCpf} keyboardType="numeric" textAlign="center" />
 
       <Text style={styles.labelSecao}>TELEFONE</Text>
-      <TextInput editable={!ocupado} style={styles.input} placeholder="+55 11 90000-0000" placeholderTextColor={colors.roxoMuitoEscuro} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" textAlign="center" />
+      <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} placeholder="+55 11 90000-0000" placeholderTextColor={colors.roxoMuitoEscuro} value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" textAlign="center" />
 
       <Text style={styles.labelSecao}>EMAIL</Text>
-      <TextInput editable={!ocupado} style={styles.input} placeholder="SEU@EMAIL.COM" placeholderTextColor={colors.roxoMuitoEscuro} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="center" />
+      <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} placeholder="SEU@EMAIL.COM" placeholderTextColor={colors.roxoMuitoEscuro} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="center" />
 
       <Text style={styles.labelSecao}>SENHA</Text>
-      <TextInput editable={!ocupado} style={styles.input} placeholder="CRIE SUA SENHA" placeholderTextColor={colors.roxoMuitoEscuro} value={senha} onChangeText={setSenha} secureTextEntry textAlign="center" />
+      <TextInput keyboardAppearance={modo} editable={!ocupado} style={styles.input} placeholder="CRIE SUA SENHA" placeholderTextColor={colors.roxoMuitoEscuro} value={senha} onChangeText={setSenha} secureTextEntry textAlign="center" />
 
       <TouchableOpacity 
         style={styles.botaoCadastrar} 
@@ -69,10 +71,10 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     paddingHorizontal: 20, 
     paddingTop: 50 
   },
@@ -98,11 +100,11 @@ const styles = StyleSheet.create({
   labelSecao: { 
     fontSize: 14, 
     fontWeight: '900', 
-    color: colors.verdeMedio, 
+    color: colors.destaque, 
     marginBottom: 5 
   },
   boxFoto: { 
-    borderColor: colors.roxoMuitoEscuro, 
+    borderColor: colors.borda, 
     borderWidth: 1, 
     borderRadius: 20, 
     padding: 15, 
@@ -123,13 +125,13 @@ const styles = StyleSheet.create({
     width: 180, 
     height: 120, 
     borderRadius: 10, 
-    backgroundColor: '#E0E0E0' 
+    backgroundColor: colors.superficieSecundaria 
   },
   placeholderImagem: { 
     width: 180, 
     height: 120, 
     borderRadius: 10, 
-    backgroundColor: '#F0F0F0', 
+    backgroundColor: colors.superficieSecundaria, 
     justifyContent: 'center', 
     alignItems: 'center', 
     borderStyle: 'dashed', 
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     marginTop: 5 
   },
   input: { 
-    borderColor: colors.roxoMuitoEscuro, 
+    borderColor: colors.borda, 
     borderWidth: 1, 
     borderRadius: 25, 
     height: 55, 
