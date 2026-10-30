@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useConsultas } from '../hooks/useConsultas';
 
 export default function ConsultaScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     navigation, modalVisivel, setModalVisivel, clinicaSelecionada, horarioSelecionado,
     setHorarioSelecionado, motivo, setMotivo, petSelecionado, setPetSelecionado,
@@ -13,7 +15,7 @@ export default function ConsultaScreen() {
   } = useConsultas();
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.branco }}>
+    <View style={{ flex: 1, backgroundColor: colors.superficie }}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         
         <View style={styles.header}>
@@ -103,13 +105,13 @@ export default function ConsultaScreen() {
               <View style={{ padding: 20, alignItems: 'center' }}>
           <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
           <TouchableOpacity accessibilityRole="button" onPress={() => { void tentarNovamente(); }} style={{ padding: 16 }}>
-            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+            <Text style={{ color: colors.destaque, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
           </TouchableOpacity>
         </View>
             )}
             <Text style={styles.modalLabel}>SELECIONE O HORÁRIO:</Text>
             {carregandoAgendas ? (
-              <ActivityIndicator color={colors.verdeMedio} style={{ marginBottom: 15 }} />
+              <ActivityIndicator color={colors.destaque} style={{ marginBottom: 15 }} />
             ) : isError ? null : listaAgendas.length === 0 ? (
               <Text style={{ color: colors.cinza, marginBottom: 15, fontSize: 12 }}>
                 Nenhum horário disponível no momento.
@@ -142,7 +144,7 @@ export default function ConsultaScreen() {
             )}
 
             <View style={styles.inputContainer}>
-              <TextInput 
+              <TextInput keyboardAppearance={modo} 
                 style={styles.input} 
                 placeholder="Motivo (Ex: Vacina, Check-up...)"
                 placeholderTextColor={colors.cinza}
@@ -154,7 +156,7 @@ export default function ConsultaScreen() {
 
             <Text style={styles.modalLabel}>SELECIONE O PET:</Text>
             {carregandoPets ? (
-              <ActivityIndicator color={colors.verdeEscuro} />
+              <ActivityIndicator color={colors.destaque} />
             ) : !isError && listaPets.length === 0 ? (
               <Text style={{ color: colors.cinza, marginBottom: 15 }}>Cadastre um pet antes de agendar.</Text>
             ) : null}
@@ -209,7 +211,7 @@ export default function ConsultaScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
@@ -321,7 +323,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   modalContent: {
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
     width: '100%',
     borderRadius: 20,
     padding: 25,
@@ -336,12 +338,12 @@ const styles = StyleSheet.create({
   modalSubtitulo: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: colors.verdeMedio,
+    color: colors.destaque,
     marginBottom: 25,
   },
   inputContainer: {
     width: '100%',
-    borderColor: colors.roxoMuitoEscuro,
+    borderColor: colors.borda,
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 15,
@@ -374,7 +376,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textoBotaoCancelar: {
-    color: '#FF3B30',
+    color: colors.erro,
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -383,7 +385,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     fontSize: 12,
     fontWeight: '900',
-    color: colors.verdeMedio,
+    color: colors.destaque,
     marginBottom: 10,
     marginTop: 5,
   },
@@ -396,7 +398,7 @@ const styles = StyleSheet.create({
   },
 
   petChip: {
-    backgroundColor: '#F0F0F0',
+    backgroundColor: colors.superficieSecundaria,
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 20,
@@ -407,7 +409,7 @@ const styles = StyleSheet.create({
 
   petChipAtivo: {
     backgroundColor: colors.verdeClaro,
-    borderColor: colors.roxoMuitoEscuro,
+    borderColor: colors.borda,
     borderWidth: 1,
   },
 
