@@ -8,10 +8,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useLogin } from '../hooks/useLogin';
 
 export default function LoginScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     navigation,
     email,
@@ -33,7 +35,7 @@ export default function LoginScreen() {
           <Text style={styles.logoTexto}>CLYVOPAWS</Text>
         </View>
 
-        <TextInput
+        <TextInput keyboardAppearance={modo}
           style={styles.input}
           placeholder="E-MAIL..."
           placeholderTextColor={colors.roxoMuitoEscuro}
@@ -47,7 +49,7 @@ export default function LoginScreen() {
           accessibilityLabel="E-mail"
         />
 
-        <TextInput
+        <TextInput keyboardAppearance={modo}
           style={styles.input}
           placeholder="SENHA..."
           placeholderTextColor={colors.roxoMuitoEscuro}
@@ -107,10 +109,10 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
   },
 
   bgDiagonal: {
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    borderColor: colors.roxoMuitoEscuro,
+    borderColor: colors.borda,
     borderWidth: 1,
     borderRadius: 25,
     height: 60,
@@ -153,7 +155,7 @@ const styles = StyleSheet.create({
     color: colors.roxoMuitoEscuro,
     fontWeight: '900',
     fontSize: 16,
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
   },
 
   botaoLogar: {
