@@ -10,10 +10,12 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { Produto } from '../types';
  
 export default function ProductDetailsScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
  
@@ -55,7 +57,7 @@ export default function ProductDetailsScreen() {
           </View>
  
           <View style={styles.boxBeneficios}>
-            <MaterialCommunityIcons name="truck-delivery-outline" size={24} color={colors.verdeEscuro} />
+            <MaterialCommunityIcons name="truck-delivery-outline" size={24} color={colors.destaque} />
             <View style={styles.textosBeneficios}>
               <Text style={styles.tituloBeneficio}>Entrega Padrão Clyvo</Text>
               <Text style={styles.subtituloBeneficio}>Receba amanhã no seu endereço.</Text>
@@ -98,10 +100,10 @@ export default function ProductDetailsScreen() {
   );
 }
  
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerPrincipal: {
      flex: 1, 
-    backgroundColor: colors.branco },
+    backgroundColor: colors.superficie },
   botaoVoltarFlutuante: { 
     position: 'absolute', 
     top: 50, 
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25, 
     shadowRadius: 3.84 },
   containerImagem: { 
-    backgroundColor: '#F8F8F8', 
+    backgroundColor: colors.superficieSecundaria, 
     width: '100%', 
     height: 350, 
     justifyContent: 'center', 
@@ -163,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: 2 },
   precoNovo: { 
     fontSize: 28, 
-    color: colors.verdeMedio, 
+    color: colors.destaque, 
     fontWeight: '900' },
   boxBeneficios: { 
     flexDirection: 'row', 
@@ -178,7 +180,7 @@ const styles = StyleSheet.create({
   tituloBeneficio: { 
     fontSize: 14, 
     fontWeight: 'bold', 
-    color: colors.verdeEscuro },
+    color: colors.destaque },
   subtituloBeneficio: { 
     fontSize: 12, 
     color: colors.roxoMuitoEscuro, 
@@ -199,12 +201,12 @@ const styles = StyleSheet.create({
     bottom: 0, 
     left: 0, 
     right: 0, 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     flexDirection: 'row', 
     padding: 20, 
     paddingTop: 15, 
     borderTopWidth: 1, 
-    borderColor: '#EEEEEE', 
+    borderColor: colors.borda, 
     elevation: 15, 
     shadowColor: '#000', 
     shadowOffset: { width: 0, height: -3 }, 
@@ -213,7 +215,7 @@ const styles = StyleSheet.create({
   controleQuantidade: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    backgroundColor: '#F0F0F0', 
+    backgroundColor: colors.superficieSecundaria, 
     borderRadius: 25, 
     paddingHorizontal: 5, 
     height: 50, 

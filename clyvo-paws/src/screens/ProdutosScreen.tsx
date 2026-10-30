@@ -10,12 +10,14 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { Produto } from '../types';
 
 import { CATEGORIAS, PROMOCOES, REMEDIOS, COSMETICOS } from '../data/produtos';
 
 export default function ProdutosScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
   const [busca, setBusca] = useState('');
 
@@ -57,7 +59,7 @@ export default function ProdutosScreen() {
 
         <View style={styles.containerBusca}>
           <MaterialCommunityIcons name="magnify" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeBusca} />
-          <TextInput 
+          <TextInput keyboardAppearance={modo} 
             style={styles.inputBusca}
             placeholder="BUSCAR NOME"
             placeholderTextColor={colors.cinza}
@@ -97,10 +99,10 @@ export default function ProdutosScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerPrincipal: { 
     flex: 1, 
-    backgroundColor: colors.branco },
+    backgroundColor: colors.superficie },
   header: { 
     paddingHorizontal: 20, 
     paddingTop: 50, 
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
   containerBusca: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    borderColor: colors.roxoMuitoEscuro, 
+    borderColor: colors.borda, 
     borderWidth: 1, 
     borderRadius: 25, 
     height: 45, 
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
   itemCategoria: { 
     marginHorizontal: 10 },
   textoCategoria: { 
-    color: colors.roxoMuitoEscuro, 
+    color: colors.textoSobreVerde, 
     fontWeight: '900', 
     fontSize: 12 },
   tituloSecao: { 
@@ -165,7 +167,7 @@ const styles = StyleSheet.create({
     borderRadius: 15, 
     padding: 10, 
     marginHorizontal: 5, 
-    backgroundColor: colors.branco },
+    backgroundColor: colors.superficie },
   imagemProduto: { 
     width: '100%', 
     height: 80, 
@@ -183,6 +185,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold' },
   precoNovo: { 
     fontSize: 14, 
-    color: colors.verdeMedio, 
+    color: colors.destaque, 
     fontWeight: '900' }
 });
