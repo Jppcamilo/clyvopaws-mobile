@@ -1,4 +1,5 @@
 import React from 'react';
+import SeletorTema from '../components/SeletorTema';
 import {
   View,
   Text,
@@ -7,11 +8,13 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useNavigation } from '@react-navigation/native';
  
  
 export default function AjudaScreen() {
+  const { colors, styles } = useEstilosTema(criarEstilos);
  
     const navigation = useNavigation<any>();
    
@@ -29,7 +32,7 @@ export default function AjudaScreen() {
  
         <TouchableOpacity style={styles.cardAjuda} activeOpacity={0.7} onPress={() => navigation.navigate('Chat')}>
           <View style={styles.iconeContainer}>
-            <MaterialCommunityIcons name="chat-processing-outline" size={28} color={colors.verdeEscuro} />
+            <MaterialCommunityIcons name="chat-processing-outline" size={28} color={colors.destaque} />
           </View>
           <View style={styles.textosContainer}>
             <Text style={styles.tituloCard}>Chat</Text>
@@ -46,7 +49,7 @@ export default function AjudaScreen() {
           onPress={() => navigation.navigate('Contatos')}
         >
           <View style={styles.iconeContainer}>
-            <MaterialCommunityIcons name="headset" size={28} color={colors.verdeEscuro} />
+            <MaterialCommunityIcons name="headset" size={28} color={colors.destaque} />
           </View>
           <View style={styles.textosContainer}>
             <Text style={styles.tituloCard}>Demais contatos</Text>
@@ -56,7 +59,7 @@ export default function AjudaScreen() {
  
         <TouchableOpacity style={styles.cardAjuda} activeOpacity={0.7} onPress={() => navigation.navigate('Enderecos')}>
           <View style={styles.iconeContainer}>
-            <MaterialCommunityIcons name="map-marker-outline" size={28} color={colors.verdeEscuro} />
+            <MaterialCommunityIcons name="map-marker-outline" size={28} color={colors.destaque} />
           </View>
           <View style={styles.textosContainer}>
             <Text style={styles.tituloCard}>Nossos endereços</Text>
@@ -67,16 +70,33 @@ export default function AjudaScreen() {
           <MaterialCommunityIcons name="chevron-right" size={24} color={colors.roxoMuitoEscuro} />
         </TouchableOpacity>
  
+        <SeletorTema />
+        <TouchableOpacity
+          style={styles.cardAjuda}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Sobre o aplicativo"
+          onPress={() => navigation.navigate('Sobre')}
+        >
+          <View style={styles.iconeContainer}>
+            <MaterialCommunityIcons name="information-outline" size={28} color={colors.destaque} />
+          </View>
+          <View style={styles.textosContainer}>
+            <Text style={styles.tituloCard}>Sobre o aplicativo</Text>
+            <Text style={styles.descricaoCard}>Conheça o projeto, a equipe e a versão instalada.</Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={24} color={colors.roxoMuitoEscuro} />
+        </TouchableOpacity>
         <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
 }
  
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerPrincipal: {
     flex: 1,
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
     paddingHorizontal: 20,
     paddingTop: 50
   },
@@ -104,7 +124,7 @@ const styles = StyleSheet.create({
   cardAjuda: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
     borderColor: colors.verdeMedio,
     borderWidth: 1,
     borderRadius: 15,
