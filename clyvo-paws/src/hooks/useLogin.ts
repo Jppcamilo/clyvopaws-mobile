@@ -36,6 +36,7 @@ export function useLogin() {
 
       if (
         !resposta.token ||
+        resposta.role !== 'TUTOR' ||
         tutorId === null ||
         !Number.isInteger(tutorId) ||
         tutorId <= 0
@@ -52,7 +53,7 @@ export function useLogin() {
         id: tutorId,
         nomeCompleto: resposta.nomeCompleto,
         fotoUrl: resposta.fotoUrl,
-      });
+      }, resposta.refreshToken, resposta.refreshExpiresAt);
     },
   });
 
