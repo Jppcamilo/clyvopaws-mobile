@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { usePetDetails } from '../hooks/usePetDetails';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { calcularIdade } from '../utils/dateUtils';
@@ -17,16 +18,21 @@ LocaleConfig.defaultLocale = 'pt-br';
 
 
 export default function PetDetailsScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
+  const [mesCalendario, setMesCalendario] = React.useState(() => {
+    const agora = new Date();
+    return `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-01`;
+  });
   const {
     navigation, pet, carregandoPet, carregandoAgendamentos, isError, tentarNovamente,
-    lembretes, datasMarcadas, racaInfo, deleteMutation, ativandoAlertas, ativarAlertas, handleExcluirPet
+    lembretes, veioDaNotificacao, consultaNotificada, atualizandoConsultaNotificada, datasMarcadas, racaInfo, deleteMutation, ativandoAlertas, ativarAlertas, handleExcluirPet
   } = usePetDetails();
   const ocupado = deleteMutation.isPending || ativandoAlertas;
 
   if (carregandoPet || carregandoAgendamentos) {
     return (
       <View style={styles.containerCentro}>
-        <ActivityIndicator size="large" color={colors.verdeEscuro} />
+        <ActivityIndicator size="large" color={colors.destaque} />
       </View>
     );
   }
@@ -37,7 +43,7 @@ export default function PetDetailsScreen() {
         <View style={{ padding: 20, alignItems: 'center' }}>
           <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
           <TouchableOpacity accessibilityRole="button" onPress={() => { void tentarNovamente(); }} style={{ padding: 16 }}>
-            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+            <Text style={{ color: colors.destaque, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.botaoVoltarErro} onPress={() => navigation.goBack()}>
@@ -74,7 +80,7 @@ const fotoUri = pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-d
             onPress={() => navigation.navigate('PetForm', { pet })}
             disabled={ocupado}
           >
-            <MaterialCommunityIcons name="pencil-outline" size={24} color={colors.verdeEscuro} />
+            <MaterialCommunityIcons name="pencil-outline" size={24} color={colors.destaque} />
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -83,9 +89,9 @@ const fotoUri = pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-d
             disabled={ocupado}
           >
             {deleteMutation.isPending ? (
-              <ActivityIndicator color="#FF3B30" />
+              <ActivityIndicator color={colors.erro} />
             ) : (
-              <MaterialCommunityIcons name="trash-can-outline" size={24} color="#FF3B30" />
+              <MaterialCommunityIcons name="trash-can-outline" size={24} color={colors.erro} />
             )}
           </TouchableOpacity>
           
@@ -93,6 +99,29 @@ const fotoUri = pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-d
       </View>
 
       <Text style={styles.nomePet}>{pet.nome}</Text>
+
+      {veioDaNotificacao && (
+        <View style={[styles.cardStatus, { marginBottom: 20 }]} accessibilityLiveRegion="polite">
+          <Text style={styles.tituloCardStatus}>CONSULTA DO AVISO</Text>
+          {atualizandoConsultaNotificada ? (
+            <ActivityIndicator color={colors.destaque} />
+          ) : consultaNotificada ? (
+            <>
+              <Text style={styles.subtituloCardStatus}>{consultaNotificada.titulo}</Text>
+              <Text style={styles.textoDescricao}>
+                {new Date(consultaNotificada.dataHora).toLocaleString('pt-BR')}
+              </Text>
+              {!!consultaNotificada.descricao && (
+                <Text style={styles.textoDescricao}>{consultaNotificada.descricao}</Text>
+              )}
+            </>
+          ) : (
+            <Text style={styles.textoDescricao}>
+              Esta consulta não está mais disponível. Confira os agendamentos abaixo.
+            </Text>
+          )}
+        </View>
+      )}
       
       <View style={styles.infoContainer}>
         <Image source={{ uri: fotoUri }} style={styles.imagemPet} />
@@ -131,26 +160,29 @@ const fotoUri = pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-d
         
         <View style={styles.containerCalendarioEscuro}>
           <Calendar
+            key={modo}
+            current={mesCalendario}
+            onMonthChange={(data) => setMesCalendario(data.dateString)}
             markedDates={datasMarcadas}
             theme={{
-              backgroundColor: '#2C2C2E',
-              calendarBackground: '#2C2C2E',
-              textSectionTitleColor: '#8E8E93',
-              selectedDayBackgroundColor: colors.verdeMedio,
-              selectedDayTextColor: '#FFFFFF',
-              todayTextColor: colors.verdeMedio,
-              dayTextColor: '#FFFFFF',
-              textDisabledColor: '#48484A',
-              dotColor: colors.verdeMedio,
-              selectedDotColor: '#FFFFFF',
-              arrowColor: '#FFFFFF',
-              monthTextColor: '#FFFFFF',
+              backgroundColor: colors.superficieSecundaria,
+              calendarBackground: colors.superficieSecundaria,
+              textSectionTitleColor: colors.cinza,
+              selectedDayBackgroundColor: colors.verdeEscuro,
+              selectedDayTextColor: colors.branco,
+              todayTextColor: colors.destaque,
+              dayTextColor: colors.roxoMuitoEscuro,
+              textDisabledColor: colors.cinza,
+              dotColor: colors.destaque,
+              selectedDotColor: colors.branco,
+              arrowColor: colors.destaque,
+              monthTextColor: colors.roxoMuitoEscuro,
               textDayFontWeight: '500',
               textMonthFontWeight: 'bold',
               textDayHeaderFontWeight: '600',
               textDayFontSize: 14,
               textMonthFontSize: 16,
-              textDayHeaderFontSize: 12
+              textDayHeaderFontSize: 12,
             }}
           />
         </View>
@@ -159,7 +191,7 @@ const fotoUri = pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-d
       <View style={styles.secao}>
         <View style={styles.headerTituloIcone}>
           <Text style={styles.tituloSecao}>STATUS DO PET</Text>
-          <TouchableOpacity onPress={ativarAlertas} disabled={ocupado} style={styles.botaoSininho}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Ativar ou atualizar lembretes de consultas" accessibilityState={{ disabled: ocupado, busy: ativandoAlertas }} onPress={() => { void ativarAlertas(); }} disabled={ocupado} style={styles.botaoSininho}>
             <MaterialCommunityIcons name="bell-ring-outline" size={20} color={colors.roxoMuitoEscuro} />
             <Text style={styles.textoSininho}>{ativandoAlertas ? 'Ativando...' : 'Alertas'}</Text>
           </TouchableOpacity>
@@ -197,12 +229,12 @@ const fotoUri = pet.fotoUrl || 'https://img.freepik.com/vetores-gratis/desenho-d
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerCentro: { 
     flex: 1, 
     justifyContent: 'center', 
     alignItems: 'center', 
-    backgroundColor: colors.branco 
+    backgroundColor: colors.superficie 
   },
   textoVazio: { 
     fontSize: 18, 
@@ -222,7 +254,7 @@ const styles = StyleSheet.create({
   },
   container: { 
     flex: 1, 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     paddingHorizontal: 20, 
     paddingTop: 50 
   },
@@ -243,7 +275,7 @@ const styles = StyleSheet.create({
   },
 
   botaoEditar: { 
-    backgroundColor: '#E8F5E9', 
+    backgroundColor: colors.verdeClaro, 
     width: 46, 
     height: 46, 
     borderRadius: 23, 
@@ -253,7 +285,7 @@ const styles = StyleSheet.create({
   },
   
   botaoDeletar: { 
-    backgroundColor: '#FFECEB', 
+    backgroundColor: colors.erroSuave, 
     width: 46, 
     height: 46, 
     borderRadius: 23, 
@@ -264,7 +296,7 @@ const styles = StyleSheet.create({
   nomePet: { 
     fontSize: 22, 
     fontWeight: '900', 
-    color: colors.verdeEscuro, 
+    color: colors.destaque, 
     textTransform: 'uppercase', 
     marginBottom: 15 
   },
@@ -353,7 +385,7 @@ const styles = StyleSheet.create({
     lineHeight: 20 
   },
   containerCalendarioEscuro: { 
-    backgroundColor: '#2C2C2E', 
+    backgroundColor: colors.superficieSecundaria, 
     borderRadius: 15, 
     overflow: 'hidden', 
     paddingBottom: 10, 
@@ -367,12 +399,11 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84 
   },
   cardStatus: { 
-    borderColor: colors.roxoMuitoEscuro, 
+    borderColor: colors.borda, 
     borderWidth: 1, 
     borderRadius: 15, 
     padding: 15, 
-    backgroundColor: 
-    colors.branco 
+    backgroundColor: colors.superficie 
   },
   tituloCardStatus: { 
     fontSize: 14, 
@@ -383,7 +414,7 @@ const styles = StyleSheet.create({
   subtituloCardStatus: { 
     fontSize: 14, 
     fontWeight: '900', 
-    color: colors.verdeMedio, 
+    color: colors.destaque, 
     marginBottom: 10 
   },
   itemLembrete: { 
@@ -401,6 +432,6 @@ const styles = StyleSheet.create({
   textoLembrete: { 
     fontSize: 14, 
     fontWeight: 'bold', 
-    color: colors.verdeMedio 
+    color: colors.destaque 
   }
 });

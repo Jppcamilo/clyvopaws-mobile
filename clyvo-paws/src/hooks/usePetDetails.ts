@@ -1,16 +1,16 @@
-import { useMemo, useRef, useState } from 'react';
-import { Alert } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Linking } from 'react-native';
 import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as Notifications from 'expo-notifications';
+import { atualizarLembretesPet, cancelarLembretesPet, solicitarPermissaoLembretes, PermissaoLembreteError } from '../services/notificacaoService';
 
 import { petService } from '../services/petService';
 import { agendamentoService } from '../services/agendamentoService';
 import { DADOS_RACAS } from '../data/racas';
-import { colors } from '../theme/colors';
+import { useTema } from '../theme/TemaProvider';
 import { sessaoService } from '../services/sessaoService';
 
 type RacaInfo = {
@@ -37,6 +37,7 @@ function dataLocal(data: Date): string {
 }
 
 export function usePetDetails() {
+  const { colors } = useTema();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const queryClient = useQueryClient();
@@ -61,6 +62,21 @@ export function usePetDetails() {
   });
 
   const pet = petQuery.data;
+  const agendamentoId = Number(route.params?.agendamentoId);
+  const veioDaNotificacao = route.params?.origemNotificacao === true;
+  const consultaNotificada = veioDaNotificacao
+    ? agendamentosQuery.data?.find(item => item.id === agendamentoId)
+    : undefined;
+
+  const { refetch: atualizarAgendamentos } = agendamentosQuery;
+  const { refetch: atualizarPet } = petQuery;
+  useEffect(() => {
+    if (idValido && veioDaNotificacao) {
+      void atualizarAgendamentos();
+      void atualizarPet();
+    }
+  }, [petId, agendamentoId, idValido, veioDaNotificacao, atualizarAgendamentos, atualizarPet]);
+
 
   const deleteMutation = useMutation({
     mutationFn: () => petService.excluir(petId),
@@ -121,7 +137,7 @@ export function usePetDetails() {
     for (const lembrete of lembretes) {
       marcacoes[lembrete.data] = {
         marked: true,
-        dotColor: colors.verdeMedio,
+        dotColor: colors.destaque,
       };
     }
 
@@ -130,107 +146,64 @@ export function usePetDetails() {
     marcacoes[hoje] = {
       ...marcacoes[hoje],
       selected: true,
-      selectedColor: colors.verdeMedio,
+      selectedColor: colors.verdeEscuro,
       dotColor: colors.branco,
     };
 
     return marcacoes;
-  }, [lembretes]);
+  }, [lembretes, colors]);
 
-const ativarAlertas = async () => {
-  if (!pet || ativacaoEmCurso.current || exclusaoEmCurso.current) {
-    return;
-  }
-
-  ativacaoEmCurso.current = true;
-  setAtivandoAlertas(true);
-
-  let quantidade = 0;
-
-  try {
-    const token = await sessaoService.obterToken();
-
-    if (!token) return;
-
-    const permissao = await Notifications.requestPermissionsAsync();
-
-    if (!permissao.granted) {
-      Alert.alert(
-        'Permissão necessária',
-        'Permita as notificações para receber os lembretes.',
-      );
-      return;
-    }
-
-    for (const agendamento of agendamentosQuery.data ?? []) {
-      if (sessaoService.obterEstado().token !== token) return;
-
-      const dataConsulta = new Date(agendamento.dataHora);
-
-      if (Number.isNaN(dataConsulta.getTime())) continue;
-
-      const dataAlarme = new Date(
-        dataConsulta.getTime() - 2 * 60 * 60 * 1000,
-      );
-
-      if (dataAlarme <= new Date()) continue;
-
-      const identificador = `consulta-${petId}-${agendamento.id}`;
-
-      await Notifications.cancelScheduledNotificationAsync(
-        identificador,
-      );
-
-      if (sessaoService.obterEstado().token !== token) return;
-
-      const idNotificacao = await Notifications.scheduleNotificationAsync({
-        identifier: identificador,
-
-        content: {
-          title: 'Lembrete de consulta',
-          body: `A consulta de ${pet.nome} acontece em 2 horas.`,
-          sound: true,
-          data: {
-            petId,
-            agendamentoId: agendamento.id,
-          },
-        },
-
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.DATE,
-          date: dataAlarme,
-          channelId: 'consultas',
-        },
-      });
-
-      if (sessaoService.obterEstado().token !== token) {
-        await Notifications.cancelScheduledNotificationAsync(
-          idNotificacao,
-        );
-        return;
+  const ativarAlertas = async () => {
+    if (!pet || ativacaoEmCurso.current || exclusaoEmCurso.current) return;
+    ativacaoEmCurso.current = true;
+    setAtivandoAlertas(true);
+    let geracao: number | null = null;
+    try {
+      const token = await sessaoService.obterToken();
+      geracao = sessaoService.obterEstado().geracao;
+      const tutor = sessaoService.obterEstado().tutor;
+      if (!token || !tutor) return;
+      if (pet.tutor.id !== tutor.id) {
+        throw new Error('Abra um pet da conta em que você está conectado.');
       }
-
-      quantidade += 1;
+      await solicitarPermissaoLembretes();
+      // Só substitui os lembretes depois que a API devolver a lista atual com sucesso.
+      const resposta = await agendamentosQuery.refetch();
+      if (resposta.isError || !resposta.data) {
+        throw new Error('Não foi possível atualizar as consultas. Os lembretes anteriores foram mantidos. Tente novamente.');
+      }
+      const { quantidade, falhas } = await atualizarLembretesPet({
+        petId, nomePet: pet.nome, tutorId: tutor.id, agendamentos: resposta.data,
+        sessaoContinuaValida: () => sessaoService.obterEstado().geracao === geracao &&
+          sessaoService.obterEstado().tutor?.id === tutor.id,
+      });
+      if (sessaoService.obterEstado().geracao !== geracao) return;
+      Alert.alert(
+        falhas ? 'Alertas parcialmente ativados' : quantidade ? 'Alertas ativados' : 'Nenhum alerta agendado',
+        falhas
+          ? `${quantidade} lembrete(s) agendado(s) e ${falhas} falha(s). Toque em Alertas para tentar novamente.`
+          : quantidade
+            ? `${quantidade} lembrete(s) neste aparelho, para 2 horas antes das consultas. Toque no aviso para abrir os detalhes. Ao cadastrar novas consultas, toque em Alertas novamente.`
+            : 'Não há consultas com mais de 2 horas de antecedência. Os lembretes antigos deste pet foram atualizados.',
+      );
+    } catch (erro) {
+      if (geracao !== null && sessaoService.obterEstado().geracao !== geracao) return;
+      const mensagem = erro instanceof Error ? erro.message : 'Não foi possível ativar os lembretes.';
+      if (erro instanceof PermissaoLembreteError) {
+        Alert.alert('Permissão necessária', mensagem, [
+          { text: 'Agora não', style: 'cancel' },
+          { text: 'Configurações', onPress: () => {
+            void Linking.openSettings().catch(() => Alert.alert('Atenção', 'Abra as configurações do aparelho manualmente.'));
+          } },
+        ]);
+      } else {
+        Alert.alert('Lembretes', mensagem);
+      }
+    } finally {
+      ativacaoEmCurso.current = false;
+      setAtivandoAlertas(false);
     }
-
-    Alert.alert(
-      quantidade > 0 ? 'Alertas ativados' : 'Nenhum alerta agendado',
-      quantidade > 0
-        ? `${quantidade} lembrete(s) agendado(s) para 2 horas antes das consultas.`
-        : 'Não há consultas com mais de 2 horas de antecedência.',
-    );
-  } catch {
-    Alert.alert(
-      'Erro',
-      quantidade > 0
-        ? `${quantidade} lembrete(s) foram agendados, mas houve uma falha ao concluir.`
-        : 'Não foi possível ativar os lembretes.',
-    );
-  } finally {
-    ativacaoEmCurso.current = false;
-    setAtivandoAlertas(false);
-  }
-};
+  };
 
   const excluirPet = async () => {
     if (
@@ -249,20 +222,7 @@ const ativarAlertas = async () => {
       let falhaAoLimparAlertas = false;
 
       try {
-        const notificacoes =
-          await Notifications.getAllScheduledNotificationsAsync();
-
-        await Promise.all(
-          notificacoes
-            .filter(
-              (item) => Number(item.content.data?.petId) === petId,
-            )
-            .map((item) =>
-              Notifications.cancelScheduledNotificationAsync(
-                item.identifier,
-              ),
-            ),
-        );
+        await cancelarLembretesPet(petId);
       } catch {
         falhaAoLimparAlertas = true;
       }
@@ -324,6 +284,9 @@ const ativarAlertas = async () => {
       agendamentosQuery.isError,
     tentarNovamente,
     lembretes,
+    veioDaNotificacao,
+    consultaNotificada,
+    atualizandoConsultaNotificada: veioDaNotificacao && agendamentosQuery.isFetching,
     datasMarcadas,
     racaInfo,
     deleteMutation,
