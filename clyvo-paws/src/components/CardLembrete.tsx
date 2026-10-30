@@ -1,13 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { Pet } from '../types';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 
 type Props = {
   pet: Pet;
 };
 
 export default function CardLembrete({ pet }: Props) {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const lembretes = pet.lembretes ?? [];
 
   return (
@@ -32,7 +34,7 @@ export default function CardLembrete({ pet }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   cardContainer: {
     backgroundColor: colors.verdeEscuro,
     borderRadius: 15,
@@ -71,3 +73,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   }
 });
+
