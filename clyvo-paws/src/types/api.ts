@@ -8,6 +8,10 @@ export type SessaoTutor = {
 
 export type LoginResposta = {
   token: string;
+  refreshToken: string;
+  refreshExpiresAt: number;
+  expiresIn: number;
+  role: string;
   id: number | null;
   nomeCompleto: string;
   fotoUrl: string | null;
