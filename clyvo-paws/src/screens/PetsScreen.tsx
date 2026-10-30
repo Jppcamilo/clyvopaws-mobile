@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 import { useMeusPets } from '../hooks/useMeusPets';
 import { useNavigation } from '@react-navigation/native';
 import CardPet from '../components/CardPet';
 
 export default function PetsScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const {
     data: listaPets = [], isLoading: carregando, isError, refetch
   } = useMeusPets();
@@ -25,13 +27,13 @@ export default function PetsScreen() {
 
       {carregando ? (
         <View style={styles.containerCentro}>
-          <ActivityIndicator size="large" color={colors.verdeEscuro} />
+          <ActivityIndicator size="large" color={colors.destaque} />
         </View>
       ) : isError ? (
         <View style={{ padding: 20, alignItems: 'center' }}>
           <Text style={{ color: colors.roxoMuitoEscuro, textAlign: 'center' }}>Não foi possível carregar os dados.</Text>
           <TouchableOpacity accessibilityRole="button" onPress={() => { void refetch(); }} style={{ padding: 16 }}>
-            <Text style={{ color: colors.verdeEscuro, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
+            <Text style={{ color: colors.destaque, fontWeight: 'bold' }}>TENTAR NOVAMENTE</Text>
           </TouchableOpacity>
         </View>
       ) : listaPets.length > 0 ? (
@@ -66,10 +68,10 @@ export default function PetsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: colors.branco, 
+    backgroundColor: colors.superficie, 
     paddingHorizontal: 20, 
     paddingTop: 50 
   },
