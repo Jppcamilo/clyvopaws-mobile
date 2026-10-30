@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+import type { CoresTema } from '../theme/colors';
+import { useEstilosTema } from '../hooks/useEstilosTema';
 
 export default function ServicesScreen() {
+  const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
 
   return (
@@ -64,10 +66,10 @@ export default function ServicesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.branco,
+    backgroundColor: colors.superficie,
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
   subtitulo: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: colors.verdeMedio,
+    color: colors.destaque,
     marginBottom: 50,
     textTransform: 'uppercase',
   },
