@@ -2,7 +2,6 @@ import React, { useEffect, useMemo } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   Text,
   TouchableOpacity,
   View,
@@ -16,8 +15,10 @@ import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import axios from 'axios';
 
-import { colors } from './src/theme/colors';
+import { TemaProvider, useTema } from './src/theme/TemaProvider';
 import { useSessaoApp } from './src/hooks/useSessaoApp';
+import { useNotificacoesConsulta } from './src/hooks/useNotificacoesConsultas';
+import { configurarCanalConsultas } from './src/services/notificacaoService';
 
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
@@ -37,6 +38,7 @@ import EnderecosScreen from './src/screens/EnderecosScreen';
 import ContatosScreen from './src/screens/ContatosScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import InfoRacaScreen from './src/screens/InfoRacaScreen';
+import SobreScreen from './src/screens/SobreScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -51,20 +53,21 @@ Notifications.setNotificationHandler({
 });
 
 function TabNavigator() {
+  const { colors } = useTema();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.verdeEscuro,
+        tabBarActiveTintColor: colors.destaque,
         tabBarInactiveTintColor: colors.cinza,
 
         tabBarStyle: {
           height: 100,
           paddingBottom: 30,
           paddingTop: 10,
-          backgroundColor: colors.branco,
+          backgroundColor: colors.superficie,
           borderTopWidth: 1,
-          borderTopColor: '#E0E0E0',
+          borderTopColor: colors.borda,
         },
 
         tabBarLabelStyle: {
@@ -115,7 +118,13 @@ function TabNavigator() {
 }
 
 export default function App() {
+  return <TemaProvider><AppConteudo /></TemaProvider>;
+}
+
+function AppConteudo() {
+  const { colors, modo, temaNavegacao } = useTema();
   const { sessao, erro, tentarNovamente } = useSessaoApp();
+  const { navigationRef, processarPendente } = useNotificacoesConsulta(sessao.token, sessao.tutor?.id);
 
   const queryClient = useMemo(
     () =>
@@ -137,7 +146,7 @@ export default function App() {
           },
         },
       }),
-    [sessao.token],
+    [sessao.geracao],
   );
 
   useEffect(() => {
@@ -148,18 +157,9 @@ export default function App() {
   }, [queryClient]);
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      void Notifications.setNotificationChannelAsync('consultas', {
-        name: 'Lembretes de consultas',
-        importance: Notifications.AndroidImportance.HIGH,
-        sound: 'default',
-      }).catch(() => {
-        Alert.alert(
-          'Notificações',
-          'Não foi possível configurar os lembretes neste aparelho.',
-        );
-      });
-    }
+    void configurarCanalConsultas().catch(() => {
+      Alert.alert('Notificações', 'Não foi possível configurar os lembretes neste aparelho.');
+    });
   }, []);
 
   if (!sessao.inicializada) {
@@ -170,14 +170,14 @@ export default function App() {
           justifyContent: 'center',
           alignItems: 'center',
           padding: 24,
-          backgroundColor: colors.branco,
+          backgroundColor: colors.superficie,
         }}
       >
-        <StatusBar style="dark" />
+        <StatusBar style={modo === "dark" ? "light" : "dark"} />
 
         {erro ? (
           <>
-            <Text style={{ textAlign: 'center' }}>{erro}</Text>
+            <Text style={{ textAlign: 'center', color: colors.roxoMuitoEscuro }}>{erro}</Text>
 
             <TouchableOpacity
               onPress={() => {
@@ -185,13 +185,13 @@ export default function App() {
               }}
               style={{ padding: 20 }}
             >
-              <Text>TENTAR NOVAMENTE</Text>
+              <Text style={{ color: colors.destaque }}>TENTAR NOVAMENTE</Text>
             </TouchableOpacity>
           </>
         ) : (
           <ActivityIndicator
             size="large"
-            color={colors.verdeEscuro}
+            color={colors.destaque}
           />
         )}
       </View>
@@ -202,12 +202,17 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar style="dark" />
+      <StatusBar style={modo === "dark" ? "light" : "dark"} />
 
-      <NavigationContainer>
+      <NavigationContainer
+        theme={temaNavegacao}
+        ref={navigationRef}
+        onReady={processarPendente}
+        onStateChange={processarPendente}
+      >
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {autenticado ? (
-            <Stack.Group navigationKey="privado">
+            <Stack.Group navigationKey={`privado-${sessao.geracao}`}>
               <Stack.Screen name="MainTabs" component={TabNavigator} />
               <Stack.Screen name="PetForm" component={PetFormScreen} />
               <Stack.Screen name="Profile" component={ProfileScreen} />
@@ -234,6 +239,7 @@ export default function App() {
               <Stack.Screen name="Contatos" component={ContatosScreen} />
               <Stack.Screen name="Chat" component={ChatScreen} />
               <Stack.Screen name="InfoRaca" component={InfoRacaScreen} />
+              <Stack.Screen name="Sobre" component={SobreScreen} />
             </Stack.Group>
           ) : (
             <Stack.Group navigationKey="publico">
