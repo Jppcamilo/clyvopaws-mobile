@@ -16,7 +16,6 @@ function lerGit(argumentos) {
 }
 
 function identificarCodigo() {
-  // O servidor EAS informa o commit enviado. Não depende de um Git instalado no celular.
   if (process.env.EAS_BUILD === 'true') {
     const commit = process.env.EAS_BUILD_GIT_COMMIT_HASH;
     if (!hashValido(commit)) {
