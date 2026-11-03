@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   View, 
   Text, 
@@ -14,25 +14,24 @@ import type { CoresTema } from '../theme/colors';
 import { useEstilosTema } from '../hooks/useEstilosTema';
 import { Produto } from '../types';
 
-import { CATEGORIAS, PROMOCOES, REMEDIOS, COSMETICOS } from '../data/produtos';
+import { useCatalogo } from '../hooks/useCatalogo';
 
 export default function ProdutosScreen() {
   const { colors, styles, modo } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
-  const [busca, setBusca] = useState('');
-
-  const aplicarFiltro = (lista: Produto[]) => {
-    return lista.filter(produto => 
-      produto.nome.toLowerCase().includes(busca.toLowerCase())
-    );
-  };
+  const {
+    busca, setBusca, categoria, setCategoria, categorias,
+    secoes, quantidade, limparFiltros,
+  } = useCatalogo();
 
   const renderProduto = (produto: Produto) => (
     <TouchableOpacity 
       key={produto.id} 
       style={styles.cardProduto} 
       activeOpacity={0.7}
-      onPress={() => navigation.navigate('ProductDetails', { produtoId: produto.id, produtoCompleto: produto })}
+      onPress={() => navigation.navigate('ProductDetails', { produtoId: produto.id })}
+      accessibilityRole="button"
+      accessibilityLabel={`Ver detalhes de ${produto.nome}`}
     >
       <Image source={produto.imagem} style={styles.imagemProduto} resizeMode="contain" />
       <Text style={styles.nomeProduto} numberOfLines={2}>{produto.nome}</Text>
@@ -50,18 +49,23 @@ export default function ProdutosScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         
         <View style={styles.header}>
-          <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()} accessibilityRole="button" accessibilityLabel="Voltar">
             <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.titulo}>PRODUTOS</Text>
+        <Text style={styles.titulo}>CATÁLOGO DE PRODUTOS</Text>
+        <Text style={styles.avisoCatalogo}>
+          Consulte os produtos e seus detalhes. Valores ilustrativos; não realizamos vendas pelo aplicativo.
+        </Text>
 
         <View style={styles.containerBusca}>
           <MaterialCommunityIcons name="magnify" size={20} color={colors.roxoMuitoEscuro} style={styles.iconeBusca} />
           <TextInput keyboardAppearance={modo} 
             style={styles.inputBusca}
-            placeholder="BUSCAR NOME"
+            placeholder="Buscar produto"
+            accessibilityLabel="Buscar produto pelo nome"
+            autoCorrect={false}
             placeholderTextColor={colors.cinza}
             value={busca}
             onChangeText={setBusca}
@@ -70,28 +74,44 @@ export default function ProdutosScreen() {
 
         <View style={styles.faixaCategorias}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollCategorias}>
-            {CATEGORIAS.map((cat, index) => (
-              <TouchableOpacity key={index} style={styles.itemCategoria}>
-                <Text style={styles.textoCategoria}>{cat}</Text>
+            {categorias.map(cat => (
+              <TouchableOpacity
+                key={cat}
+                style={[styles.itemCategoria, categoria === cat && styles.categoriaSelecionada]}
+                onPress={() => setCategoria(cat)}
+                accessibilityRole="button"
+                accessibilityLabel={cat === 'TODOS' ? 'Todas as categorias' : `Filtrar por ${cat}`}
+                accessibilityState={{ selected: categoria === cat }}
+              >
+                <Text style={[styles.textoCategoria, categoria === cat && styles.textoCategoriaSelecionada]}>{cat}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        <Text style={styles.tituloSecao}>PROMOÇÕES</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
-          {aplicarFiltro(PROMOCOES).map(renderProduto)}
-        </ScrollView>
+        <Text style={styles.resultados} accessibilityLiveRegion="polite">
+          {quantidade} {quantidade === 1 ? 'produto encontrado' : 'produtos encontrados'}
+        </Text>
 
-        <Text style={styles.tituloSecao}>REMÉDIOS</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
-          {aplicarFiltro(REMEDIOS).map(renderProduto)}
-        </ScrollView>
+        {secoes.map(secao => (
+          <View key={secao.titulo}>
+            <Text style={styles.tituloSecao}>{secao.titulo}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
+              {secao.produtos.map(renderProduto)}
+            </ScrollView>
+          </View>
+        ))}
 
-        <Text style={styles.tituloSecao}>COSMÉTICOS</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollProdutos}>
-          {aplicarFiltro(COSMETICOS).map(renderProduto)}
-        </ScrollView>
+        {quantidade === 0 && (
+          <View style={styles.vazio}>
+            <MaterialCommunityIcons name="magnify" size={36} color={colors.destaque} />
+            <Text style={styles.tituloVazio}>Nenhum produto encontrado</Text>
+            <Text style={styles.textoVazio}>Tente outro nome ou selecione outra categoria.</Text>
+            <TouchableOpacity style={styles.limpar} onPress={limparFiltros} accessibilityRole="button">
+              <Text style={styles.textoLimpar}>LIMPAR FILTROS</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -144,8 +164,29 @@ const criarEstilos = (colors: CoresTema) => StyleSheet.create({
     marginBottom: 30 },
   scrollCategorias: { 
     paddingHorizontal: 15 },
-  itemCategoria: { 
-    marginHorizontal: 10 },
+  itemCategoria: {
+    marginHorizontal: 5,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: 'transparent' },
+  categoriaSelecionada: {
+    borderColor: colors.textoSobreVerde,
+    backgroundColor: colors.superficie },
+  textoCategoriaSelecionada: { color: colors.destaque },
+  avisoCatalogo: {
+    marginHorizontal: 20, marginBottom: 20,
+    color: colors.cinza, fontSize: 13, lineHeight: 20 },
+  resultados: {
+    marginHorizontal: 20, marginBottom: 20,
+    color: colors.cinza, fontSize: 13 },
+  vazio: { alignItems: 'center', padding: 24 },
+  tituloVazio: { color: colors.roxoMuitoEscuro, fontWeight: 'bold', fontSize: 18, marginTop: 12 },
+  textoVazio: { color: colors.cinza, textAlign: 'center', marginTop: 8, lineHeight: 20 },
+  limpar: { backgroundColor: colors.verdeEscuro, padding: 16, borderRadius: 24, marginTop: 20 },
+  textoLimpar: { color: colors.textoSobreVerde, fontWeight: 'bold' },
   textoCategoria: { 
     color: colors.textoSobreVerde, 
     fontWeight: '900', 

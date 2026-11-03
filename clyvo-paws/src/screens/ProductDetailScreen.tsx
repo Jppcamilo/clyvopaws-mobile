@@ -1,38 +1,50 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
-  Alert
+  Image
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { CoresTema } from '../theme/colors';
 import { useEstilosTema } from '../hooks/useEstilosTema';
-import { Produto } from '../types';
+import type { RouteProp } from '@react-navigation/native';
+import { catalogoService } from '../services/catalogoService';
  
 export default function ProductDetailsScreen() {
-  const { colors, styles, modo } = useEstilosTema(criarEstilos);
+  const { colors, styles } = useEstilosTema(criarEstilos);
   const navigation = useNavigation<any>();
-  const route = useRoute<any>();
+  const route = useRoute<RouteProp<{
+    ProductDetails: { produtoId?: string; produtoCompleto?: { id: string } };
+  }, 'ProductDetails'>>();
  
-  const { produtoCompleto } = route.params;
-  const produto: Produto = produtoCompleto;
- 
-  const [quantidade, setQuantidade] = useState(1);
- 
-  const adicionarAoCarrinho = () => {
-    Alert.alert('Sucesso!', `${quantidade}x ${produto.nome} adicionado ao carrinho.`);
-    navigation.goBack();
-  };
- 
+  const produto = catalogoService.buscarPorId(
+    route.params?.produtoId ?? route.params?.produtoCompleto?.id,
+  );
+
+  if (!produto) {
+    return (
+      <View style={styles.estadoVazio}>
+        <Text style={styles.tituloSecao}>Produto não encontrado</Text>
+        <Text style={styles.textoDescricao}>Volte ao catálogo e selecione outro item.</Text>
+        <TouchableOpacity
+          style={styles.botaoRetornar}
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+        >
+          <Text style={styles.textoRetornar}>VOLTAR</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.containerPrincipal}>
      
-      <TouchableOpacity style={styles.botaoVoltarFlutuante} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.botaoVoltarFlutuante} onPress={() => navigation.goBack()} accessibilityRole="button" accessibilityLabel="Voltar ao catálogo">
         <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
       </TouchableOpacity>
  
@@ -57,45 +69,23 @@ export default function ProductDetailsScreen() {
           </View>
  
           <View style={styles.boxBeneficios}>
-            <MaterialCommunityIcons name="truck-delivery-outline" size={24} color={colors.destaque} />
+            <MaterialCommunityIcons name="information-outline" size={24} color={colors.destaque} />
             <View style={styles.textosBeneficios}>
-              <Text style={styles.tituloBeneficio}>Entrega Padrão Clyvo</Text>
-              <Text style={styles.subtituloBeneficio}>Receba amanhã no seu endereço.</Text>
+              <Text style={styles.tituloBeneficio}>Catálogo informativo</Text>
+              <Text style={styles.subtituloBeneficio}>Valores ilustrativos. Não realizamos pedidos, pagamentos ou entregas pelo aplicativo.</Text>
             </View>
           </View>
  
           <Text style={styles.tituloSecao}>DESCRIÇÃO</Text>
           <Text style={styles.textoDescricao}>
-            Produto de alta qualidade recomendado pelos especialistas da Clyvo VET.
-            Garante o bem-estar e a saúde contínua do seu pet. Siga sempre as orientações do seu médico veterinário de confiança.
+            Consulte as informações do fabricante sobre composição, apresentação e modo de uso.
+            Para medicamentos e suplementos, procure orientação do médico veterinário.
           </Text>
         </View>
-        <View style={{ height: 120 }} />
+        <View style={{ height: 40 }} />
       </ScrollView>
  
-      <View style={styles.barraInferior}>
-       
-        <View style={styles.controleQuantidade}>
-          <TouchableOpacity
-            style={styles.botaoQtd}
-            onPress={() => setQuantidade(q => Math.max(1, q - 1))}
-          >
-            <MaterialCommunityIcons name="minus" size={20} color={colors.roxoMuitoEscuro} />
-          </TouchableOpacity>
-          <Text style={styles.textoQtd}>{quantidade}</Text>
-          <TouchableOpacity
-            style={styles.botaoQtd}
-            onPress={() => setQuantidade(q => q + 1)}
-          >
-            <MaterialCommunityIcons name="plus" size={20} color={colors.roxoMuitoEscuro} />
-          </TouchableOpacity>
-        </View>
- 
-        <TouchableOpacity style={styles.botaoAdicionar} onPress={adicionarAoCarrinho}>
-          <Text style={styles.textoBotaoAdicionar}>ADICIONAR</Text>
-        </TouchableOpacity>
- 
-      </View>
+
     </View>
   );
 }
@@ -196,50 +186,12 @@ const criarEstilos = (colors: CoresTema) => StyleSheet.create({
     lineHeight: 22, 
     fontWeight: '500' },
  
-  barraInferior: { 
-    position: 'absolute', 
-    bottom: 0, 
-    left: 0, 
-    right: 0, 
-    backgroundColor: colors.superficie, 
-    flexDirection: 'row', 
-    padding: 20, 
-    paddingTop: 15, 
-    borderTopWidth: 1, 
-    borderColor: colors.borda, 
-    elevation: 15, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: -3 }, 
-    shadowOpacity: 0.1, 
-    shadowRadius: 5 },
-  controleQuantidade: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    backgroundColor: colors.superficieSecundaria, 
-    borderRadius: 25, 
-    paddingHorizontal: 5, 
-    height: 50, 
-    marginRight: 15 },
-  botaoQtd: { 
-    width: 40, 
-    height: 40, 
-    justifyContent: 'center', 
-    alignItems: 'center' },
-  textoQtd: { 
-    fontSize: 16, 
-    fontWeight: 'bold', 
-    color: colors.roxoMuitoEscuro, 
-    marginHorizontal: 10 },
-  botaoAdicionar: { 
-    flex: 1, 
-    backgroundColor: colors.verdeEscuro, 
-    borderRadius: 25, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    height: 50 },
-  textoBotaoAdicionar: { 
-    color: colors.branco, 
-    fontSize: 16, 
-    fontWeight: '900' }
+  estadoVazio: {
+    flex: 1, justifyContent: 'center', alignItems: 'center',
+    padding: 24, backgroundColor: colors.superficie,
+  },
+  botaoRetornar: {
+    marginTop: 24, padding: 16, borderRadius: 24, backgroundColor: colors.verdeEscuro,
+  },
+  textoRetornar: { color: colors.textoSobreVerde, fontWeight: 'bold' },
 });
- 
