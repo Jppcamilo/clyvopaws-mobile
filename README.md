@@ -16,15 +16,30 @@ O aplicativo utiliza React Native com Expo e uma API REST em Java integrada ao b
 
 ## 📦 Distribuição e demonstração
 
-| Entrega | Situação |
-| --- | --- |
-| APK no Firebase App Distribution | Publicação pendente |
-| Acesso do professor à distribuição | Pendente |
-| Vídeo da Sprint 4 | Gravação pendente |
+| Entrega                            | Situação                                  |
+|------------------------------------|-------------------------------------------|
+| APK no Firebase App Distribution   | Publicado (versão 1.0.0, build 1)         |
+| Acesso do professor à distribuição | Convite enviado pelo Firebase             |
+| Vídeo da Sprint 4                  | Gravação pendente                         |
 
 [Vídeo da demonstração anterior](https://youtu.be/0Srws2ukES0)
 
-> Os links da distribuição e do vídeo da Sprint 4 serão adicionados após a publicação e a gravação.
+### Instalação do APK (Android)
+
+O APK foi distribuído pelo Firebase App Distribution e é compatível apenas com dispositivos **Android**.
+
+1. Abra o e-mail de convite do Firebase **no celular Android** e aceite o convite.
+2. Instale o app pelo link do e-mail ou pelo aplicativo **Firebase App Tester**.
+3. Se o Android solicitar, autorize a instalação de apps de fontes desconhecidas.
+4. Conceda as permissões solicitadas (notificações e localização) para testar todos os fluxos.
+
+> Link de convite: [LINK DO FIREBASE](https://appdistribution.firebase.dev/i/f62bd58ed0deb8e2)
+
+> A API está hospedada no Render. Na primeira requisição, o servidor pode levar alguns segundos para responder.
+
+### Geração do APK
+
+O APK foi gerado com o EAS Build, usando o perfil `preview` do `eas.json`:
 
 ## 📱 Funcionalidades
 
