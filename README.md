@@ -1,279 +1,299 @@
 # 🐾 ClyvoPaws — Prevenção e Cuidado Pet
 
-Aplicativo mobile desenvolvido para o Challenge da FIAP, com foco na organização dos cuidados com animais de estimação.
+Aplicativo desenvolvido para o Challenge da FIAP, no curso de Análise e Desenvolvimento de Sistemas.
 
-O projeto permite gerenciar o perfil do tutor, cadastrar pets, agendar consultas e consultar medicamentos e informações preventivas. O aplicativo utiliza React Native com Expo e consome uma API REST desenvolvida em Java.
+O ClyvoPaws reúne ferramentas para organizar os cuidados com animais de estimação: gerenciamento de pets, consultas, lembretes, medicamentos e identificação de espécie e raça por imagem.
 
-## 🔗 Links do projeto
+O aplicativo utiliza React Native com Expo e uma API REST em Java integrada ao banco de dados Oracle.
 
-- [Repositório Mobile](https://github.com/Jppcamilo/clyvopaws-mobile)
-- [Repositório Backend — Java](https://github.com/LucasMatsubara/clyvopawsJavaChallenge)
-- [API hospedada no Render](https://clyvopawsjavachallenge.onrender.com)
-- [Vídeo de demonstração anterior](https://youtu.be/0Srws2ukES0)
+## 🔗 Repositórios e serviços
 
-> A demonstração da Sprint 4 será adicionada após a gravação e a validação das funcionalidades pendentes.
+- [Aplicativo Mobile](https://github.com/Jppcamilo/clyvopaws-mobile)
+- [Backend Java](https://github.com/LucasMatsubara/clyvopawsJavaChallenge)
+- [Serviço de IA](https://github.com/Jppcamilo/IA-Sprint3-IOT)
+- [API Java no Render](https://clyvopawsjavachallenge.onrender.com)
+- [Serviço de IA no Render](https://clyvopaws-ia.onrender.com)
+
+## 📦 Distribuição e demonstração
+
+| Entrega | Situação |
+| --- | --- |
+| APK no Firebase App Distribution | Publicação pendente |
+| Acesso do professor à distribuição | Pendente |
+| Vídeo da Sprint 4 | Gravação pendente |
+
+[Vídeo da demonstração anterior](https://youtu.be/0Srws2ukES0)
+
+> Os links da distribuição e do vídeo da Sprint 4 serão adicionados após a publicação e a gravação.
 
 ## 📱 Funcionalidades
 
 ### Conta e autenticação
 
-- Cadastro e login de tutores pela API.
-- Armazenamento do token JWT com Expo SecureStore.
-- Restauração da sessão enquanto o token estiver válido.
-- Verificação da expiração do token.
-- Encerramento da sessão quando uma requisição autenticada recebe HTTP 401.
-- Navegação condicionada ao estado da sessão.
-- Edição de dados pessoais e exclusão da conta.
-- Limpeza do cache e dos lembretes locais ao sair da conta.
+- Cadastro e login de tutores.
+- Edição do perfil e exclusão da conta.
+- Armazenamento das credenciais de sessão com Expo SecureStore.
+- Restauração da sessão ao reabrir o aplicativo.
+- Renovação automática do JWT por refresh token.
+- Tratamento de sessão expirada e falhas de conexão.
+- Navegação condicionada à autenticação.
+- Limpeza do cache e dos lembretes locais ao encerrar a sessão.
 
 ### Gestão dos pets
 
 - Cadastro, listagem, edição e exclusão.
 - Associação dos pets ao tutor autenticado.
-- Registro de nome, nascimento, peso, sexo, espécie, raça e descrição.
-- Seleção de foto na galeria.
-- Informações preventivas das raças presentes no catálogo local.
+- Registro de nome, espécie, raça, nascimento, peso, sexo e descrição.
+- Seleção e envio de fotos.
+- Consulta das informações preventivas disponíveis no catálogo de raças.
 - Visualização dos agendamentos de cada pet.
 
-### Consultas e lembretes
+### Fotos persistentes
 
-- Consulta dos horários disponíveis de veterinários.
+- Envio das fotos do tutor e dos pets para a API Java.
+- Preparação e compressão da imagem antes do upload.
+- Armazenamento das imagens no banco Oracle pelo backend.
+- Exibição das fotos por URLs retornadas pela API.
+
+> Fotos antigas que foram salvas apenas como caminhos locais do celular precisam ser selecionadas e enviadas novamente.
+
+### Consultas e notificações
+
+- Consulta dos horários disponíveis.
 - Agendamento com seleção de clínica, pet, horário e motivo.
-- Visualização de agendamentos na Home e nos detalhes do pet.
-- Calendário com marcações das consultas.
-- Ativação manual de notificações locais para duas horas antes das consultas, quando houver antecedência suficiente.
+- Visualização das consultas na Home e nos detalhes do pet.
+- Calendário com marcações dos agendamentos.
+- Ativação de lembretes pelo botão **Alertas**.
+- Notificações locais programadas para duas horas antes da consulta.
+- Abertura dos detalhes do pet relacionado à consulta ao tocar na notificação.
 
-### Medicamentos
-
-- Listagem paginada dos medicamentos retornados pela API.
-- Exibição das informações de tratamento.
-- Estados de carregamento, erro e lista vazia.
-
-### Rede clínica e assistência
-
-- Exibição das clínicas cadastradas no aplicativo.
-- Identificação da região do dispositivo mediante permissão.
-- Acesso aos contatos das clínicas.
-- Assistente de navegação com respostas predefinidas sobre o aplicativo.
+O lembrete só é programado quando o horário de envio ainda está no futuro. É necessário conceder as permissões solicitadas pelo aparelho.
 
 ### Identificação de pets por IA
 
-O frontend possui um fluxo para enviar uma foto à API e receber sugestões de espécie e raça.
-
-- Preparação e compressão da imagem antes do envio.
-- Envio da foto como multipart/form-data.
+- Seleção de uma foto do animal.
+- Preparação e envio da imagem à API Java, que se comunica com o serviço de IA.
+- Sugestão de espécie e raça provável.
+- Exibição do resultado e de informações sobre a análise.
+- Confirmação do tutor antes de aplicar a sugestão ao formulário.
 - Tratamento de falhas e cancelamento da análise.
-- Confirmação do tutor antes de aplicar a sugestão.
-- Possibilidade de preencher os dados manualmente.
+- Preenchimento manual disponível quando a análise não puder ser concluída.
 
-> A integração mobile está implementada. A validação completa depende da publicação e configuração do endpoint de IA no backend hospedado no Render.
->
-> A identificação por imagem é uma sugestão e pode apresentar erros.
+> A identificação por imagem pode apresentar erros e não substitui a avaliação veterinária.
+
+### Medicamentos e assistência
+
+- Listagem paginada de medicamentos retornados pela API.
+- Exibição de informações de tratamento.
+- Consulta das clínicas e dos contatos disponíveis no aplicativo.
+- Identificação da região do dispositivo mediante permissão.
+- Assistente de navegação com respostas predefinidas sobre o aplicativo.
+
+### Catálogo e carrinho
+
+- Busca de produtos pelo nome.
+- Filtros por categoria.
+- Tela de detalhes com foto e preço.
+- Adição de produtos ao carrinho.
+- Alteração de quantidades e remoção de itens.
+- Opção de esvaziar o carrinho com confirmação.
+- Cálculo dos subtotais e do total estimado.
+- Contador de itens compartilhado entre as telas.
+- Persistência local do carrinho, separada por conta.
+
+O carrinho é demonstrativo e utiliza produtos e preços do catálogo local. Não realiza pedidos, pagamentos, controle de estoque ou entregas.
+
+Os itens ficam salvos no aparelho e não são sincronizados entre dispositivos.
+
+### Aparência e informações do aplicativo
+
+- Temas claro e escuro.
+- Persistência da preferência de aparência.
+- Tela **Sobre o aplicativo**, acessível pela área de ajuda.
+- Informações do projeto e dos integrantes.
+- Exibição da versão e do commit associado ao código da build.
 
 ## 🛠️ Tecnologias
 
 | Tecnologia | Utilização |
 | --- | --- |
-| React Native e Expo | Desenvolvimento mobile |
+| React Native e Expo SDK 58 | Aplicativo mobile |
 | TypeScript | Tipagem estática |
-| React Navigation | Navegação por telas e abas |
+| React Navigation | Navegação entre telas e abas |
 | TanStack Query | Consultas, mutations e cache |
 | Axios | Comunicação HTTP e interceptors |
-| Expo SecureStore | Armazenamento do JWT |
-| AsyncStorage | Persistência dos dados básicos do tutor |
-| jwt-decode | Leitura da expiração do token |
-| Expo Image Picker | Seleção de imagens da galeria |
-| Expo Image Manipulator | Preparação das fotos enviadas à IA |
-| Expo Notifications | Notificações locais de consultas |
-| Expo Location | Obtenção da região do dispositivo |
+| Expo SecureStore | Persistência das credenciais da sessão |
+| AsyncStorage | Preferência de tema e carrinho local |
+| Expo Image Picker | Seleção de imagens |
+| Expo Image Manipulator | Preparação e compressão das fotos |
+| Expo Notifications | Lembretes locais |
+| Expo Location | Localização mediante permissão |
 | React Native Calendars | Calendário dos agendamentos |
 | DateTimePicker | Seleção de datas |
 
-O backend é mantido em um repositório separado, com Java, Spring Boot e banco de dados Oracle.
+O backend utiliza Java, Spring Boot e Oracle. A identificação por imagem utiliza um serviço separado de IA.
 
 ## 🧩 Organização do código
 
-O aplicativo fica dentro da pasta `clyvo-paws`.
+O aplicativo está dentro da pasta `clyvo-paws`.
 
 | Caminho | Responsabilidade |
 | --- | --- |
-| `clyvo-paws/App.tsx` | Inicialização, navegação, sessão e providers |
-| `clyvo-paws/src/screens/` | Telas e apresentação dos dados |
-| `clyvo-paws/src/components/` | Componentes reutilizáveis |
-| `clyvo-paws/src/hooks/` | Estado e regras dos fluxos da aplicação |
-| `clyvo-paws/src/services/` | Comunicação com a API e persistência da sessão |
-| `clyvo-paws/src/types/` | Tipos compartilhados e contratos da API |
-| `clyvo-paws/src/utils/` | Funções auxiliares de datas, JWT e notificações |
-| `clyvo-paws/src/data/` | Catálogos locais |
-| `clyvo-paws/src/theme/` | Cores da interface |
+| `App.tsx` | Inicialização, providers e navegação |
+| `src/screens/` | Telas e apresentação dos dados |
+| `src/components/` | Componentes reutilizáveis |
+| `src/hooks/` | Estado e lógica dos fluxos da aplicação |
+| `src/services/` | API, persistência e serviços compartilhados |
+| `src/types/` | Tipos e contratos da aplicação |
+| `src/utils/` | Funções auxiliares |
+| `src/data/` | Catálogos locais e informações do projeto |
+| `src/theme/` | Paletas, estado e configuração dos temas |
 
-### Principais hooks
+As telas utilizam hooks para coordenar os fluxos. Os serviços concentram as requisições e a persistência, reduzindo a lógica diretamente nos componentes visuais.
 
-- `useLogin` e `useLogout`: entrada e saída da conta.
-- `useCadastro`: cadastro do tutor.
-- `usePerfil`: consulta, edição e exclusão do perfil.
-- `useSessaoApp`: inicialização e acompanhamento da sessão.
-- `useSessaoLocal`: acesso aos dados básicos do tutor.
-- `useMeusPets`: listagem dos pets.
-- `usePetForm`: cadastro, edição e identificação por IA.
-- `usePetDetails`: detalhes, exclusão e lembretes do pet.
-- `useConsultas`: horários disponíveis e agendamento.
-- `useMedicamentos`: listagem paginada dos medicamentos.
-- `useHome`: dados e interações da tela inicial.
-- `useFotoGaleria`: seleção da foto do perfil.
-- `useRedeClinica`: localização do dispositivo.
-- `useChat`: respostas do assistente de navegação.
+Exemplos:
 
-> Os hooks `useSessaoLocal` e `useMedicamentos` estão nos arquivos `useSessaolocal.ts` e `useMedicamento.ts`, respectivamente.
+- `usePetForm`: cadastro, edição e identificação do pet por IA.
+- `usePerfil`: consulta e atualização do perfil.
+- `useSessaoApp`: acompanhamento da sessão.
+- `useCatalogo`: busca e filtros dos produtos.
+- `useCarrinho`: estado compartilhado e operações do carrinho.
+- `fotoService`: preparação e upload de fotos.
+- `sessaoService`: armazenamento e renovação da sessão.
+- `notificacaoService`: permissões e agendamento dos lembretes.
+- `carrinhoService`: persistência, validações e cálculos em centavos.
 
 ## 🔐 Gerenciamento da sessão
 
-Após o login, o JWT é armazenado no SecureStore e os dados básicos do tutor são armazenados no AsyncStorage.
+O login retorna um token de acesso e um refresh token. As credenciais e os dados básicos necessários à sessão são armazenados no Expo SecureStore.
 
-O aplicativo verifica a expiração do token ao restaurar a sessão, antes das requisições autenticadas e durante o uso. Também verifica novamente quando volta ao primeiro plano.
+O aplicativo verifica a validade da sessão ao iniciar, antes das requisições protegidas e ao retornar ao primeiro plano. Quando necessário, solicita um novo token de acesso ao backend.
 
-Os interceptors do Axios adicionam o token às requisições protegidas e tratam respostas HTTP 401. Quando a sessão é encerrada, as telas privadas deixam de ficar disponíveis.
+Os interceptors adicionam o JWT às requisições autenticadas. Em caso de HTTP 401, o aplicativo pode renovar a sessão e repetir a requisição uma única vez, evitando tentativas infinitas.
 
-O cache das consultas é separado por sessão para evitar reaproveitar dados da conta anterior.
+Quando a renovação é recusada ou a sessão não pode mais ser utilizada, o usuário precisa entrar novamente. Falhas temporárias de conexão durante a renovação são tratadas sem apagar automaticamente uma sessão ainda recuperável.
 
-**Não há renovação automática por refresh token nesta versão.** Quando o token expira, o usuário precisa entrar novamente. A leitura do JWT no aplicativo não substitui a validação realizada pelo backend.
+O cache e a navegação acompanham as mudanças de sessão para evitar a exibição de dados da conta anterior.
 
 ## 🚀 Como executar
 
 ### Pré-requisitos
 
-- Node.js e npm compatíveis com a versão do Expo utilizada no projeto.
 - Git.
-- Expo Go compatível com o SDK do projeto ou um ambiente de desenvolvimento nativo configurado.
-- Acesso à internet e ao backend.
+- Node.js e npm compatíveis com o SDK do projeto.
+- Dispositivo ou emulador compatível.
+- Expo Go compatível para os fluxos suportados, ou uma build de desenvolvimento.
+- Acesso à internet para as funcionalidades integradas ao backend.
 
-### 1. Clonar o repositório
+### Instalação
 
 ```bash
 git clone https://github.com/Jppcamilo/clyvopaws-mobile.git
-```
-
-### 2. Entrar na pasta do aplicativo
-
-```bash
 cd clyvopaws-mobile/clyvo-paws
-```
-
-> Execute os comandos de instalação e do Expo dentro de `clyvo-paws`, onde está o `package.json`.
-
-### 3. Instalar as dependências
-
-```bash
 npm ci
 ```
 
-### 4. Verificar a tipagem
+> Execute os comandos do aplicativo dentro de `clyvo-paws`, onde está o `package.json`.
+
+### Verificações
 
 ```bash
 npx tsc --noEmit
+npx expo-doctor@latest
 ```
 
-Quando o comando termina sem mensagens de erro, a verificação de tipos foi concluída com sucesso. Isso não substitui os testes das funcionalidades no dispositivo.
+A verificação de tipos e o diagnóstico das dependências não substituem os testes no aparelho.
 
-### 5. Iniciar o aplicativo
+### Inicialização
 
 ```bash
 npx expo start
 ```
 
-Abra o projeto pelo QR Code no dispositivo ou utilize um emulador compatível.
+Para reiniciar o servidor de desenvolvimento limpando o cache:
+
+```bash
+npx expo start -c
+```
+
+As permissões e o comportamento das notificações devem ser conferidos também no APK que será distribuído.
 
 ## 🌐 Configuração da API
 
-A URL principal está em:
+A configuração compartilhada está em:
 
-`clyvo-paws/src/services/api.ts`
+`clyvo-paws/src/services/httpAuth.ts`
 
 ```ts
-const api = axios.create({
+export const API_CONFIG = {
   baseURL: 'https://clyvopawsjavachallenge.onrender.com',
-  timeout: 15000,
-});
+  timeout: 30000,
+};
 ```
 
-Os serviços utilizam caminhos relativos. Por exemplo:
+Os serviços utilizam rotas relativas, combinadas com essa URL base. Não é necessário repetir o domínio em cada requisição.
 
-```ts
-api.post('/login', dados);
-```
+`src/services/api.ts` configura os interceptors das chamadas autenticadas.
 
-Essa chamada utiliza o endereço:
-
-```text
-https://clyvopawsjavachallenge.onrender.com/login
-```
-
-Não é necessário repetir o domínio em cada serviço.
-
-### Rotas utilizadas pelo frontend
+### Principais rotas
 
 | Método | Rota | Finalidade |
 | --- | --- | --- |
-| POST | `/login` | Autenticação |
+| POST | `/login` | Login |
+| POST | `/auth/refresh` | Renovação da sessão |
+| POST | `/auth/logout` | Encerramento da sessão |
 | POST | `/tutores` | Cadastro do tutor |
-| GET | `/tutores/{id}` | Consulta do perfil |
-| PUT | `/tutores/{id}` | Atualização do perfil |
-| DELETE | `/tutores/{id}` | Exclusão da conta |
+| GET / PUT / DELETE | `/tutores/{id}` | Consulta, atualização e exclusão do tutor |
 | GET | `/pets/tutor/{tutorId}` | Pets do tutor |
-| GET | `/pets/{id}` | Detalhes do pet |
 | POST | `/pets` | Cadastro do pet |
-| PUT | `/pets/{id}` | Atualização do pet |
-| DELETE | `/pets/{id}` | Exclusão do pet |
+| GET / PUT / DELETE | `/pets/{id}` | Consulta, atualização e exclusão do pet |
+| GET | `/fotos/{id}` | Exibição de uma foto armazenada |
 | GET | `/agendas/veterinario/{veterinarioId}` | Horários disponíveis |
 | GET | `/agendamentos/tutor/{tutorId}` | Agendamentos do tutor |
 | GET | `/agendamentos/pet/{petId}` | Agendamentos do pet |
-| POST | `/agendamentos` | Criação do agendamento |
-| GET | `/medicamentos?page=0&size=10` | Listagem paginada |
-| POST | `/api/ia/analisar-pet` | Análise da foto, dependente da publicação do backend |
+| POST | `/agendamentos` | Agendamento de consulta |
+| GET | `/medicamentos` | Listagem paginada |
+| POST | `/api/ia/analisar-pet` | Análise da foto do animal |
 
-## 🧪 Roteiro de testes
+O catálogo e o carrinho funcionam no frontend, sem rotas de compra no backend.
 
-1. Cadastrar uma conta e realizar login.
-2. Fechar e abrir o aplicativo para verificar a restauração da sessão.
-3. Editar o perfil e conferir os dados exibidos.
-4. Alterar o e-mail e entrar novamente com o novo endereço.
-5. Cadastrar, listar, editar e excluir um pet de teste.
-6. Selecionar clínica, pet e horário disponível para agendar uma consulta.
-7. Conferir o agendamento na Home e nos detalhes do pet.
-8. Consultar a tela de medicamentos.
-9. Ativar e verificar os lembretes em um dispositivo.
-10. Sair da conta e verificar o retorno ao login.
-11. Testar a identificação por foto após a publicação da IA.
-12. Verificar o comportamento com sessão expirada e falha de conexão.
+## 🧪 Roteiro de validação
 
-Use dados de teste para as operações de exclusão.
+- Cadastrar uma conta e realizar login.
+- Fechar e abrir o aplicativo para conferir a restauração da sessão.
+- Verificar a renovação do JWT e o comportamento com falha de conexão.
+- Editar os dados e a foto do tutor.
+- Cadastrar, editar e excluir um pet de teste.
+- Conferir a persistência das fotos após reabrir o aplicativo.
+- Analisar uma foto por IA e confirmar a sugestão no formulário.
+- Agendar uma consulta e conferir sua exibição.
+- Ativar um lembrete, verificar o recebimento e tocar na notificação.
+- Consultar os medicamentos.
+- Buscar produtos, filtrar categorias e abrir os detalhes.
+- Adicionar, alterar e remover itens do carrinho.
+- Reabrir o aplicativo e conferir a restauração do carrinho.
+- Trocar de conta e verificar a separação dos dados.
+- Alternar os temas claro e escuro.
+- Conferir a versão e o commit na tela Sobre.
+- Sair da conta e verificar o retorno ao login.
 
-## 📌 Limitações e pendências
+Utilize contas e registros de teste para as operações de exclusão.
 
-- **IA:** falta concluir a publicação e a validação da integração no Render.
-- **Fotos:** o cadastro atualmente envia a URI da imagem selecionada. Não há upload permanente da foto de perfil ou do pet para um serviço de arquivos; essas imagens podem não funcionar em outro dispositivo.
-- **Sessão:** tokens expirados exigem novo login; não há refresh automático.
-- **Consultas:** dependem de agendas futuras e disponíveis cadastradas no banco.
-- **Clínicas:** o vínculo entre clínicas e veterinários está definido no frontend e precisa corresponder aos IDs do banco.
-- **Notificações:** são locais, dependem de permissão e precisam ser ativadas pelo usuário. São removidas no encerramento da sessão.
-- **Assistente:** utiliza respostas predefinidas; não realiza atendimento veterinário.
-- **Produtos:** o catálogo é demonstrativo, sem fluxo completo de compra.
+## 📌 Limitações e observações
 
-## 🔄 Evolução na Sprint 4
-
-- Separação das regras dos principais fluxos em hooks.
-- Centralização das requisições em serviços.
-- Organização dos tipos compartilhados.
-- Verificação da validade do JWT e tratamento de sessão expirada.
-- Navegação condicionada à autenticação.
-- Limpeza do cache na troca de sessão.
-- Melhorias nas validações, mensagens de erro e estados de carregamento.
-- Integração do frontend com a API hospedada no Render.
-- Preparação do fluxo de identificação de pets por imagem.
+- Consultas dependem de horários futuros disponíveis no backend.
+- O vínculo entre clínicas e veterinários definido no frontend deve corresponder aos IDs do banco.
+- Os lembretes são locais, precisam de permissão e são ativados pelo usuário.
+- Ao sair da conta, os lembretes locais são removidos. Ative-os novamente quando necessário.
+- Após alterações nas consultas, utilize **Alertas** para atualizar os lembretes do pet.
+- A IA depende da disponibilidade do serviço e do provedor do modelo.
+- O assistente utiliza respostas predefinidas e não realiza atendimento veterinário.
+- O carrinho possui limite de 99 unidades por produto e não representa estoque real.
+- Desinstalar o aplicativo ou apagar seus dados pode remover o carrinho e as preferências locais.
 
 ## 👥 Equipe
 
-Projeto desenvolvido para o Challenge da FIAP — Análise e Desenvolvimento de Sistemas.
+FIAP — Análise e Desenvolvimento de Sistemas.
 
 | Integrante | RM |
 | --- | --- |
