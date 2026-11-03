@@ -47,7 +47,6 @@ export async function salvarComFoto<T>(
 
   const uri = await prepararFoto(foto);
   const formulario = new FormData();
-  // Não envia file:// para o campo do banco. A API substitui esse null pela URL do upload.
   formulario.append('dados', JSON.stringify({ ...dados, [campoFoto]: null }));
 
   if (Platform.OS === 'web') {

@@ -41,7 +41,6 @@ export async function solicitarPermissaoLembretes(): Promise<void> {
   if (Platform.OS === 'web') {
     throw new Error('Ative os lembretes no aplicativo Android ou iOS.');
   }
-  // No Android, o canal deve existir antes da solicitação de permissão.
   await configurarCanalConsultas();
   const permitida = (p: Notifications.NotificationPermissionsStatus) =>
     p.granted || p.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL ||
@@ -65,7 +64,6 @@ export async function solicitarPermissaoLembretes(): Promise<void> {
 }
 
 function pertenceAoPet(item: Notifications.NotificationRequest, petId: number) {
-  // Inclui os identificadores antigos para removê-los ao atualizar os alertas.
   return Number(item.content.data?.petId) === petId &&
     (item.content.data?.tipo === 'consulta' || item.identifier.startsWith(`consulta-${petId}-`));
 }
@@ -91,7 +89,6 @@ type ConfiguracaoLembretes = {
   sessaoContinuaValida: () => boolean;
 };
 
-// Serializa ativações para não criar duplicatas se duas telas solicitarem ao mesmo tempo.
 let fila: Promise<unknown> = Promise.resolve();
 
 export function atualizarLembretesPet(config: ConfiguracaoLembretes) {

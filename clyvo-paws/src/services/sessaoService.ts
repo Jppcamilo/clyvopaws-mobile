@@ -43,7 +43,6 @@ function credenciaisValidas(v: unknown): v is Credenciais {
     typeof c.refreshExpiresAt === 'number' && Number.isFinite(c.refreshExpiresAt) && tutorValido(c.tutor);
 }
 async function limparArquivos() {
-  // Um registro único grava o par de tokens junto, evitando misturar rotações.
   const resultados = await Promise.allSettled([
     SecureStore.deleteItemAsync(SESSION_KEY),
     SecureStore.deleteItemAsync('clyvo_token'),
@@ -67,7 +66,6 @@ function inicializar(): Promise<void> {
       publicar(salvo, false, true);
       return;
     }
-    // Sessões antigas sem refresh exigem um novo login uma única vez após a atualização.
     publicar(null, false, true);
     await limparArquivos();
   });
@@ -77,7 +75,7 @@ async function revogar(refreshToken: string): Promise<void> {
 }
 async function encerrar(expirada: boolean): Promise<void> {
   const antiga = credenciais;
-  publicar(null, expirada, true); // invalida imediatamente qualquer renovação em andamento
+  publicar(null, expirada, true);
   const limpeza = executar(limparArquivos);
   const resultados = await Promise.allSettled([
     limpeza,
@@ -114,7 +112,6 @@ function renovar(): Promise<string | null> {
         await invalidar(atual.token, geracao).catch(() => undefined);
         return null;
       }
-      // Sem rede/5xx/timeout: não destrói as credenciais nem volta ao login.
       throw new Error('Não foi possível renovar sua sessão. Confira a conexão e tente novamente.');
     }
     if (estado.geracao !== geracao) {
@@ -131,7 +128,6 @@ function renovar(): Promise<string | null> {
     try {
       return await executar(async () => {
         if (estado.geracao !== geracao) return null;
-        // Uma edição do perfil durante a chamada não é sobrescrita pela resposta do refresh.
         const dados = { ...novos, tutor: credenciais!.tutor };
         await SecureStore.setItemAsync(SESSION_KEY, JSON.stringify(dados));
         if (estado.geracao !== geracao) return null;
@@ -174,7 +170,6 @@ async function salvar(token: string, tutor: SessaoTutor, refreshToken: string, r
     throw new Error('O servidor não retornou uma sessão com renovação válida. Confira a atualização da API Java.');
   }
   const geracao = estado.geracao + 1;
-  // Trocar conta invalida operações antigas antes de gravar a nova sessão.
   publicar(null, false, true);
   await executar(async () => {
     if (estado.geracao !== geracao) {

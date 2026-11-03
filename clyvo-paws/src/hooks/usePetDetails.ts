@@ -167,7 +167,6 @@ export function usePetDetails() {
         throw new Error('Abra um pet da conta em que você está conectado.');
       }
       await solicitarPermissaoLembretes();
-      // Só substitui os lembretes depois que a API devolver a lista atual com sucesso.
       const resposta = await agendamentosQuery.refetch();
       if (resposta.isError || !resposta.data) {
         throw new Error('Não foi possível atualizar as consultas. Os lembretes anteriores foram mantidos. Tente novamente.');
