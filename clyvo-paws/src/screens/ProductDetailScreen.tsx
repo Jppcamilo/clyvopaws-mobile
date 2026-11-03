@@ -1,21 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image
+  Image,
+  ActivityIndicator
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { CoresTema } from '../theme/colors';
 import { useEstilosTema } from '../hooks/useEstilosTema';
 import type { RouteProp } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCarrinho } from '../hooks/useCarrinho';
+import BotaoCarrinho from '../components/BotaoCarrinho';
+import SeletorQuantidade from '../components/SeletorQuantidade';
+import { formatarMoeda, precoEmCentavos, LIMITE_QUANTIDADE } from '../services/carrinhoService';
 import { catalogoService } from '../services/catalogoService';
  
 export default function ProductDetailsScreen() {
   const { colors, styles } = useEstilosTema(criarEstilos);
+  const insets = useSafeAreaInsets();
+  const carrinho = useCarrinho();
+  const [quantidade, setQuantidade] = useState(1);
+  const [adicionado, setAdicionado] = useState(false);
   const navigation = useNavigation<any>();
   const route = useRoute<RouteProp<{
     ProductDetails: { produtoId?: string; produtoCompleto?: { id: string } };
@@ -41,13 +51,27 @@ export default function ProductDetailsScreen() {
     );
   }
 
+  const noCarrinho = carrinho.linhas.find(item => item.produtoId === produto.id)?.quantidade ?? 0;
+  const disponivel = LIMITE_QUANTIDADE - noCarrinho;
+  const quantidadeSelecionada = Math.min(quantidade, Math.max(1, disponivel));
+  const bloqueado = carrinho.indisponivel || disponivel === 0;
+  const adicionar = async () => {
+    if (await carrinho.adicionar(produto.id, quantidadeSelecionada)) {
+      setAdicionado(true);
+      setQuantidade(1);
+    }
+  };
+
   return (
     <View style={styles.containerPrincipal}>
      
-      <TouchableOpacity style={styles.botaoVoltarFlutuante} onPress={() => navigation.goBack()} accessibilityRole="button" accessibilityLabel="Voltar ao catálogo">
-        <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
-      </TouchableOpacity>
- 
+      <View style={[styles.headerDetalhe, { paddingTop: insets.top + 12 }]}>
+        <TouchableOpacity style={styles.botaoVoltarFlutuante} onPress={() => navigation.goBack()} accessibilityRole="button" accessibilityLabel="Voltar ao catálogo">
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
+        </TouchableOpacity>
+        <BotaoCarrinho />
+      </View>
+
       <ScrollView showsVerticalScrollIndicator={false}>
        
         <View style={styles.containerImagem}>
@@ -71,7 +95,7 @@ export default function ProductDetailsScreen() {
           <View style={styles.boxBeneficios}>
             <MaterialCommunityIcons name="information-outline" size={24} color={colors.destaque} />
             <View style={styles.textosBeneficios}>
-              <Text style={styles.tituloBeneficio}>Catálogo informativo</Text>
+              <Text style={styles.tituloBeneficio}>Carrinho demonstrativo</Text>
               <Text style={styles.subtituloBeneficio}>Valores ilustrativos. Não realizamos pedidos, pagamentos ou entregas pelo aplicativo.</Text>
             </View>
           </View>
@@ -82,7 +106,35 @@ export default function ProductDetailsScreen() {
             Para medicamentos e suplementos, procure orientação do médico veterinário.
           </Text>
         </View>
-        <View style={{ height: 40 }} />
+        <View style={styles.compra}>
+          <View style={styles.linhaQuantidade}>
+            <View>
+              <Text style={styles.tituloSecao}>QUANTIDADE</Text>
+              <Text style={styles.textoDescricao}>{noCarrinho > 0 ? `${noCarrinho} no seu carrinho` : 'Escolha quantas unidades'}</Text>
+            </View>
+            <SeletorQuantidade quantidade={quantidadeSelecionada} maximo={Math.max(1, disponivel)} desabilitado={bloqueado}
+              nome={produto.nome} onChange={valor => { setQuantidade(valor); setAdicionado(false); }} />
+          </View>
+          <View style={styles.linhaQuantidade}>
+            <Text style={styles.textoDescricao}>Subtotal estimado</Text>
+            <Text style={styles.subtotal}>{formatarMoeda(precoEmCentavos(produto.precoNovo) * quantidadeSelecionada)}</Text>
+          </View>
+          <TouchableOpacity style={[styles.adicionar, bloqueado && styles.desabilitado]} disabled={bloqueado}
+            onPress={() => { void adicionar(); }} accessibilityRole="button" accessibilityState={{ disabled: bloqueado, busy: carrinho.salvando }}>
+            {carrinho.salvando ? <ActivityIndicator color={colors.textoSobreVerde} /> : <MaterialCommunityIcons name="cart-plus" size={23} color={colors.textoSobreVerde} />}
+            <Text style={styles.textoAdicionar}>{carrinho.carregando ? 'Abrindo carrinho…' : disponivel === 0 ? 'Limite de 99 unidades' : 'Adicionar ao carrinho'}</Text>
+          </TouchableOpacity>
+          {carrinho.erro && <Text style={styles.textoDescricao}>Abra o carrinho para recuperar os itens salvos.</Text>}
+          {adicionado && <View style={styles.confirmacao} accessibilityLiveRegion="polite">
+            <MaterialCommunityIcons name="check-circle-outline" size={22} color={colors.destaque} />
+            <Text style={styles.textoConfirmacao}>Produto adicionado ao carrinho!</Text>
+          </View>}
+          <TouchableOpacity style={styles.verCarrinho} onPress={() => navigation.navigate('Carrinho')} accessibilityRole="button">
+            <Text style={styles.textoConfirmacao}>Ver meu carrinho</Text>
+            <MaterialCommunityIcons name="arrow-right" size={18} color={colors.destaque} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ height: Math.max(insets.bottom, 20) }} />
       </ScrollView>
  
 
@@ -91,14 +143,20 @@ export default function ProductDetailsScreen() {
 }
  
 const criarEstilos = (colors: CoresTema) => StyleSheet.create({
+  headerDetalhe: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 14 },
+  compra: { marginHorizontal: 20, marginTop: 24, padding: 18, borderWidth: 1, borderColor: colors.borda, borderRadius: 22, gap: 18 },
+  linhaQuantidade: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 },
+  subtotal: { color: colors.destaque, fontWeight: '900', fontSize: 22 },
+  adicionar: { minHeight: 54, padding: 14, backgroundColor: colors.verdeEscuro, borderRadius: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 },
+  textoAdicionar: { color: colors.textoSobreVerde, fontSize: 15, fontWeight: '800', flexShrink: 1 },
+  desabilitado: { opacity: 0.5 },
+  confirmacao: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  textoConfirmacao: { color: colors.destaque, fontSize: 13, fontWeight: '700', flexShrink: 1 },
+  verCarrinho: { minHeight: 44, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
   containerPrincipal: {
      flex: 1, 
     backgroundColor: colors.superficie },
   botaoVoltarFlutuante: { 
-    position: 'absolute', 
-    top: 50, 
-    left: 20, 
-    zIndex: 10, 
     backgroundColor: colors.verdeMedio, 
     width: 46, 
     height: 46, 
@@ -113,12 +171,12 @@ const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   containerImagem: { 
     backgroundColor: colors.superficieSecundaria, 
     width: '100%', 
-    height: 350, 
+    height: 270, 
     justifyContent: 'center', 
     alignItems: 'center', 
     borderBottomLeftRadius: 30, 
     borderBottomRightRadius: 30, 
-    paddingTop: 50 },
+    paddingTop: 10 },
   imagemGrande: { 
     width: '80%', 
     height: '80%' },
@@ -195,3 +253,4 @@ const criarEstilos = (colors: CoresTema) => StyleSheet.create({
   },
   textoRetornar: { color: colors.textoSobreVerde, fontWeight: 'bold' },
 });
+

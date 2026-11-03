@@ -39,6 +39,8 @@ import ContatosScreen from './src/screens/ContatosScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import InfoRacaScreen from './src/screens/InfoRacaScreen';
 import SobreScreen from './src/screens/SobreScreen';
+import CarrinhoScreen from './src/screens/CarrinhoScreen';
+import { CarrinhoProvider } from './src/hooks/useCarrinho';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -204,6 +206,7 @@ function AppConteudo() {
     <QueryClientProvider client={queryClient}>
       <StatusBar style={modo === "dark" ? "light" : "dark"} />
 
+      <CarrinhoProvider key={sessao.geracao} tutorId={autenticado ? sessao.tutor!.id : null}>
       <NavigationContainer
         theme={temaNavegacao}
         ref={navigationRef}
@@ -226,6 +229,7 @@ function AppConteudo() {
                 name="RedeClinica"
                 component={RedeClinicaScreen}
               />
+              <Stack.Screen name="Carrinho" component={CarrinhoScreen} />
               <Stack.Screen name="Produtos" component={ProdutosScreen} />
               <Stack.Screen
                 name="ProductDetails"
@@ -249,6 +253,8 @@ function AppConteudo() {
           )}
         </Stack.Navigator>
       </NavigationContainer>
+      </CarrinhoProvider>
     </QueryClientProvider>
   );
 }
+

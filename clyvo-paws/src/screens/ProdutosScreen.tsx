@@ -14,10 +14,13 @@ import type { CoresTema } from '../theme/colors';
 import { useEstilosTema } from '../hooks/useEstilosTema';
 import { Produto } from '../types';
 
+import BotaoCarrinho from '../components/BotaoCarrinho';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCatalogo } from '../hooks/useCatalogo';
 
 export default function ProdutosScreen() {
   const { colors, styles, modo } = useEstilosTema(criarEstilos);
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const {
     busca, setBusca, categoria, setCategoria, categorias,
@@ -48,15 +51,16 @@ export default function ProdutosScreen() {
     <View style={styles.containerPrincipal}>
       <ScrollView showsVerticalScrollIndicator={false}>
         
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()} accessibilityRole="button" accessibilityLabel="Voltar">
             <MaterialCommunityIcons name="arrow-left" size={24} color={colors.roxoMuitoEscuro} />
           </TouchableOpacity>
+          <BotaoCarrinho />
         </View>
 
         <Text style={styles.titulo}>CATÁLOGO DE PRODUTOS</Text>
         <Text style={styles.avisoCatalogo}>
-          Consulte os produtos e seus detalhes. Valores ilustrativos; não realizamos vendas pelo aplicativo.
+          Explore os produtos e monte seu carrinho. Valores ilustrativos, sem pedidos ou pagamentos reais.
         </Text>
 
         <View style={styles.containerBusca}>
@@ -127,7 +131,9 @@ const criarEstilos = (colors: CoresTema) => StyleSheet.create({
     paddingHorizontal: 20, 
     paddingTop: 50, 
     marginBottom: 20, 
-    alignItems: 'flex-start' },
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center' },
   botaoVoltar: { 
     backgroundColor: colors.verdeMedio, 
     width: 46, 
@@ -229,3 +235,4 @@ const criarEstilos = (colors: CoresTema) => StyleSheet.create({
     color: colors.destaque, 
     fontWeight: '900' }
 });
+
