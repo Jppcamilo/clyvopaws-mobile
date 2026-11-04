@@ -10,7 +10,7 @@ O aplicativo utiliza React Native com Expo e uma API REST em Java integrada ao b
 
 - [Aplicativo Mobile](https://github.com/Jppcamilo/clyvopaws-mobile)
 - [Backend Java](https://github.com/LucasMatsubara/clyvopawsJavaChallenge)
-- [Serviço de IA](https://github.com/Jppcamilo/IA-Sprint3-IOT)
+- [Serviço de IA](https://github.com/Jppcamilo/ClyvoPawns-IA)
 - [API Java no Render](https://clyvopawsjavachallenge.onrender.com)
 - [Serviço de IA no Render](https://clyvopaws-ia.onrender.com)
 
@@ -20,7 +20,7 @@ O aplicativo utiliza React Native com Expo e uma API REST em Java integrada ao b
 |------------------------------------|-------------------------------------------|
 | APK no Firebase App Distribution   | Publicado (versão 1.0.0, build 1)         |
 | Acesso do professor à distribuição | Convite enviado pelo Firebase             |
-| Vídeo da Sprint 4                  | Gravação pendente                         |
+| Vídeo da Sprint 4                  | Gravação realizada                        |
 
 [Vídeo da demonstração](https://youtu.be/uoStI_ok_UQ)
 
@@ -70,8 +70,6 @@ O APK foi gerado com o EAS Build, usando o perfil `preview` do `eas.json`:
 - Armazenamento das imagens no banco Oracle pelo backend.
 - Exibição das fotos por URLs retornadas pela API.
 
-> Fotos antigas que foram salvas apenas como caminhos locais do celular precisam ser selecionadas e enviadas novamente.
-
 ### Consultas e notificações
 
 - Consulta dos horários disponíveis.
@@ -81,8 +79,6 @@ O APK foi gerado com o EAS Build, usando o perfil `preview` do `eas.json`:
 - Ativação de lembretes pelo botão **Alertas**.
 - Notificações locais programadas para duas horas antes da consulta.
 - Abertura dos detalhes do pet relacionado à consulta ao tocar na notificação.
-
-O lembrete só é programado quando o horário de envio ainda está no futuro. É necessário conceder as permissões solicitadas pelo aparelho.
 
 ### Identificação de pets por IA
 
