@@ -22,7 +22,7 @@ O aplicativo utiliza React Native com Expo e uma API REST em Java integrada ao b
 | Acesso do professor à distribuição | Convite enviado pelo Firebase             |
 | Vídeo da Sprint 4                  | Gravação pendente                         |
 
-[Vídeo da demonstração anterior](https://youtu.be/0Srws2ukES0)
+[Vídeo da demonstração anterior](https://youtu.be/uoStI_ok_UQ)
 
 ### Instalação do APK (Android)
 
