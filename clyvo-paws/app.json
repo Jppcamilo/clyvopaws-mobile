@@ -11,6 +11,7 @@
     },
     "android": {
       "package": "com.clyvopaws.mobile",
+      "version": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
