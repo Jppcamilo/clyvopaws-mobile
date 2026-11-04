@@ -3,8 +3,8 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import api from './api';
 
 function fotoLocal(valor: unknown): valor is string {
-  return typeof valor === 'string' && valor.trim().length > 0
-    && !/^https?:\/\//i.test(valor);
+  return typeof valor === 'string'
+    && /^(file|content|ph|assets-library):\/\//i.test(valor.trim());
 }
 
 async function prepararFoto(uri: string): Promise<string> {
@@ -32,7 +32,8 @@ async function prepararFoto(uri: string): Promise<string> {
   }
 }
 
-/** Mantém JSON sem foto nova; usa multipart somente para enviar um arquivo local. */
+
+
 export async function salvarComFoto<T>(
   method: 'post' | 'put',
   url: string,
@@ -40,25 +41,32 @@ export async function salvarComFoto<T>(
   campoFoto: 'foto' | 'fotoUrl',
 ): Promise<T> {
   const foto = dados[campoFoto];
-  if (!fotoLocal(foto)) {
+  const local = fotoLocal(foto);
+
+  if (!local && method === 'post') {
     const { data } = await api.request<T>({ method, url, data: dados });
     return data;
   }
 
-  const uri = await prepararFoto(foto);
+  const uri = local ? await prepararFoto(foto) : null;
   const formulario = new FormData();
-  formulario.append('dados', JSON.stringify({ ...dados, [campoFoto]: null }));
+  formulario.append(
+    'dados',
+    JSON.stringify({ ...dados, [campoFoto]: local ? null : foto }),
+  );
 
-  if (Platform.OS === 'web') {
-    const resposta = await fetch(uri);
-    if (!resposta.ok) throw new Error('Não foi possível preparar a foto para envio.');
-    formulario.append('foto', await resposta.blob(), 'foto.jpg');
-  } else {
-    formulario.append('foto', {
-      uri,
-      name: 'foto.jpg',
-      type: 'image/jpeg',
-    } as unknown as Blob);
+  if (uri) {
+    if (Platform.OS === 'web') {
+      const resposta = await fetch(uri);
+      if (!resposta.ok) throw new Error('Não foi possível preparar a foto para envio.');
+      formulario.append('foto', await resposta.blob(), 'foto.jpg');
+    } else {
+      formulario.append('foto', {
+        uri,
+        name: 'foto.jpg',
+        type: 'image/jpeg',
+      } as unknown as Blob);
+    }
   }
 
   const { data } = await api.request<T>({

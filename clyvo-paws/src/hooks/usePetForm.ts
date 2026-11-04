@@ -102,8 +102,10 @@ export function usePetForm() {
   const route = useRoute<any>();
   const queryClient = useQueryClient();
 
-  const petParaEditar = route.params?.pet as Pet | undefined;
+  const FOTO_LOCAL = /^(file|content|ph|assets-library):\/\//i;
 
+  const petParaEditar = route.params?.pet as Pet | undefined;
+  const [fotoAlterada, setFotoAlterada] = useState(false);
   const [nome, setNome] = useState(petParaEditar?.nome ?? '');
   const [dataNascimento, setDataNascimento] = useState(() =>
     obterDataInicial(petParaEditar?.dataNascimento),
@@ -218,6 +220,7 @@ export function usePetForm() {
 
         setFoto(imagem.uri);
         setFotoParaIA(imagem);
+        setFotoAlterada(true);
       }
     } catch {
       if (telaAtiva.current) {
@@ -403,7 +406,11 @@ export function usePetForm() {
         especie,
         raca,
         descricao: descricao.trim(),
-        fotoUrl: foto,
+        fotoUrl: fotoAlterada
+        ? foto
+        : foto && !FOTO_LOCAL.test(foto)
+        ? foto
+        : null,
         tutorId: tutor.id,
       };
 

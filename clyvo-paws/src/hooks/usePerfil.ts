@@ -15,7 +15,7 @@ export function usePerfil() {
 
   const sessao = useSessaoLocal();
   const tutorId = sessao.data?.id;
-
+  const FOTO_LOCAL = /^(file|content|ph|assets-library):\/\//i;
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [cpf, setCpf] = useState('');
@@ -104,6 +104,12 @@ export function usePerfil() {
       return;
     }
 
+    const fotoOriginal = perfilQuery.data.fotoUrl ?? null;
+    const fotoEnviada =
+    foto !== fotoOriginal || (foto && !FOTO_LOCAL.test(foto))
+    ? foto
+    : null;
+
     operacaoEmCurso.current = true;
 
     try {
@@ -112,7 +118,7 @@ export function usePerfil() {
         email: emailNormalizado,
         cpf: cpf.trim(),
         telefone: telefone.trim(),
-        foto,
+        foto: fotoEnviada,
       });
 
       const emailAnterior = perfilQuery.data.email.trim().toLowerCase();
@@ -127,6 +133,7 @@ export function usePerfil() {
      } catch {
        mensagem +=
           '\nNão foi possível limpar todos os dados locais da sessão anterior.';
+
      }
 
   queryClient.clear();
